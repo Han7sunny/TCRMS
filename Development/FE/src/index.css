@@ -1,16 +1,121 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap');
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: black;
+  src: url("./fonts/NotoSansKR/NotoSansKR-Black.ttf");
+}
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: bold;
+  src: url("./fonts/NotoSansKR/NotoSansKR-Bold.ttf");
+}
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: extrabold;
+  src: url("./fonts/NotoSansKR/NotoSansKR-ExtraBold.ttf");
+}
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: extralight;
+  src: url("./fonts/NotoSansKR/NotoSansKR-ExtraLight.ttf");
+}
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: light;
+  src: url("./fonts/NotoSansKR/NotoSansKR-Light.ttf");
+}
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: medium;
+  src: url("./fonts/NotoSansKR/NotoSansKR-Medium.ttf");
+}
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: regular;
+  src: url("./fonts/NotoSansKR/NotoSansKR-Regular.ttf");
+}
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: semibold;
+  src: url("./fonts/NotoSansKR/NotoSansKR-SemiBold.ttf");
+}
+@font-face {
+  font-family: "NotoSansKR";
+  font-weight: thin;
+  src: url("./fonts/NotoSansKR/NotoSansKR-Thin.ttf");
+}
+
+@font-face {
+  font-family: "Roboto";
+  font-weight: black;
+  src: url("./fonts/Roboto/Roboto-Black.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: black-italic;
+  src: url("./fonts/Roboto/Roboto-BlackItalic.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: bold;
+  src: url("./fonts/Roboto/Roboto-Bold.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: bold-italic;
+  src: url("./fonts/Roboto/Roboto-BoldItalic.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: italic;
+  src: url("./fonts/Roboto/Roboto-Italic.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: light;
+  src: url("./fonts/Roboto/Roboto-Light.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: light-italic;
+  src: url("./fonts/Roboto/Roboto-LightItalic.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: medium;
+  src: url("./fonts/Roboto/Roboto-Medium.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: medium-italic;
+  src: url("./fonts/Roboto/Roboto-MediumItalic.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: regular;
+  src: url("./fonts/Roboto/Roboto-Regular.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: thin;
+  src: url("./fonts/Roboto/Roboto-Thin.ttf");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: thin-italic;
+  src: url("./fonts/Roboto/Roboto-ThinItalic.ttf");
+}
 
 * {
   box-sizing: border-box;
 }
 
 html {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "NotoSansKR", "Roboto";
 }
 
 body {
   margin: 0;
-  background: #4d4d4d;
+  background: #f2f2f2;
 }
 
 .slide-in-left-enter {

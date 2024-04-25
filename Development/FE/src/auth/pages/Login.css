@@ -1,0 +1,24 @@
+.authentication {
+  background-color: white;
+  text-align: center;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+}
+
+.authentication > div {
+  width: 100%;
+  margin: auto;
+  padding-bottom: 120px;
+}
+
+.authentication .authentication-form {
+  background-color: #f2f2f2;
+  width: 100%;
+  padding: 30px;
+}
+
+.authentication form {
+  width: 800px;
+  margin: auto;
+}
