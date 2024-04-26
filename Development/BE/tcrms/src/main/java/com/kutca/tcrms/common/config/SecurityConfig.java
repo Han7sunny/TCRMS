@@ -3,10 +3,20 @@ package com.kutca.tcrms.common.config;
 import com.kutca.tcrms.common.security.JWTAuthenticationRequestFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -30,7 +40,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 // id, pw 인증 필터 이전에 JWT Token 필터 추가
 //                .addFilterBefore(new JWTAuthenticationRequestFilter(), UsernamePasswordAuthenticationFilter.class)
-                            ;
+                ;
 
         return http.build();
     }
@@ -44,6 +54,24 @@ public class SecurityConfig {
     // UserDetailsService 설정
     //  AuthenticationManager에서 계정 정보 조회하기 위함
     //  UserDetailsManager 또는 InMemoryUserDetailsManager
+    public InMemoryUserDetailsManager userDetailsService() {
+        UserDetails user = User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build();
+        UserDetails admin = User.withDefaultPasswordEncoder().username("admin").password("password").roles("ADMIN").build();
+        return new InMemoryUserDetailsManager(user, admin);
+    }
 
     // AuthenticationManager 설정
+    @Bean
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(authenticationProvider);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+//        return new BCryptPasswordEncoder();
+    }
 }
