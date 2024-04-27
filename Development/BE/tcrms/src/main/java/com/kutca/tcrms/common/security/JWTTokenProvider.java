@@ -19,8 +19,8 @@ import java.util.Map;
 public class JWTTokenProvider {
 
 //    private final UserDetailsService;
-    private String secretKey = "test1234567890test";
-    private Long tokenExpiration = 1000L;
+    private String secretKey = "test1234567890test".repeat(100);
+    private Long tokenExpiration = 1000 * 60 * 60L;
 
     private final UserDetailService userDetailService;
 

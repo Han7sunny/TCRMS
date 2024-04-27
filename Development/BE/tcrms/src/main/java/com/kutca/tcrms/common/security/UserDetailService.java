@@ -1,14 +1,21 @@
 package com.kutca.tcrms.common.security;
 
+import com.kutca.tcrms.user.entity.User;
+import com.kutca.tcrms.user.repository.UserRepository;
 import com.sun.security.auth.UserPrincipal;
-import org.springframework.security.core.userdetails.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
+@RequiredArgsConstructor
 public class UserDetailService implements UserDetailsService {
+
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -16,8 +23,8 @@ public class UserDetailService implements UserDetailsService {
     }
 
     public UserDetails loadUserById(Long id) {
-        //  repository
-//        return new UserDetail(user);
-        return null;
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("UserDetailService loadUserById 예외 발생"));
+        return new UserDetail(user);
     }
 }

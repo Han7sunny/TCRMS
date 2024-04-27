@@ -1,6 +1,8 @@
 package com.kutca.tcrms.common.config;
 
 import com.kutca.tcrms.common.security.JWTAuthenticationRequestFilter;
+import com.kutca.tcrms.common.security.JWTTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,8 +23,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JWTTokenProvider jwtTokenProvider;
 
     // HttpSecurity 설정
     @Bean
@@ -39,7 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/login").permitAll()
                         .anyRequest().authenticated())
                 // id, pw 인증 필터 이전에 JWT Token 필터 추가
-//                .addFilterBefore(new JWTAuthenticationRequestFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JWTAuthenticationRequestFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 ;
 
         return http.build();

@@ -1,5 +1,6 @@
 package com.kutca.tcrms.common.security;
 
+import com.kutca.tcrms.user.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -17,6 +18,16 @@ public class UserDetail implements UserDetails {
     권한
      */
 
+    private final Long id;
+    private final String username;
+    private final String password;
+//    private final Map<string, Object>
+
+    public UserDetail(User user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
