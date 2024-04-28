@@ -8,54 +8,67 @@ import {
 
 // TODO : remove
 // import Users from "./user_/pages/Users";
-import NewPlace from "./places_/pages/NewPlace";
-import UserPlaces from "./places_/pages/UserPlaces";
-import UpdatePlace from "./places_/pages/UpdatePlace";
-import Auth from "./user_/pages/Auth";
+// import NewPlace from "./places_/pages/NewPlace";
+// import UserPlaces from "./places_/pages/UserPlaces";
+// import UpdatePlace from "./places_/pages/UpdatePlace";
+// import Auth from "./user_/pages/Auth";
 // import MainNavigation from "./shared_/components/Navigation/MainNavigation";
-import { AuthContext } from "./shared_/context/auth-context";
-import { useAuth } from "./shared_/hooks/auth-hook";
+
 //
 
-import Login from "./auth/pages/Login";
+import { AuthContext } from "./shared/context/auth-context";
+import { useAuth } from "./shared/hooks/auth-hook";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
+import Login from "./auth/pages/Login";
+import RegistMain from "./user/regist/pages/RegistMain";
 
 const App = () => {
-  const { token, login, logout, userId } = useAuth();
+  const { token, login, logout, userId, isAdmin } = useAuth();
 
   let routes;
 
   if (token) {
-    routes = (
-      <Switch>
-        <Route path="/" exact>
-          <Login />
-        </Route>
-        <Route path="/:userId/places" exact>
-          <UserPlaces />
-        </Route>
-        <Route path="/places/new" exact>
-          <NewPlace />
-        </Route>
-        <Route path="/places/:placeId">
-          <UpdatePlace />
-        </Route>
-        <Redirect to="/" />
-      </Switch>
-    );
+    if (isAdmin) {
+      routes = (
+        <Switch>
+          <Route path="/" exact>
+            <Redirect to="/regist" />
+          </Route>
+          <Route path="/regist" exact>
+            <RegistMain />
+          </Route>
+          <Redirect to="/" />
+        </Switch>
+      );
+    } else {
+      routes = (
+        <Switch>
+          <Route path="/" exact>
+            <Redirect to="/regist" />
+          </Route>
+          <Route path="/regist" exact>
+            <RegistMain />
+          </Route>
+          <Route path="/docu" exact>
+            {/* <NewPlace /> */}
+          </Route>
+          <Route path="/submit" exact>
+            {/* <NewPlace /> */}
+          </Route>
+          <Redirect to="/" />
+        </Switch>
+      );
+    }
   } else {
     routes = (
       <Switch>
         <Route path="/" exact>
+          <Redirect to="/login" />
+        </Route>
+        <Route path="/login" exact>
           <Login />
         </Route>
-        <Route path="/:userId/places" exact>
-          <UserPlaces />
-        </Route>
-        <Route path="/auth">
-          <Auth />
-        </Route>
-        <Redirect to="/auth" />
+        <Redirect to="/login" />
       </Switch>
     );
   }
@@ -68,6 +81,7 @@ const App = () => {
         userId: userId,
         login: login,
         logout: logout,
+        isAdmin: isAdmin,
       }}
     >
       <Router>

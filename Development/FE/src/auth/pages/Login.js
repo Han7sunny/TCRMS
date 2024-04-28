@@ -1,29 +1,28 @@
 import React, { useState, useContext } from "react";
 
-// import Card from "../../shared_/components/UIElements/Card";
-import Input from "../../shared_/components/FormElements/Input";
-import Button from "../../shared_/components/FormElements/Button";
-import ErrorModal from "../../shared_/components/UIElements/ErrorModal";
-import LoadingSpinner from "../../shared_/components/UIElements/LoadingSpinner";
-import ImageUpload from "../../shared_/components/FormElements/ImageUpload";
-import {
-  VALIDATOR_EMAIL,
-  VALIDATOR_MINLENGTH,
-  VALIDATOR_REQUIRE,
-} from "../../shared_/util/validators";
-import { useForm } from "../../shared_/hooks/form-hook";
-import { useHttpClient } from "../../shared_/hooks/http-hook";
-import { AuthContext } from "../../shared_/context/auth-context";
+import Input from "../../shared/components/FormElements/Input";
+import Button from "../../shared/components/FormElements/Button";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+
+import { VALIDATOR_REQUIRE } from "../../shared/util/validators";
+import { useForm } from "../../shared/hooks/form-hook";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import { AuthContext } from "../../shared/context/auth-context";
 import "./Login.css";
 
 const Login = () => {
   const auth = useContext(AuthContext);
-  const [isFirst, setIsFirst] = useState(true);
+  const [isFirst, setIsFirst] = useState(false);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-  const [formState, inputHandler, setFormData] = useForm(
+  const [formState, inputHandler] = useForm(
     {
-      email: {
+      uniname: {
+        value: "",
+        isValid: false,
+      },
+      username: {
         value: "",
         isValid: false,
       },
@@ -35,77 +34,122 @@ const Login = () => {
     false
   );
 
-  const switchModeHandler = () => {
-    if (!isFirst) {
-      setFormData(
-        {
-          ...formState.inputs,
-          name: undefined,
-          image: undefined,
-        },
-        formState.inputs.email.isValid && formState.inputs.password.isValid
-      );
-    } else {
-      setFormData(
-        {
-          ...formState.inputs,
-          name: {
-            value: "",
-            isValid: false,
-          },
-          image: {
-            value: null,
-            isValid: false,
-          },
-        },
-        false
-      );
-    }
-    setIsFirst((prevMode) => !prevMode);
-  };
-
   const authSubmitHandler = async (event) => {
     event.preventDefault();
 
-    if (isFirst) {
+    if (!isFirst) {
       try {
-        const responseData = await sendRequest(
-          "http://localhost:5000/api/users/login",
-          "POST",
-          JSON.stringify({
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            "Content-Type": "application/json",
-          }
-        );
-        auth.login(responseData.userId, responseData.token);
+        // const responseData = await sendRequest(
+        //   `${process.env.REACT_APP_BACKEND_URL}/api/login`,
+        //   "POST",
+        //   JSON.stringify({
+        //     uniName: formState.inputs.uniname.value,
+        //     userName: formState.inputs.username.value,
+        //     userPass: formState.inputs.password.value,
+        //   }),
+        //   {
+        //     "Content-Type": "application/json",
+        //   }
+        // );
+
+        // TODO : change Dummy DATA
+        const responseData = {
+          is_first_login: false,
+          userId: 1,
+          token: "asdf",
+          isAdmin: false,
+        };
+
+        if (responseData.is_first_login) {
+          setIsFirst(responseData.is_first_login);
+        } else {
+          auth.login(
+            responseData.userId,
+            responseData.token,
+            responseData.isAdmin
+          );
+        }
       } catch (err) {}
     } else {
       try {
-        const formData = new FormData();
-        formData.append("email", formState.inputs.email.value);
-        formData.append("name", formState.inputs.name.value);
-        formData.append("password", formState.inputs.password.value);
-        formData.append("image", formState.inputs.image.value);
-        const responseData = await sendRequest(
-          "http://localhost:5000/api/users/signup",
-          "POST",
-          formData
-        );
-
-        auth.login(responseData.userId, responseData.token);
+        // const formData = new FormData();
+        // formData.append("email", formState.inputs.uniName.value);
+        // formData.append("name", formState.inputs.userName.value);
+        // formData.append("password", formState.inputs.password.value);
+        // const responseData = await sendRequest(
+        //   `${process.env.REACT_APP_BACKEND_URL}/api/changePW`,
+        //   "POST",
+        //   formData
+        // );
+        //비밀번호 변경 후 로그인
+        // auth.login(responseData.userId, responseData.token, responseData.isAdmin);
       } catch (err) {}
     }
   };
+
+  const formElement = !isFirst ? (
+    <React.Fragment>
+      <Input
+        element="input"
+        id="uniname"
+        type="text"
+        placeholder="학교명"
+        validators={[VALIDATOR_REQUIRE()]}
+        // errorText="Please enter a valid email address."
+        onInput={inputHandler}
+      />
+      <Input
+        element="input"
+        id="username"
+        type="text"
+        placeholder="대표자명"
+        validators={[VALIDATOR_REQUIRE()]}
+        onInput={inputHandler}
+      />
+      <Input
+        element="input"
+        id="password"
+        type="password"
+        placeholder="비밀번호"
+        validators={[VALIDATOR_REQUIRE()]}
+        onInput={inputHandler}
+      />
+    </React.Fragment>
+  ) : (
+    <React.Fragment>
+      <Input
+        element="input"
+        id="password-initial"
+        type="password"
+        placeholder="초기 비밀번호"
+        validators={[VALIDATOR_REQUIRE()]}
+        onInput={inputHandler}
+      />
+      <Input
+        element="input"
+        id="password-change"
+        type="password"
+        placeholder="변경할 비밀번호"
+        validators={[VALIDATOR_REQUIRE()]}
+        onInput={inputHandler}
+      />
+      <Input
+        element="input"
+        id="password-check"
+        type="password"
+        placeholder="비밀번호 확인"
+        validators={[VALIDATOR_REQUIRE()]}
+        onInput={inputHandler}
+      />
+    </React.Fragment>
+  );
 
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
       <div className="authentication">
         <div>
-          <div>
+          <div className="kutca-logo">
             <img
               src={`${process.env.PUBLIC_URL}/img/KUTCA_logo.png`}
               alt=""
@@ -114,47 +158,15 @@ const Login = () => {
           </div>
           <div className="authentication-form">
             {isLoading && <LoadingSpinner asOverlay />}
+            {isFirst && (
+              <p className="form__firstlogin-text">
+                최초 로그인 시 비밀번호를 변경해주세요.
+              </p>
+            )}
             <form onSubmit={authSubmitHandler}>
-              {/* {!isFirst && (
-                <Input
-                  element="input"
-                  id="name"
-                  type="text"
-                  label="Your Name"
-                  validators={[VALIDATOR_REQUIRE()]}
-                  errorText="Please enter a name."
-                  onInput={inputHandler}
-                />
-              )} */}
-              <Input
-                element="input"
-                id="uni-name"
-                type="text"
-                placeholder="학교명"
-                validators={[VALIDATOR_EMAIL()]}
-                // errorText="Please enter a valid email address."
-                onInput={inputHandler}
-              />
-              <Input
-                element="input"
-                id="user-name"
-                type="text"
-                placeholder="대표자명"
-                validators={[VALIDATOR_EMAIL()]}
-                // errorText="Please enter a valid email address."
-                onInput={inputHandler}
-              />
-              <Input
-                element="input"
-                id="password"
-                type="password"
-                placeholder="비밀번호"
-                validators={[VALIDATOR_MINLENGTH(6)]}
-                errorText="Please enter a valid password, at least 6 characters."
-                onInput={inputHandler}
-              />
+              {formElement}
               <Button type="submit" disabled={!formState.isValid}>
-                {isFirst ? "로그인" : "비밀번호 변경"}
+                {!isFirst ? "로그인" : "비밀번호 변경"}
               </Button>
             </form>
           </div>

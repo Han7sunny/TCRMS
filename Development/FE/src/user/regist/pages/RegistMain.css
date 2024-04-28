@@ -1,0 +1,12 @@
+.regist-main {
+  margin: auto;
+  height: 100%;
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.regist-main a {
+  margin-bottom: 30px;
+}

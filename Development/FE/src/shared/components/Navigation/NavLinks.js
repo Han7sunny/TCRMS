@@ -1,40 +1,69 @@
-import React, { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useContext } from "react";
+import { NavLink } from "react-router-dom";
 
-import { AuthContext } from '../../context/auth-context';
-import './NavLinks.css';
+import { AuthContext } from "../../context/auth-context";
+import Button from "../FormElements/Button";
+import "./NavLinks.css";
 
-const NavLinks = props => {
+const NavLinks = (props) => {
   const auth = useContext(AuthContext);
 
-  return (
-    <ul className="nav-links">
+  const userMenu = (
+    <React.Fragment>
       <li>
-        <NavLink to="/" exact>
-          ALL USERS
-        </NavLink>
+        <NavLink to="/regist">신청</NavLink>
       </li>
-      {auth.isLoggedIn && (
+      <ul>
         <li>
-          <NavLink to={`/${auth.userId}/places`}>MY PLACES</NavLink>
+          <NavLink to="/regist/individual">개인전 신청</NavLink>
         </li>
-      )}
-      {auth.isLoggedIn && (
         <li>
-          <NavLink to="/places/new">ADD PLACE</NavLink>
+          <NavLink to="/regist/team">단체전 신청</NavLink>
         </li>
-      )}
-      {!auth.isLoggedIn && (
         <li>
-          <NavLink to="/auth">AUTHENTICATE</NavLink>
+          <NavLink to="/regist/second">세컨 신청</NavLink>
         </li>
-      )}
-      {auth.isLoggedIn && (
         <li>
-          <button onClick={auth.logout}>LOGOUT</button>
+          <NavLink to="/regist/volunteer">자원봉사자 신청</NavLink>
         </li>
-      )}
-    </ul>
+      </ul>
+      <li>
+        <NavLink to="/docu">서류제출</NavLink>
+      </li>
+      <li>
+        <NavLink to="/submit">신청내역</NavLink>
+      </li>
+    </React.Fragment>
+  );
+
+  const adminMenu = (
+    <React.Fragment>
+      <li>
+        <NavLink to="">서류 일괄보기</NavLink>
+      </li>
+      <li>
+        <NavLink to="">등록내역(1차)</NavLink>
+      </li>
+      <li>
+        <NavLink to="">최종내역(2차)</NavLink>
+      </li>
+    </React.Fragment>
+  );
+
+  return (
+    <React.Fragment>
+      <div className="nav-links__logo">
+        <img
+          src={`${process.env.PUBLIC_URL}/img/KUTCA_logo.png`}
+          alt=""
+          width="64%"
+        />
+      </div>
+      <ul className="nav-links">{auth.isAdmin ? adminMenu : userMenu}</ul>
+      <div className="nav-links__logout" onClick={auth.logout}>
+        <Button type="submit">로그아웃</Button>
+      </div>
+    </React.Fragment>
   );
 };
 

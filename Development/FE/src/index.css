@@ -1,46 +1,55 @@
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: black;
+  /* font-weight: black; */
+  font-weight: 900;
   src: url("./fonts/NotoSansKR/NotoSansKR-Black.ttf");
 }
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: bold;
+  /* font-weight: bold; */
+  font-weight: 700;
   src: url("./fonts/NotoSansKR/NotoSansKR-Bold.ttf");
 }
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: extrabold;
+  /* font-weight: extrabold; */
+  font-weight: 800;
   src: url("./fonts/NotoSansKR/NotoSansKR-ExtraBold.ttf");
 }
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: extralight;
+  /* font-weight: extralight; */
+  font-weight: 200;
   src: url("./fonts/NotoSansKR/NotoSansKR-ExtraLight.ttf");
 }
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: light;
+  /* font-weight: light; */
+  font-weight: 300;
   src: url("./fonts/NotoSansKR/NotoSansKR-Light.ttf");
 }
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: medium;
+  /* font-weight: medium; */
+  font-weight: 500;
   src: url("./fonts/NotoSansKR/NotoSansKR-Medium.ttf");
 }
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: regular;
+  /* font-weight: regular; */
+  font-weight: 400;
   src: url("./fonts/NotoSansKR/NotoSansKR-Regular.ttf");
 }
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: semibold;
+  /* font-weight: semibold; */
+  font-weight: 600;
   src: url("./fonts/NotoSansKR/NotoSansKR-SemiBold.ttf");
 }
 @font-face {
   font-family: "NotoSansKR";
-  font-weight: thin;
+  /* font-weight: thin; */
+  font-weight: 100;
   src: url("./fonts/NotoSansKR/NotoSansKR-Thin.ttf");
 }
 

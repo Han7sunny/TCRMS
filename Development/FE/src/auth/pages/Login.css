@@ -6,19 +6,35 @@
   display: flex;
 }
 
+.authentication .kutca-logo {
+  margin-bottom: 20px;
+}
+
 .authentication > div {
   width: 100%;
   margin: auto;
   padding-bottom: 120px;
 }
 
+.authentication .form__firstlogin-text {
+  margin: 0px;
+}
+
 .authentication .authentication-form {
   background-color: #f2f2f2;
   width: 100%;
-  padding: 30px;
+  padding: 40px;
 }
 
 .authentication form {
-  width: 800px;
+  width: 360px;
   margin: auto;
+}
+
+.authentication form > div {
+  margin: 20px 0px;
+}
+
+.authentication form > button {
+  margin: 20px 0px;
 }

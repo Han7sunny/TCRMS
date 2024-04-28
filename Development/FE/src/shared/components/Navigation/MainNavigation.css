@@ -1,4 +1,4 @@
-.main-navigation__menu-btn {
+/* .main-navigation__menu-btn {
   width: 3rem;
   height: 3rem;
   background: transparent;
@@ -42,4 +42,10 @@
   .main-navigation__header-nav {
     display: block;
   }
+} */
+
+.main-navigation__drawer-nav {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
