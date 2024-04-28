@@ -3,6 +3,7 @@ package com.kutca.tcrms.user.entity;
 import com.kutca.tcrms.common.enums.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,12 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Builder
+    public User(String universityName, String username, String password, Role role) {
+        this.universityName = universityName;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
 }

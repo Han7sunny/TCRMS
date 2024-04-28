@@ -1,6 +1,5 @@
 package com.kutca.tcrms.user.service;
 
-
 import com.kutca.tcrms.common.security.JWTTokenProvider;
 import com.kutca.tcrms.user.controller.dto.request.LoginRequestDto;
 import com.kutca.tcrms.user.entity.User;
@@ -12,12 +11,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
-//    private final UserRepository userRepository;
     private final JWTTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     public String login(LoginRequestDto loginRequestDto) {
-//        User user = userRepository.findByUniversityNameAndUsernameAndPassword(loginRequestDto.getUniversityName(), loginRequestDto.getUsername(), loginRequestDto.getPassword());
-//        return jwtTokenProvider.createToken(user.getId(), user.getRole().toString());
-        return jwtTokenProvider.createToken(1L, "USER");
+        User user = userRepository.findByUniversityNameAndUsernameAndPassword(loginRequestDto.getUniversityName(), loginRequestDto.getUsername(), loginRequestDto.getPassword());
+        return jwtTokenProvider.createToken(user.getId(), user.getRole().name());
     }
+
 }

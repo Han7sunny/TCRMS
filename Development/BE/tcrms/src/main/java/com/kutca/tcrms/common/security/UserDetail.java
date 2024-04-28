@@ -2,6 +2,7 @@ package com.kutca.tcrms.common.security;
 
 import com.kutca.tcrms.user.entity.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -9,39 +10,26 @@ import java.util.List;
 
 public class UserDetail implements UserDetails {
 
-//    private final UserInfoDto user; // 대신 UserDetail 객체로 ...
-    /*
-    아이디
-    대표자명
-    학교명
-    비밀번호
-    권한
-     */
-
-    private final Long id;
-    private final String username;
-    private final String password;
-//    private final Map<string, Object>
+    //  추후 프론트 ResponseDto에 따라 수정
+    private final User user;
 
     public UserDetail(User user) {
-        this.id = user.getId();
-        this.username = user.getUsername();
-        this.password = user.getPassword();
+        this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override
     public String getPassword() {
-        return "";
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return user.getUsername();
     }
 
     @Override

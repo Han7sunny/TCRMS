@@ -1,5 +1,6 @@
 package com.kutca.tcrms.common.security;
 
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,15 +21,9 @@ public class JWTAuthenticationRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String token = parseJWT(request);
-
         if(token != null && jwtTokenProvider.validateToken(token)){
-
-            // 아니면 UserDetails로 user 정보를 id 기반으로 db에서 가져오고
-            // 이걸로 UsernamePasswordAuthenticationToken 생성함 -> 이건 outh
-
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            //  filterChain에 해당 토큰 filter 추가
         }
         filterChain.doFilter(request, response);
     }
