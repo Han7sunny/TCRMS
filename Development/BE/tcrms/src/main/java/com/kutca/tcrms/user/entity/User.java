@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -24,13 +25,24 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role auth;
 
-    @Builder
-    public User(String universityName, String username, String password, Role role) {
-        this.universityName = universityName;
-        this.username = username;
-        this.password = password;
-        this.role = role;
-    }
+    private String phoneNumber;
+
+    private String depositorName;
+
+    @Column(columnDefinition = "boolean default true")
+    private Boolean isFirstLogin;
+
+    private Boolean isEditable;
+
+    private Boolean isDepositConfirmed;
+
+//    @Builder
+//    public User(String universityName, String username, String password, Role role) {
+//        this.universityName = universityName;
+//        this.username = username;
+//        this.password = password;
+//        this.role = role;
+//    }
 }
