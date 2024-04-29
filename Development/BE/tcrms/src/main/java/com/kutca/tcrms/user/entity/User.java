@@ -1,17 +1,19 @@
 package com.kutca.tcrms.user.entity;
 
 import com.kutca.tcrms.common.enums.Role;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "`user`")
+@DynamicInsert
 public class User {
 
     @Id
@@ -27,15 +29,20 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role auth;
 
+    @Nullable
     private String phoneNumber;
 
+    @Nullable
     private String depositorName;
 
-    @Column(columnDefinition = "boolean default true")
+//    @Column(name = "isFirstLogin", columnDefinition = "boolean default true")
+    @ColumnDefault("true")
     private Boolean isFirstLogin;
 
+    @ColumnDefault("false")
     private Boolean isEditable;
 
+    @ColumnDefault("false")
     private Boolean isDepositConfirmed;
 
 //    @Builder
