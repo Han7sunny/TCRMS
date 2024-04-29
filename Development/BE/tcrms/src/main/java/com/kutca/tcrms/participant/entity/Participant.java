@@ -1,10 +1,9 @@
 package com.kutca.tcrms.participant.entity;
 
+import com.kutca.tcrms.participantfile.entity.ParticipantFile;
+import com.kutca.tcrms.user.entity.User;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,7 @@ public class Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long participantId;
 
     private String name;
 
@@ -32,4 +31,11 @@ public class Participant {
 
     @Nullable
     private String phoneNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToOne(mappedBy = "participant")
+    private ParticipantFile participantFile;
 }

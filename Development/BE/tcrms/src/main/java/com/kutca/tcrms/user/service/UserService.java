@@ -16,7 +16,7 @@ public class UserService {
 
     public String login(LoginRequestDto loginRequestDto) {
         User user = userRepository.findByUniversityNameAndUsernameAndPassword(loginRequestDto.getUniversityName(), loginRequestDto.getUsername(), loginRequestDto.getPassword());
-        return jwtTokenProvider.createToken(user.getId(), user.getAuth().name());
+        return jwtTokenProvider.createToken(user.getUserId(), user.getAuth().name());
     }
 
 }

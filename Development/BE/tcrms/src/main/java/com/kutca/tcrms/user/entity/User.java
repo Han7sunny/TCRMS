@@ -1,11 +1,15 @@
 package com.kutca.tcrms.user.entity;
 
 import com.kutca.tcrms.common.enums.Role;
+import com.kutca.tcrms.participant.entity.Participant;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,7 +22,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     private String universityName;
 
@@ -44,6 +48,9 @@ public class User {
 
     @ColumnDefault("false")
     private Boolean isDepositConfirmed;
+
+    @OneToMany(mappedBy = "user")
+    private List<Participant> participants = new ArrayList<>();
 
 //    @Builder
 //    public User(String universityName, String username, String password, Role role) {
