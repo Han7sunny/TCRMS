@@ -2,6 +2,7 @@ package com.kutca.tcrms.participant.entity;
 
 import com.kutca.tcrms.participantfile.entity.ParticipantFile;
 import com.kutca.tcrms.user.entity.User;
+import com.kutca.tcrms.weightclass.entity.WeightClass;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -35,6 +36,10 @@ public class Participant {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "weight_class_id")
+    private WeightClass weightClass;
 
     @OneToOne(mappedBy = "participant")
     private ParticipantFile participantFile;
