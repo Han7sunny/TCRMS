@@ -54,7 +54,7 @@ const Login = () => {
 
         // TODO : change Dummy DATA
         const responseData = {
-          is_first_login: false,
+          is_first_login: true,
           userId: 1,
           token: "asdf",
           isAdmin: false,
@@ -81,8 +81,17 @@ const Login = () => {
         //   "POST",
         //   formData
         // );
+
+        // TODO : change Dummy DATA
+        const responseData = {
+          userId: 1,
+          token: "asdf",
+          isAdmin: false,
+        };
+
+
         //비밀번호 변경 후 로그인
-        // auth.login(responseData.userId, responseData.token, responseData.isAdmin);
+        auth.login(responseData.userId, responseData.token, responseData.isAdmin);
       } catch (err) {}
     }
   };

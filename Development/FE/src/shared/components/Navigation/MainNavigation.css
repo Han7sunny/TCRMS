@@ -46,6 +46,7 @@
 
 .main-navigation__drawer-nav {
   height: 100vh;
+  width: 200px;
   display: flex;
   flex-direction: column;
 }
