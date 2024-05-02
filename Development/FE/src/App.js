@@ -21,6 +21,7 @@ import { useAuth } from "./shared/hooks/auth-hook";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import Login from "./auth/pages/Login";
 import RegistMain from "./user/regist/pages/RegistMain";
+import RegistIndividual from "./user/regist/pages/RegistIndividual";
 
 const App = () => {
   const { token, login, logout, userId, isAdmin } = useAuth();
@@ -40,7 +41,7 @@ const App = () => {
           <Redirect to="/" />
         </Switch>
       );
-    } else {
+    } else { // 일반 대표자
       routes = (
         <Switch>
           <Route path="/" exact>
@@ -48,6 +49,9 @@ const App = () => {
           </Route>
           <Route path="/regist" exact>
             <RegistMain />
+          </Route>
+          <Route path="/regist/individual" exact>
+            <RegistIndividual />
           </Route>
           <Route path="/docu" exact>
             {/* <NewPlace /> */}
