@@ -1,5 +1,6 @@
 package com.kutca.tcrms.user.service;
 
+import com.kutca.tcrms.common.enums.Role;
 import com.kutca.tcrms.common.security.JWTTokenProvider;
 import com.kutca.tcrms.user.controller.dto.request.LoginRequestDto;
 import com.kutca.tcrms.user.entity.User;
