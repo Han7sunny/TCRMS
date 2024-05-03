@@ -28,55 +28,55 @@ const App = () => {
 
   let routes;
 
-  if (token) {
-    if (isAdmin) {
-      routes = (
-        <Switch>
-          <Route path="/" exact>
-            <Redirect to="/regist" />
-          </Route>
-          <Route path="/regist" exact>
-            <RegistMain />
-          </Route>
-          <Redirect to="/" />
-        </Switch>
-      );
-    } else {
-      // 일반 대표자
-      routes = (
-        <Switch>
-          <Route path="/" exact>
-            <Redirect to="/regist" />
-          </Route>
-          <Route path="/regist" exact>
-            <RegistMain />
-          </Route>
-          <Route path="/regist/individual" exact>
-            <RegistIndividual />
-          </Route>
-          <Route path="/docu" exact>
-            {/* <NewPlace /> */}
-          </Route>
-          <Route path="/submit" exact>
-            {/* <NewPlace /> */}
-          </Route>
-          <Redirect to="/" />
-        </Switch>
-      );
-    }
-  } else {
-    routes = (
-      <Switch>
-        <Route path="/" exact>
-          <Redirect to="/login" />
-        </Route>
-        <Route path="/login" exact>
-          <Login />
-        </Route>
-        <Redirect to="/login" />
-      </Switch>
-    );
-  }
+  // if (token) {
+  //   if (isAdmin) {
+  //     routes = (
+  //       <Switch>
+  //         <Route path="/" exact>
+  //           <Redirect to="/regist" />
+  //         </Route>
+  //         <Route path="/regist" exact>
+  //           <RegistMain />
+  //         </Route>
+  //         <Redirect to="/" />
+  //       </Switch>
+  //     );
+  //   } else {
+  // 일반 대표자
+  routes = (
+    <Switch>
+      <Route path="/" exact>
+        <Redirect to="/regist" />
+      </Route>
+      <Route path="/regist" exact>
+        <RegistMain />
+      </Route>
+      <Route path="/regist/individual" exact>
+        <RegistIndividual />
+      </Route>
+      <Route path="/docu" exact>
+        {/* <NewPlace /> */}
+      </Route>
+      <Route path="/submit" exact>
+        {/* <NewPlace /> */}
+      </Route>
+      <Redirect to="/" />
+    </Switch>
+  );
+  //   }
+  // } else {
+  //   routes = (
+  //     <Switch>
+  //       <Route path="/" exact>
+  //         <Redirect to="/login" />
+  //       </Route>
+  //       <Route path="/login" exact>
+  //         <Login />
+  //       </Route>
+  //       <Redirect to="/login" />
+  //     </Switch>
+  //   );
+  // }
 
   return (
     <AuthContext.Provider
