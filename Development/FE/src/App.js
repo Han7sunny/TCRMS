@@ -41,7 +41,8 @@ const App = () => {
           <Redirect to="/" />
         </Switch>
       );
-    } else { // 일반 대표자
+    } else {
+      // 일반 대표자
       routes = (
         <Switch>
           <Route path="/" exact>
@@ -90,6 +91,7 @@ const App = () => {
     >
       <Router>
         {!!token && <MainNavigation />}
+        {/* <MainNavigation /> */}
         <main>{routes}</main>
       </Router>
     </AuthContext.Provider>
