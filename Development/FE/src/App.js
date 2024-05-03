@@ -28,20 +28,20 @@ const App = () => {
 
   let routes;
 
-  if (token) {
-    if (isAdmin) {
-      routes = (
-        <Switch>
-          <Route path="/" exact>
-            <Redirect to="/regist" />
-          </Route>
-          <Route path="/regist" exact>
-            <RegistMain />
-          </Route>
-          <Redirect to="/" />
-        </Switch>
-      );
-    } else { // 일반 대표자
+  // if (token) {
+  //   if (isAdmin) {
+  //     routes = (
+  //       <Switch>
+  //         <Route path="/" exact>
+  //           <Redirect to="/regist" />
+  //         </Route>
+  //         <Route path="/regist" exact>
+  //           <RegistMain />
+  //         </Route>
+  //         <Redirect to="/" />
+  //       </Switch>
+  //     );
+  //   } else { // 일반 대표자
       routes = (
         <Switch>
           <Route path="/" exact>
@@ -62,20 +62,20 @@ const App = () => {
           <Redirect to="/" />
         </Switch>
       );
-    }
-  } else {
-    routes = (
-      <Switch>
-        <Route path="/" exact>
-          <Redirect to="/login" />
-        </Route>
-        <Route path="/login" exact>
-          <Login />
-        </Route>
-        <Redirect to="/login" />
-      </Switch>
-    );
-  }
+  //   }
+  // } else {
+  //   routes = (
+  //     <Switch>
+  //       <Route path="/" exact>
+  //         <Redirect to="/login" />
+  //       </Route>
+  //       <Route path="/login" exact>
+  //         <Login />
+  //       </Route>
+  //       <Redirect to="/login" />
+  //     </Switch>
+  //   );
+  // }
 
   return (
     <AuthContext.Provider
