@@ -1,0 +1,42 @@
+.table-input {
+  /* margin: 1rem 0; */
+}
+
+.table-input label,
+.table-input input,
+.table-input textarea {
+  display: block;
+}
+
+.table-input label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.table-input input,
+.table-input textarea {
+  width: 100%;
+  font: inherit;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  background: white;
+  padding: 8px;
+}
+
+.table-input input:focus,
+.table-input textarea:focus {
+  border: 1px dashed rgb(28, 1, 104);
+  outline: none;
+  background-color: white;
+}
+
+.table-input--invalid label,
+.table-input--invalid p {
+  color: red;
+}
+
+.table-input--invalid input,
+.table-input--invalid textarea {
+  border-color: red;
+  background: #ffd1d1;
+}

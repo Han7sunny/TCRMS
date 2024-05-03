@@ -90,8 +90,8 @@ const App = () => {
       }}
     >
       <Router>
-        {!!token && <MainNavigation />}
-        {/* <MainNavigation /> */}
+        {/* {!!token && <MainNavigation />} */}
+        <MainNavigation />
         <main>{routes}</main>
       </Router>
     </AuthContext.Provider>
