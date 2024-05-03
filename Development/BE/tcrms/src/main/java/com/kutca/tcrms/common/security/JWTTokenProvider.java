@@ -16,7 +16,7 @@ import java.util.Map;
 public class JWTTokenProvider {
 
     private String secretKey = "test1234567890test".repeat(100);
-    private Long tokenExpiration = 1000 * 60 * 60L;
+    private Long tokenExpiration = 1000 * 60L;  //  1분 .. * 60 * 2 2시간
 
     private final UserDetailService userDetailService;
 
@@ -36,7 +36,7 @@ public class JWTTokenProvider {
             return false;
         } catch (MalformedJwtException e) { // 유효한 JWT token이 아닙니다.
             return false;
-        } catch (ExpiredJwtException e) {   // 만료된 JWT token 입니다.
+        } catch (ExpiredJwtException e) {  // 만료된 JWT token 입니다.
             return false;
         } catch (UnsupportedJwtException e) {   //  지원하지 않는 JWT token 입니다.
             return false;
