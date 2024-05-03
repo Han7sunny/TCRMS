@@ -39,26 +39,26 @@ const Login = () => {
 
     if (!isFirst) {
       try {
-        // const responseData = await sendRequest(
-        //   `${process.env.REACT_APP_BACKEND_URL}/api/login`,
-        //   "POST",
-        //   JSON.stringify({
-        //     uniName: formState.inputs.uniname.value,
-        //     userName: formState.inputs.username.value,
-        //     userPass: formState.inputs.password.value,
-        //   }),
-        //   {
-        //     "Content-Type": "application/json",
-        //   }
-        // );
+        const responseData = await sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/api/login`,
+          "POST",
+          JSON.stringify({
+            universityName: formState.inputs.uniname.value,
+            username: formState.inputs.username.value,
+            password: formState.inputs.password.value,
+          }),
+          {
+            "Content-Type": "application/json",
+          }
+        );
 
-        // TODO : change Dummy DATA
-        const responseData = {
-          is_first_login: true,
-          userId: 1,
-          token: "asdf",
-          isAdmin: false,
-        };
+        // // TODO : change Dummy DATA
+        // const responseData = {
+        //   is_first_login: true,
+        //   userId: 1,
+        //   token: "asdf",
+        //   isAdmin: false,
+        // };
 
         if (responseData.is_first_login) {
           setIsFirst(responseData.is_first_login);
@@ -72,26 +72,29 @@ const Login = () => {
       } catch (err) {}
     } else {
       try {
-        // const formData = new FormData();
-        // formData.append("email", formState.inputs.uniName.value);
-        // formData.append("name", formState.inputs.userName.value);
-        // formData.append("password", formState.inputs.password.value);
-        // const responseData = await sendRequest(
-        //   `${process.env.REACT_APP_BACKEND_URL}/api/changePW`,
-        //   "POST",
-        //   formData
-        // );
+        const formData = new FormData();
+        formData.append("universityName", formState.inputs.uniName.value);
+        formData.append("username", formState.inputs.userName.value);
+        formData.append("password", formState.inputs.password.value);
+        const responseData = await sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/api/changePW`,
+          "POST",
+          formData
+        );
 
-        // TODO : change Dummy DATA
-        const responseData = {
-          userId: 1,
-          token: "asdf",
-          isAdmin: false,
-        };
-
+        // // TODO : change Dummy DATA
+        // const responseData = {
+        //   userId: 1,
+        //   token: "asdf",
+        //   isAdmin: false,
+        // };
 
         //비밀번호 변경 후 로그인
-        auth.login(responseData.userId, responseData.token, responseData.isAdmin);
+        auth.login(
+          responseData.userId,
+          responseData.token,
+          responseData.isAdmin
+        );
       } catch (err) {}
     }
   };
@@ -104,7 +107,6 @@ const Login = () => {
         type="text"
         placeholder="학교명"
         validators={[VALIDATOR_REQUIRE()]}
-        // errorText="Please enter a valid email address."
         onInput={inputHandler}
       />
       <Input
