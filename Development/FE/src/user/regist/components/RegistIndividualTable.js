@@ -1,7 +1,10 @@
 import React from "react";
 
 import Input from "../../../shared/components/TableInputElements/Input";
-import Radio from "../../../shared/components/TableInputElements/Radio";
+import RadioGroup from "../../../shared/components/TableInputElements/RadioGroup";
+import CheckboxGroup from "../../../shared/components/TableInputElements/CheckboxGroup";
+import Dropdown from "../../../shared/components/TableInputElements/Dropdown";
+import Button from "../../../shared/components/TableInputElements/Button";
 
 import "./RegistIndividualTable.css";
 
@@ -91,14 +94,75 @@ const RegistIndividualTable = () => {
             />
           </td>
           <td>
-            <Radio />
+            <RadioGroup
+              id="sex"
+              items={["남성", "여성"]}
+              initialValue="남성"
+              onInput={inputHandler}
+              showLabel
+            />
           </td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td>
+            <CheckboxGroup
+              id="foreigner"
+              items={["외국인"]}
+              onInput={inputHandler}
+              showLabel
+            />
+          </td>
+          <td>
+            <Dropdown
+              id="nationality"
+              items={["대한민국", "영국", "프랑스"]}
+              onInput={inputHandler}
+            />
+          </td>
+          <td>
+            <div className="div-flex">
+              <Input
+                id="idnum0"
+                element="input"
+                type="text"
+                onInput={inputHandler}
+                validators="[]"
+              />
+              &nbsp;-&nbsp;
+              <Input
+                id="idnum1"
+                element="input"
+                type="text"
+                onInput={inputHandler}
+                validators="[]"
+              />
+            </div>
+          </td>
+          <td>
+            <CheckboxGroup
+              id="event"
+              items={["겨루기", "품새"]}
+              onInput={inputHandler}
+              showLabel
+            />
+          </td>
+          <td>
+            <Dropdown
+              id="nationality"
+              items={[
+                "핀",
+                "플라이",
+                "밴텀",
+                "페더",
+                "라이트",
+                "웰터",
+                "미들",
+                "헤비",
+              ]}
+              onInput={inputHandler}
+            />
+          </td>
+          <td>
+            <Button>삭제</Button>
+          </td>
         </tr>
       </tbody>
     </table>

@@ -1,0 +1,65 @@
+.table-button {
+  font: inherit;
+  font-weight: 300;
+  padding: 4px 8px;
+  border: 1px solid #000000;
+  border-radius: 5px;
+  background: none;
+  color: black;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.table-button:focus {
+  outline: none;
+  background: #000000;
+  color: white;
+}
+
+.table-button:hover,
+.table-button:active {
+  background: #000000;
+  color: white;
+}
+
+.table-button--inverse {
+  background: transparent;
+  color: #000000;
+}
+
+.table-button--inverse:hover,
+.table-button--inverse:active {
+  /* color: white; */
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.table-button--danger {
+  background: #830000;
+  border-color: #830000;
+}
+
+.table-button--danger:hover,
+.table-button--danger:active {
+  background: #f34343;
+  border-color: #f34343;
+}
+
+.table-button:disabled,
+.table-button:hover:disabled,
+.table-button:active:disabled {
+  background: #ccc;
+  color: #979797;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
+.table-button--small {
+  font-size: 0.8rem;
+}
+
+.table-button--big {
+  font-size: 1.5rem;
+}

@@ -20,7 +20,7 @@
   border-radius: 5px;
   border: 1px solid rgba(0, 0, 0, 0.7);
   background: white;
-  padding: 8px;
+  padding: 4px 6px;
 }
 
 .table-input input:focus,

@@ -1,0 +1,13 @@
+select.table-dropdown {
+  border-radius: 5px;
+  padding: 3px;
+  border: 1px solid rgba(52, 52, 52, 0.7);
+  font-weight: 200;
+  font-size: 12px;
+}
+
+select.table-dropdown:focus,
+select.table-dropdown:target {
+  /* border: 1px solid black; */
+  outline: none;
+}
