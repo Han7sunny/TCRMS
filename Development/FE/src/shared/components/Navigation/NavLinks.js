@@ -5,7 +5,7 @@ import { AuthContext } from "../../context/auth-context";
 import Button from "../FormElements/Button";
 import "./NavLinks.css";
 
-const NavLinks = (props) => {
+const NavLinks = () => {
   const auth = useContext(AuthContext);
 
   const userMenu = (

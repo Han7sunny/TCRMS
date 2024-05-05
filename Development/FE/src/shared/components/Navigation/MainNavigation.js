@@ -7,7 +7,7 @@ import "./MainNavigation.css";
 const MainNavigation = () => {
   return (
     <React.Fragment>
-      <SideDrawer>
+      <SideDrawer show>
         <nav className="main-navigation__drawer-nav">
           <NavLinks />
         </nav>
