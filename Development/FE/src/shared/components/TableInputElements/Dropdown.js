@@ -44,6 +44,7 @@ const Dropdown = (props) => {
       className={`table-dropdown `}
       onChange={changeHandler}
       disabled={props.disabled}
+      value={inputState.values}
     >
       {props.items.map((item, i) => (
         <option key={item + i} value={item}>

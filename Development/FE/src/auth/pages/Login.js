@@ -62,6 +62,7 @@ const Login = () => {
 
         if (responseData.is_first_login) {
           setIsFirst(responseData.is_first_login);
+          this.forceUpdate();
         } else {
           auth.login(
             responseData.userId,
@@ -89,9 +90,12 @@ const Login = () => {
           isAdmin: false,
         };
 
-
         //비밀번호 변경 후 로그인
-        auth.login(responseData.userId, responseData.token, responseData.isAdmin);
+        auth.login(
+          responseData.userId,
+          responseData.token,
+          responseData.isAdmin
+        );
       } catch (err) {}
     }
   };
@@ -104,7 +108,6 @@ const Login = () => {
         type="text"
         placeholder="학교명"
         validators={[VALIDATOR_REQUIRE()]}
-        // errorText="Please enter a valid email address."
         onInput={inputHandler}
       />
       <Input
@@ -133,6 +136,7 @@ const Login = () => {
         placeholder="초기 비밀번호"
         validators={[VALIDATOR_REQUIRE()]}
         onInput={inputHandler}
+        initialValue=""
       />
       <Input
         element="input"
@@ -141,6 +145,7 @@ const Login = () => {
         placeholder="변경할 비밀번호"
         validators={[VALIDATOR_REQUIRE()]}
         onInput={inputHandler}
+        initialValue=""
       />
       <Input
         element="input"
@@ -149,6 +154,7 @@ const Login = () => {
         placeholder="비밀번호 확인"
         validators={[VALIDATOR_REQUIRE()]}
         onInput={inputHandler}
+        initialValue=""
       />
     </React.Fragment>
   );

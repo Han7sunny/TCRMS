@@ -127,10 +127,6 @@ body {
   background: #f2f2f2;
 }
 
-main {
-  padding: 16px;
-}
-
 .slide-in-left-enter {
   transform: translateX(-100%);
 }

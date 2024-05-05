@@ -42,7 +42,7 @@ const App = () => {
   //       </Switch>
   //     );
   //   } else {
-  // 일반 대표자
+  //     // 일반 대표자
   routes = (
     <Switch>
       <Route path="/" exact>

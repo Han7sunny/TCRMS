@@ -6,6 +6,10 @@ import CheckboxGroup from "../../../shared/components/TableInputElements/Checkbo
 import Dropdown from "../../../shared/components/TableInputElements/Dropdown";
 import Button from "../../../shared/components/TableInputElements/Button";
 
+// 되는거 체크하고 registindividualtable에서 임포트하기
+// registindividualtable 에서 컬럼데이터, 내부데이터 주기
+import { TABLE_COLUMNS_REGIST_INDIVIDUAL } from "../../../shared/util/regist-columns";
+
 import "./RegistIndividualTable.css";
 
 function createData(
@@ -33,37 +37,25 @@ const rows = [
   createData("", "", "", "", "", [], ""),
 ];
 
-const columns = [
-  "",
-  "성명",
-  "성별",
-  "외국인",
-  "국적",
-  "주민등록번호",
-  "종목",
-  "체급(겨루기만)",
-  "",
-];
-
-const RegistIndividualTable = () => {
+const RegistTable = () => {
+  // props로 받아오기
   const props = {
-    columns: columns,
+    columns: TABLE_COLUMNS_REGIST_INDIVIDUAL,
     data: rows,
+    inputHandler: () => {},
   };
-
-  const inputHandler = () => {};
 
   return (
     <table className="regist-table">
       <colgroup>
         {props.columns.map((col, i) => (
-          <col key={col + i} className={"table-col-" + i} />
+          <col key={col.id} className={"table-col-" + i} />
         ))}
       </colgroup>
       <thead>
         <tr>
-          {props.columns.map((col, i) => (
-            <th key={i}>{col}</th>
+          {props.columns.map((col) => (
+            <th key={col.id}>{col.name}</th>
           ))}
         </tr>
       </thead>
@@ -81,6 +73,7 @@ const RegistIndividualTable = () => {
             <td></td>
           </tr>
         ))}
+
         <tr>
           <td>3</td>
           <td>
@@ -88,9 +81,10 @@ const RegistIndividualTable = () => {
               id="name"
               element="input"
               type="text"
-              onInput={inputHandler}
+              onInput={props.inputHandler}
               validators="[]"
               placeholder="성명"
+              initialValue={props.data[0].name}
             />
           </td>
           <td>
@@ -98,7 +92,7 @@ const RegistIndividualTable = () => {
               id="sex"
               items={["남성", "여성"]}
               initialValue="남성"
-              onInput={inputHandler}
+              onInput={props.inputHandler}
               showLabel
             />
           </td>
@@ -106,7 +100,8 @@ const RegistIndividualTable = () => {
             <CheckboxGroup
               id="foreigner"
               items={["외국인"]}
-              onInput={inputHandler}
+              initialValue={["외국인"]}
+              onInput={props.inputHandler}
               showLabel
             />
           </td>
@@ -114,7 +109,8 @@ const RegistIndividualTable = () => {
             <Dropdown
               id="nationality"
               items={["대한민국", "영국", "프랑스"]}
-              onInput={inputHandler}
+              onInput={props.inputHandler}
+              initialValue="영국"
             />
           </td>
           <td>
@@ -123,7 +119,7 @@ const RegistIndividualTable = () => {
                 id="idnum0"
                 element="input"
                 type="text"
-                onInput={inputHandler}
+                onInput={props.inputHandler}
                 validators="[]"
               />
               &nbsp;-&nbsp;
@@ -131,7 +127,7 @@ const RegistIndividualTable = () => {
                 id="idnum1"
                 element="input"
                 type="text"
-                onInput={inputHandler}
+                onInput={props.inputHandler}
                 validators="[]"
               />
             </div>
@@ -140,8 +136,9 @@ const RegistIndividualTable = () => {
             <CheckboxGroup
               id="event"
               items={["겨루기", "품새"]}
-              onInput={inputHandler}
+              onInput={props.inputHandler}
               showLabel
+              initialValue={["품새"]}
             />
           </td>
           <td>
@@ -158,7 +155,8 @@ const RegistIndividualTable = () => {
                 "미들",
                 "헤비",
               ]}
-              onInput={inputHandler}
+              onInput={props.inputHandler}
+              initialValue="플라이"
             />
           </td>
           <td>
@@ -170,4 +168,4 @@ const RegistIndividualTable = () => {
   );
 };
 
-export default RegistIndividualTable;
+export default RegistTable;

@@ -5,6 +5,11 @@ import "./Input.css";
 
 const inputReducer = (state, action) => {
   switch (action.type) {
+    case "SETTING":
+      return {
+        ...state,
+        value: action.val,
+      };
     case "CHANGE":
       return {
         ...state,
@@ -38,11 +43,10 @@ const Input = (props) => {
 
   useEffect(() => {
     dispatch({
-      type: "CHANGE",
-      val: "",
-      validators: [],
+      type: "SETTING",
+      val: props.initialValue || "",
     });
-  }, [id]);
+  }, [props.initialValue]);
 
   const changeHandler = (event) => {
     dispatch({

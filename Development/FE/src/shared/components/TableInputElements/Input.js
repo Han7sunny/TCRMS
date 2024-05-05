@@ -36,14 +36,6 @@ const Input = (props) => {
     onInput(id, value, isValid);
   }, [id, value, isValid, onInput]);
 
-  useEffect(() => {
-    dispatch({
-      type: "CHANGE",
-      val: "",
-      validators: [],
-    });
-  }, [id]);
-
   const changeHandler = (event) => {
     dispatch({
       type: "CHANGE",
@@ -86,7 +78,9 @@ const Input = (props) => {
     >
       {/* <label htmlFor={props.id}>{props.label}</label> */}
       {element}
-      {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
+      {!inputState.isValid && inputState.isTouched && props.errorText && (
+        <p>{props.errorText}</p>
+      )}
     </div>
   );
 };
