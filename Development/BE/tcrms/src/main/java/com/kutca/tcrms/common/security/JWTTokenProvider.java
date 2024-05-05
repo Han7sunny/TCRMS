@@ -3,6 +3,7 @@ package com.kutca.tcrms.common.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,8 +16,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JWTTokenProvider {
 
-    private String secretKey = "test1234567890test".repeat(100);
-    private Long tokenExpiration = 1000 * 60L;  //  1분 .. * 60 * 2 2시간
+    @Value("${jwt.token.secretkey}")
+    private String secretKey;
+
+    @Value("${jwt.token.expiration}")
+    private Long tokenExpiration;  // 2시간 2 * 60 * 60 * 1000L
 
     private final UserDetailService userDetailService;
 
