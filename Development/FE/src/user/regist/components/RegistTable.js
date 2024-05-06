@@ -6,43 +6,90 @@ import CheckboxGroup from "../../../shared/components/TableInputElements/Checkbo
 import Dropdown from "../../../shared/components/TableInputElements/Dropdown";
 import Button from "../../../shared/components/TableInputElements/Button";
 
-// 되는거 체크하고 registindividualtable에서 임포트하기
-// registindividualtable 에서 컬럼데이터, 내부데이터 주기
-import { TABLE_COLUMNS_REGIST_INDIVIDUAL } from "../../../shared/util/regist-columns";
+import "./RegistTable.css";
 
-import "./RegistIndividualTable.css";
-
-function createData(
-  name,
-  sex,
-  foreigner,
-  nationality,
-  idnumber,
-  event,
-  weight
-) {
-  return { name, sex, foreigner, nationality, idnumber, event, weight };
-}
-
-const rows = [
-  createData(
-    "홍길동",
-    "남자",
-    "true",
-    "영국",
-    "200101-2000000",
-    ["겨루기"],
-    "핀"
-  ),
-  createData("", "", "", "", "", [], ""),
-];
-
-const RegistTable = () => {
-  // props로 받아오기
-  const props = {
-    columns: TABLE_COLUMNS_REGIST_INDIVIDUAL,
-    data: rows,
-    inputHandler: () => {},
+const RegistTable = (props) => {
+  const inputField = (colInfo, initVal, rowidx, colidx, key) => {
+    switch (colInfo.type) {
+      case "text":
+        return (
+          <div
+            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            key={key}
+          >
+            &nbsp;{colInfo.detail.content}&nbsp;
+          </div>
+        );
+      case "input":
+        return (
+          <Input
+            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            key={key}
+            element="input"
+            type="text"
+            onInput={props.inputHandler}
+            validators={colInfo.detail.validators}
+            placeholder={colInfo.detail.placeholder}
+            initialValue={initVal}
+          />
+        );
+      case "radio-group":
+        return (
+          <RadioGroup
+            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            key={key}
+            items={colInfo.detail.items}
+            initialValue={initVal}
+            onInput={props.inputHandler}
+            showLabel={colInfo.detail.showLabel}
+          />
+        );
+      case "checkbox-group":
+        return (
+          <CheckboxGroup
+            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            key={key}
+            items={colInfo.detail.items}
+            initialValue={initVal}
+            onInput={props.inputHandler}
+            showLabel={colInfo.detail.showLabel}
+            affector={colInfo.detail.affector}
+          />
+        );
+      case "dropdown":
+        return (
+          <Dropdown
+            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            key={key}
+            items={colInfo.detail.items}
+            onInput={props.inputHandler}
+            initialValue={initVal}
+          />
+        );
+      case "button":
+        return (
+          <Button
+            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            key={key}
+            onClick={props.buttonHandler}
+          >
+            {colInfo.detail.content}
+          </Button>
+        );
+      case "multi-input":
+        return (
+          <div
+            className="div-flex"
+            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            key={key}
+          >
+            {colInfo.details.map((item, i) =>
+              inputField(item, initVal[i], rowidx, colidx, colInfo.id + i)
+            )}
+          </div>
+        );
+      default:
+    }
   };
 
   return (
@@ -51,9 +98,13 @@ const RegistTable = () => {
         {props.columns.map((col, i) => (
           <col key={col.id} className={"table-col-" + i} />
         ))}
+        {props.showNumber && (
+          <col className={"table-col-" + props.columns.length} />
+        )}
       </colgroup>
       <thead>
         <tr>
+          {props.showNumber && <th></th>}
           {props.columns.map((col) => (
             <th key={col.id}>{col.name}</th>
           ))}
@@ -61,108 +112,15 @@ const RegistTable = () => {
       </thead>
       <tbody>
         {props.data.map((row, i) => (
-          <tr key={row.name}>
-            <td>{i + 1}</td>
-            <td>{row.name}</td>
-            <td>{row.sex}</td>
-            <td>{row.sex}</td>
-            <td>{row.nationality}</td>
-            <td>{row.idnumber}</td>
-            <td>{row.event}</td>
-            <td>{row.weight}</td>
-            <td></td>
+          <tr key={i}>
+            {props.showNumber && <td>{i + 1}</td>}
+            {props.columns.map((col, j) => (
+              <td key={"row" + i + "col" + j}>
+                {inputField(col, row[col.id], i, j)}
+              </td>
+            ))}
           </tr>
         ))}
-
-        <tr>
-          <td>3</td>
-          <td>
-            <Input
-              id="name"
-              element="input"
-              type="text"
-              onInput={props.inputHandler}
-              validators="[]"
-              placeholder="성명"
-              initialValue={props.data[0].name}
-            />
-          </td>
-          <td>
-            <RadioGroup
-              id="sex"
-              items={["남성", "여성"]}
-              initialValue="남성"
-              onInput={props.inputHandler}
-              showLabel
-            />
-          </td>
-          <td>
-            <CheckboxGroup
-              id="foreigner"
-              items={["외국인"]}
-              initialValue={["외국인"]}
-              onInput={props.inputHandler}
-              showLabel
-            />
-          </td>
-          <td>
-            <Dropdown
-              id="nationality"
-              items={["대한민국", "영국", "프랑스"]}
-              onInput={props.inputHandler}
-              initialValue="영국"
-            />
-          </td>
-          <td>
-            <div className="div-flex">
-              <Input
-                id="idnum0"
-                element="input"
-                type="text"
-                onInput={props.inputHandler}
-                validators="[]"
-              />
-              &nbsp;-&nbsp;
-              <Input
-                id="idnum1"
-                element="input"
-                type="text"
-                onInput={props.inputHandler}
-                validators="[]"
-              />
-            </div>
-          </td>
-          <td>
-            <CheckboxGroup
-              id="event"
-              items={["겨루기", "품새"]}
-              onInput={props.inputHandler}
-              showLabel
-              initialValue={["품새"]}
-            />
-          </td>
-          <td>
-            <Dropdown
-              id="weight"
-              items={[
-                "체급선택",
-                "핀",
-                "플라이",
-                "밴텀",
-                "페더",
-                "라이트",
-                "웰터",
-                "미들",
-                "헤비",
-              ]}
-              onInput={props.inputHandler}
-              initialValue="플라이"
-            />
-          </td>
-          <td>
-            <Button>삭제</Button>
-          </td>
-        </tr>
       </tbody>
     </table>
   );

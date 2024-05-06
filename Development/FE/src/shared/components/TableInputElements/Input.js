@@ -15,6 +15,7 @@ const inputReducer = (state, action) => {
       return {
         ...state,
         isTouched: true,
+        isValid: validate(action.val, action.validators),
       };
     }
     default:
@@ -29,24 +30,34 @@ const Input = (props) => {
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput } = props;
+  const { id, onInput, initialValue, validators } = props;
   const { value, isValid } = inputState;
 
   useEffect(() => {
     onInput(id, value, isValid);
   }, [id, value, isValid, onInput]);
 
+  useEffect(() => {
+    dispatch({
+      type: "CHANGE",
+      val: initialValue,
+      validators: validators,
+    });
+  }, [initialValue, validators]);
+
   const changeHandler = (event) => {
     dispatch({
       type: "CHANGE",
       val: event.target.value,
-      validators: props.validators,
+      validators: validators,
     });
   };
 
-  const touchHandler = () => {
+  const touchHandler = (event) => {
     dispatch({
       type: "TOUCH",
+      val: event.target.value,
+      validators: props.validators,
     });
   };
 
@@ -73,7 +84,7 @@ const Input = (props) => {
   return (
     <div
       className={`table-input ${
-        !inputState.isValid && inputState.isTouched && "form-control--invalid"
+        !inputState.isValid && inputState.isTouched && "table-input--invalid"
       }`}
     >
       {/* <label htmlFor={props.id}>{props.label}</label> */}

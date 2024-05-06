@@ -13,11 +13,11 @@
   text-align: center;
 }
 
-.table-button:focus {
+/* .table-button:focus {
   outline: none;
   background: #000000;
   color: white;
-}
+} */
 
 .table-button:hover,
 .table-button:active {

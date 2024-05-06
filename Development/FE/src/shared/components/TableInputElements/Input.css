@@ -33,6 +33,7 @@
 .table-input--invalid label,
 .table-input--invalid p {
   color: red;
+  border-color: red;
 }
 
 .table-input--invalid input,

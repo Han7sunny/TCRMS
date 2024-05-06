@@ -22,18 +22,26 @@ const RadioGroup = (props) => {
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput } = props;
+  const { id, onInput, initialValue, validators } = props;
   const { value, isValid } = inputState;
 
   useEffect(() => {
     onInput(id, value, isValid);
   }, [id, value, isValid, onInput]);
 
+  useEffect(() => {
+    dispatch({
+      type: "CHANGE",
+      val: initialValue,
+      validators: validators,
+    });
+  }, [initialValue, validators]);
+
   const changeHandler = (event) => {
     dispatch({
       type: "CHANGE",
       val: event.target.value,
-      validators: props.validators,
+      validators: validators,
     });
   };
 

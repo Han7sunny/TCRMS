@@ -8,6 +8,10 @@ select.table-dropdown {
 
 select.table-dropdown:focus,
 select.table-dropdown:target {
-  /* border: 1px solid black; */
+  border: 1px dashed rgb(28, 1, 104);
   outline: none;
+}
+
+select.table-dropdown[disabled] {
+  border: 1px solid rgba(213, 213, 213, 0.7);
 }

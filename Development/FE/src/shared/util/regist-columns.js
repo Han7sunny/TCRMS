@@ -1,23 +1,32 @@
+import {
+  VALIDATOR_REQUIRE,
+  VALIDATOR_REQUIRE_LENGTH,
+} from "../../shared/util/validators";
+
 // individual
 export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
-  { id: "number", name: "", type: "text" },
+  // { id: "number", name: "", type: "text" },
   {
     id: "name",
     name: "성명",
     type: "input",
-    detail: { validators: "[]", placeholder: "성명" },
+    detail: { validators: [VALIDATOR_REQUIRE()], placeholder: "성명" },
   },
   {
     id: "sex",
     name: "성별",
     type: "radio-group",
-    detail: { items: ["남성", "여성"], initialValue: "남성", showLabel: true },
+    detail: { items: ["남성", "여성"], showLabel: true },
   },
   {
     id: "foreigner",
     name: "외국인",
     type: "checkbox-group",
-    detail: { items: ["외국인"], showLabel: true },
+    detail: {
+      items: ["외국인"],
+      showLabel: true,
+      affector: { id: "-col3-nationality", type: "disabled", value: "외국인" },
+    },
   },
   {
     id: "nationality",
@@ -30,16 +39,28 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
     name: "주민등록번호",
     type: "multi-input",
     details: [
-      { id: "idnum1", type: "input", detail: {} },
+      {
+        id: "idnumber-input0",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(6)] },
+      },
       { id: "idnum-hypen", type: "text", detail: { content: "-" } },
-      { id: "idnum1", type: "input", detail: {} },
+      {
+        id: "idnumber-input2",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(7)] },
+      },
     ],
   },
   {
     id: "event",
     name: "종목",
     type: "checkbox-group",
-    detail: { items: ["겨루기", "품새"], showLabel: true },
+    detail: {
+      items: ["겨루기", "품새"],
+      showLabel: true,
+      affector: { id: "-col6-weight", type: "disabled", value: "겨루기" },
+    },
   },
   {
     id: "weight",

@@ -8,7 +8,7 @@ const inputReducer = (state, action) => {
     case "CHANGE":
       return {
         ...state,
-        values: action.val,
+        value: action.val,
         // isValid: validate(action.val, action.validators),
       };
     default:
@@ -18,16 +18,24 @@ const inputReducer = (state, action) => {
 
 const Dropdown = (props) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
-    values: props.initialValue || [],
+    value: props.initialValue || "",
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput } = props;
-  const { values, isValid } = inputState;
+  const { id, onInput, initialValue, validators } = props;
+  const { value, isValid } = inputState;
 
   useEffect(() => {
-    onInput(id, values, isValid);
-  }, [id, values, isValid, onInput]);
+    onInput(id, value, isValid);
+  }, [id, value, isValid, onInput]);
+
+  useEffect(() => {
+    dispatch({
+      type: "CHANGE",
+      val: initialValue,
+      validators: validators,
+    });
+  }, [initialValue, validators]);
 
   const changeHandler = (event) => {
     dispatch({
@@ -44,7 +52,7 @@ const Dropdown = (props) => {
       className={`table-dropdown `}
       onChange={changeHandler}
       disabled={props.disabled}
-      value={inputState.values}
+      value={inputState.value}
     >
       {props.items.map((item, i) => (
         <option key={item + i} value={item}>
