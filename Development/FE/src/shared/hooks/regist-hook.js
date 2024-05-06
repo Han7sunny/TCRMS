@@ -39,6 +39,11 @@ const registReducer = (state, action) => {
         inputs: [...dataDelete],
       };
 
+    case "SET_DATA":
+      return {
+        inputs: action.inputs,
+      };
+
     default:
       return state;
   }
@@ -72,5 +77,12 @@ export const useRegist = (initialInputs, defaultInputs) => {
     });
   }, []);
 
-  return [registState, inputHandler, addRow, deleteRow];
+  const setRegistData = useCallback((inputData) => {
+    dispatch({
+      type: "SET_DATA",
+      inputs: inputData,
+    });
+  }, []);
+
+  return [registState, inputHandler, addRow, deleteRow, setRegistData];
 };

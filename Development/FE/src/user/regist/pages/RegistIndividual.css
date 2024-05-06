@@ -19,13 +19,20 @@
   font-size: 14px;
 }
 
-.regist-form .regist-btn-submit {
+.regist-form .regist-btn-submit,
+.check-btn-submit {
   padding: 16px 0;
   text-align: right;
 }
 
 .regist-form .regist-btn-submit button {
   width: 100px;
+  height: 40px;
+  font-weight: 400;
+}
+
+.regist-form .check-btn-submit button {
+  width: 140px;
   height: 40px;
   font-weight: 400;
 }

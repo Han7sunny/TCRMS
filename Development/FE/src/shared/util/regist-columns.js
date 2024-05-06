@@ -44,7 +44,7 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
         type: "input",
         detail: { validators: [VALIDATOR_REQUIRE_LENGTH(6)] },
       },
-      { id: "idnum-hypen", type: "text", detail: { content: "-" } },
+      { id: "idnum-hypen", type: "text" },
       {
         id: "idnumber-input2",
         type: "input",
@@ -81,4 +81,14 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
     },
   },
   { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
+];
+
+export const TABLE_COLUMNS_CHECK_INDIVIDUAL = [
+  { id: "name", name: "성명", type: "text" },
+  { id: "sex", name: "성별", type: "text" },
+  { id: "foreigner", name: "외국인", type: "text" },
+  { id: "nationality", name: "국적", type: "text" },
+  { id: "idnumber", name: "주민등록번호", type: "text" },
+  { id: "event", name: "종목", type: "text" },
+  { id: "weight", name: "체급(겨루기만)", type: "text" },
 ];

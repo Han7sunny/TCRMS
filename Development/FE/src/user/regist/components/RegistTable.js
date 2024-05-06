@@ -17,7 +17,7 @@ const RegistTable = (props) => {
             id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
           >
-            &nbsp;{colInfo.detail.content}&nbsp;
+            &nbsp;{initVal}&nbsp;
           </div>
         );
       case "input":
