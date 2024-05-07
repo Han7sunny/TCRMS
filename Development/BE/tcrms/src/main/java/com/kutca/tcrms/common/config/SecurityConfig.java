@@ -1,10 +1,7 @@
 package com.kutca.tcrms.common.config;
 
 import com.kutca.tcrms.common.enums.Role;
-import com.kutca.tcrms.common.security.JWTAuthenticationEntryPoint;
-import com.kutca.tcrms.common.security.JWTAuthenticationRequestFilter;
-import com.kutca.tcrms.common.security.JWTTokenProvider;
-import com.kutca.tcrms.common.security.UserDetailService;
+import com.kutca.tcrms.common.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +33,7 @@ public class SecurityConfig {
 
     private final JWTTokenProvider jwtTokenProvider;
     private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JWTAccessDeniedHandler jwtAccessDeniedHandler;
     private final UserDetailService userDetailService;
 
     // HttpSecurity 설정
@@ -53,7 +51,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/login").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
                 // id, pw 인증 필터 이전에 JWT Token 필터 추가
 //                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(new JWTAuthenticationRequestFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
