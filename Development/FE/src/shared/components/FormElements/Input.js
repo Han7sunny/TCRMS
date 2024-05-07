@@ -9,6 +9,8 @@ const inputReducer = (state, action) => {
       return {
         ...state,
         value: action.val,
+        isValid: false,
+        isTouched: false,
       };
     case "CHANGE":
       return {

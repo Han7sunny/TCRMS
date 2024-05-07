@@ -26,9 +26,11 @@ export const useHttpClient = () => {
           (reqCtrl) => reqCtrl !== httpAbortCtrl
         );
 
-        if (!response.ok) {
+        console.log(responseData.success) // bool인지 STRING인지 타입 확인하기
+        if (!response.ok || !responseData.success) {
           throw new Error(responseData.message);
         }
+
 
         setIsLoading(false);
         return responseData;

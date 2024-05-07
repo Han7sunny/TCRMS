@@ -5,7 +5,7 @@ import Button from "../../shared/components/FormElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
-import { VALIDATOR_REQUIRE } from "../../shared/util/validators";
+import { VALIDATOR_REQUIRE, VALIDATOR_SAME_VALUE } from "../../shared/util/validators";
 import { useForm } from "../../shared/hooks/form-hook";
 import { useHttpClient } from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/context/auth-context";
@@ -16,7 +16,7 @@ const Login = () => {
   const [isFirst, setIsFirst] = useState(false);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-  const [formState, inputHandler] = useForm(
+  const [formState, inputHandler, setFormData] = useForm(
     {
       uniname: {
         value: "",
@@ -62,7 +62,6 @@ const Login = () => {
 
         if (responseData.is_first_login) {
           setIsFirst(responseData.is_first_login);
-          this.forceUpdate();
         } else {
           auth.login(
             responseData.userId,
@@ -74,12 +73,12 @@ const Login = () => {
     } else {
       try {
         // const formData = new FormData();
-        // formData.append("email", formState.inputs.uniName.value);
-        // formData.append("name", formState.inputs.userName.value);
-        // formData.append("password", formState.inputs.password.value);
+        // formData.append("userId", auth.userId);
+        // formData.append("passInit", formState.inputs['password-initial'].value);
+        // formData.append("passChange", formState.inputs['password-change'].value);
         // const responseData = await sendRequest(
         //   `${process.env.REACT_APP_BACKEND_URL}/api/changePW`,
-        //   "POST",
+        //   "PATCH",
         //   formData
         // );
 
@@ -89,6 +88,7 @@ const Login = () => {
           token: "asdf",
           isAdmin: false,
         };
+        // 비밀번호 변경 백에서 에러날 경우 에러 코드 수행 안되는지 확인하기
 
         //비밀번호 변경 후 로그인
         auth.login(
@@ -152,7 +152,7 @@ const Login = () => {
         id="password-check"
         type="password"
         placeholder="비밀번호 확인"
-        validators={[VALIDATOR_REQUIRE()]}
+        validators={[VALIDATOR_REQUIRE(), VALIDATOR_SAME_VALUE("password-change")]}
         onInput={inputHandler}
         initialValue=""
       />

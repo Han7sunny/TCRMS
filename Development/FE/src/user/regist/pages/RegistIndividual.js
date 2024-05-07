@@ -128,9 +128,9 @@ const RegistIndividual = () => {
 
   return (
     <div className="regist-event">
-      <h1 className="regist-event-title">
+      <h2 className="regist-event-title">
         {isRegistMode ? "개인전 신청" : "개인전 신청확인"}
-      </h1>
+      </h2>
       {isRegistMode ? (
         <form className="regist-form">
           <div className="regist-btn-add-row">
