@@ -57,6 +57,10 @@ public class SecurityConfig {
                 // id, pw 인증 필터 이전에 JWT Token 필터 추가
 //                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(new JWTAuthenticationRequestFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+//                        .logoutSuccessUrl("/api/login")
+                )
                 ;
 
         return http.build();
