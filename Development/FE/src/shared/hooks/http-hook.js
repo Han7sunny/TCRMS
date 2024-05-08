@@ -1,6 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useContext } from "react";
+
+import { AuthContext } from "../context/auth-context";
 
 export const useHttpClient = () => {
+  const auth = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
 
@@ -26,11 +29,15 @@ export const useHttpClient = () => {
           (reqCtrl) => reqCtrl !== httpAbortCtrl
         );
 
-        console.log(responseData.success) // bool인지 STRING인지 타입 확인하기
-        if (!response.ok || !responseData.success) {
+        if (response.status === 401) {
+          auth.logout();
           throw new Error(responseData.message);
         }
 
+        console.log(responseData.success); // bool인지 STRING인지 타입 확인하기
+        if (!response.ok || !responseData.success) {
+          throw new Error(responseData.message);
+        }
 
         setIsLoading(false);
         return responseData;
@@ -40,7 +47,7 @@ export const useHttpClient = () => {
         throw err;
       }
     },
-    []
+    [auth]
   );
 
   const clearError = () => {
