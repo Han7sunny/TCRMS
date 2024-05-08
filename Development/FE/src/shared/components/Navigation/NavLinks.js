@@ -2,26 +2,29 @@ import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 
 import { AuthContext } from "../../context/auth-context";
-import { useHttpClient } from "../../hooks/http-hook";
+import { HttpContext } from "../../context/http-context";
 import Button from "../FormElements/Button";
 import "./NavLinks.css";
 
-const NavLinks = (props) => {
+const NavLinks = () => {
   const auth = useContext(AuthContext);
-  const { sendRequest } = useHttpClient();
+  const http = useContext(HttpContext);
 
   const logout = async () => {
     try {
       const formData = new FormData();
       formData.append("userId", auth.userId);
-      // const responseData = await sendRequest(
-      await sendRequest(
+      // const responseData = await http.sendRequest(
+      await http.sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/api/logout`,
         "POST",
-        formData
+        formData,
+        { Authorization: `Bearer ${http.token}` }
       );
       auth.logout();
-    } catch (err) {}
+    } catch (err) {
+      auth.logout();
+    }
   };
 
   const userMenu = (

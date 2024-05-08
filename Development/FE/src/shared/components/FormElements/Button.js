@@ -1,9 +1,9 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { Link } from "react-router-dom";
 
 import "./Button.css";
 
-const Button = (props) => {
+const Button = forwardRef((props, ref) => {
   if (props.href) {
     return (
       <a
@@ -31,6 +31,7 @@ const Button = (props) => {
   }
   return (
     <button
+      ref={ref}
       className={`button button--${props.size || "default"} ${
         props.inverse && "button--inverse"
       } ${props.danger && "button--danger"}`}
@@ -41,6 +42,6 @@ const Button = (props) => {
       {props.children}
     </button>
   );
-};
+});
 
 export default Button;
