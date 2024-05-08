@@ -18,6 +18,10 @@ import {
 
 import { AuthContext } from "./shared/context/auth-context";
 import { useAuth } from "./shared/hooks/auth-hook";
+import { HttpContext } from "./shared/context/http-context";
+import { useHttpClient } from "./shared/hooks/http-hook";
+import ErrorModal from "./shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "./shared/components/UIElements/LoadingSpinner";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import Login from "./auth/pages/Login";
 import RegistMain from "./user/regist/pages/RegistMain";
@@ -25,6 +29,7 @@ import RegistIndividual from "./user/regist/pages/RegistIndividual";
 
 const App = () => {
   const { token, login, logout, userId, isAdmin } = useAuth();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   let routes;
 
@@ -89,11 +94,19 @@ const App = () => {
         isAdmin: isAdmin,
       }}
     >
-      <Router>
-        {!!token && <MainNavigation />}
-        {/* <MainNavigation /> */}
-        <main>{routes}</main>
-      </Router>
+      <HttpContext.Provider
+        value={{
+          isLoading, error, sendRequest, clearError
+        }}
+      >
+        <ErrorModal error={error} onClear={clearError} />
+        {isLoading && <LoadingSpinner asOverlay />}
+        <Router>
+          {!!token && <MainNavigation />}
+          {/* <MainNavigation /> */}
+          <main>{routes}</main>
+        </Router>
+      </HttpContext.Provider>
     </AuthContext.Provider>
   );
 };
