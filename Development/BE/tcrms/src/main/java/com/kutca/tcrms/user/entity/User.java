@@ -52,11 +52,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Participant> participants = new ArrayList<>();
 
-//    @Builder
-//    public User(String universityName, String username, String password, Role role) {
-//        this.universityName = universityName;
-//        this.username = username;
-//        this.password = password;
-//        this.role = role;
-//    }
+    public User changePassword(String newPassword) {
+        this.password = newPassword;
+        this.isFirstLogin = false;
+        return this;
+    }
 }
