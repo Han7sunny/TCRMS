@@ -1,0 +1,9 @@
+.table-checkbox label {
+  display: inline-flex;
+  padding-right: 2px;
+}
+
+.table-checkbox input[type="checkbox"] {
+  accent-color: black;
+  margin-bottom: 5px;
+}
