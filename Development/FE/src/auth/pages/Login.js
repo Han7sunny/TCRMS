@@ -87,7 +87,8 @@ const Login = () => {
         const responseData = await http.sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/api/changePW`,
           "PATCH",
-          formData
+          formData,
+          { Authorization: `Bearer ${auth.token}` }
         );
 
         // // TODO : change Dummy DATA

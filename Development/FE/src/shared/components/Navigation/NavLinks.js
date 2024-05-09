@@ -19,7 +19,7 @@ const NavLinks = () => {
         `${process.env.REACT_APP_BACKEND_URL}/api/logout`,
         "POST",
         formData,
-        { Authorization: `Bearer ${http.token}` }
+        { Authorization: `Bearer ${auth.token}` }
       );
       auth.logout();
     } catch (err) {
