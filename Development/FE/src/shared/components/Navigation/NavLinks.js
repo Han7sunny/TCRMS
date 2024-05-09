@@ -2,11 +2,30 @@ import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 
 import { AuthContext } from "../../context/auth-context";
+import { HttpContext } from "../../context/http-context";
 import Button from "../FormElements/Button";
 import "./NavLinks.css";
 
 const NavLinks = () => {
   const auth = useContext(AuthContext);
+  const http = useContext(HttpContext);
+
+  const logout = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("userId", auth.userId);
+      // const responseData = await http.sendRequest(
+      await http.sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/logout`,
+        "POST",
+        formData,
+        { Authorization: `Bearer ${auth.token}` }
+      );
+      auth.logout();
+    } catch (err) {
+      auth.logout();
+    }
+  };
 
   const userMenu = (
     <React.Fragment>
@@ -60,7 +79,7 @@ const NavLinks = () => {
         />
       </div>
       <ul className="nav-links">{auth.isAdmin ? adminMenu : userMenu}</ul>
-      <div className="nav-links__logout" onClick={auth.logout}>
+      <div className="nav-links__logout" onClick={logout}>
         <Button type="submit">로그아웃</Button>
       </div>
     </React.Fragment>
