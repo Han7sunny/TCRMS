@@ -47,8 +47,17 @@ public class SecurityConfig {
         http
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-//                .cors(AbstractHttpConfigurer::disable)
-                .securityMatcher("/api/**")
+                .cors(cors -> {
+                    CorsConfigurationSource source = request -> {
+                        CorsConfiguration corsConfiguration = new CorsConfiguration();
+                        corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                        corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+                        corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("http://localhost"));
+                        corsConfiguration.setAllowCredentials(true);
+                        return corsConfiguration;
+                    };
+                    cors.configurationSource(source);
+                })                .securityMatcher("/api/**")
                 .authorizeHttpRequests(authorize ->
                 authorize
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
