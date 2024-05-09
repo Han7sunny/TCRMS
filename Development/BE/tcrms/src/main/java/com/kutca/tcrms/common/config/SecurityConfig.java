@@ -25,6 +25,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class SecurityConfig {
     private final JWTTokenProvider jwtTokenProvider;
     private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JWTAccessDeniedHandler jwtAccessDeniedHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final UserDetailService userDetailService;
 
     // HttpSecurity 설정
@@ -59,7 +64,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTAuthenticationRequestFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
-//                        .logoutSuccessUrl("/api/login")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
                 )
                 ;
 
