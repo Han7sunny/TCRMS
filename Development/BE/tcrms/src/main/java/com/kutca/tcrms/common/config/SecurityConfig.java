@@ -1,9 +1,7 @@
 package com.kutca.tcrms.common.config;
 
 import com.kutca.tcrms.common.enums.Role;
-import com.kutca.tcrms.common.security.JWTAuthenticationRequestFilter;
-import com.kutca.tcrms.common.security.JWTTokenProvider;
-import com.kutca.tcrms.common.security.UserDetailService;
+import com.kutca.tcrms.common.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +25,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
@@ -34,6 +36,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JWTTokenProvider jwtTokenProvider;
+    private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JWTAccessDeniedHandler jwtAccessDeniedHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final UserDetailService userDetailService;
 
     // HttpSecurity 설정
@@ -42,8 +47,17 @@ public class SecurityConfig {
         http
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-//                .cors(AbstractHttpConfigurer::disable)
-                .securityMatcher("/api/**")
+                .cors(cors -> {
+                    CorsConfigurationSource source = request -> {
+                        CorsConfiguration corsConfiguration = new CorsConfiguration();
+                        corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                        corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+                        corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("http://localhost"));
+                        corsConfiguration.setAllowCredentials(true);
+                        return corsConfiguration;
+                    };
+                    cors.configurationSource(source);
+                })                .securityMatcher("/api/**")
                 .authorizeHttpRequests(authorize ->
                 authorize
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -51,9 +65,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/login").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
                 // id, pw 인증 필터 이전에 JWT Token 필터 추가
 //                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(new JWTAuthenticationRequestFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
+                )
                 ;
 
         return http.build();
