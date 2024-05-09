@@ -1,0 +1,9 @@
+.table-radio label {
+  display: inline-flex;
+  padding-right: 2px;
+}
+
+.table-radio input[type="radio"] {
+  accent-color: black;
+  margin-bottom: 5px;
+}

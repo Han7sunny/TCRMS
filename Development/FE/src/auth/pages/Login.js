@@ -2,19 +2,20 @@ import React, { useState, useContext } from "react";
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
-import ErrorModal from "../../shared/components/UIElements/ErrorModal";
-import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
-import { VALIDATOR_REQUIRE } from "../../shared/util/validators";
+import {
+  VALIDATOR_REQUIRE,
+  VALIDATOR_SAME_VALUE,
+} from "../../shared/util/validators";
 import { useForm } from "../../shared/hooks/form-hook";
-import { useHttpClient } from "../../shared/hooks/http-hook";
+import { HttpContext } from "../../shared/context/http-context";
 import { AuthContext } from "../../shared/context/auth-context";
 import "./Login.css";
 
 const Login = () => {
   const auth = useContext(AuthContext);
+  const http = useContext(HttpContext);
   const [isFirst, setIsFirst] = useState(false);
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   const [formState, inputHandler] = useForm(
     {
@@ -62,6 +63,7 @@ const Login = () => {
 
         if (responseData.is_first_login) {
           setIsFirst(responseData.is_first_login);
+          document.getElementById("uniname").focus();
         } else {
           auth.login(
             responseData.userId,
@@ -73,13 +75,20 @@ const Login = () => {
     } else {
       try {
         const formData = new FormData();
-        formData.append("universityName", formState.inputs.uniName.value);
-        formData.append("username", formState.inputs.userName.value);
-        formData.append("password", formState.inputs.password.value);
-        const responseData = await sendRequest(
+        formData.append("userId", auth.userId);
+        formData.append(
+          "initPassword",
+          formState.inputs["password-initial"].value
+        );
+        formData.append(
+          "newPassword",
+          formState.inputs["password-change"].value
+        );
+        const responseData = await http.sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/api/changePW`,
-          "POST",
-          formData
+          "PATCH",
+          formData,
+          { Authorization: `Bearer ${auth.token}` }
         );
 
         // // TODO : change Dummy DATA
@@ -88,6 +97,7 @@ const Login = () => {
         //   token: "asdf",
         //   isAdmin: false,
         // };
+        // 비밀번호 변경 백에서 에러날 경우 에러 코드 수행 안되는지 확인하기
 
         //비밀번호 변경 후 로그인
         auth.login(
@@ -135,6 +145,7 @@ const Login = () => {
         placeholder="초기 비밀번호"
         validators={[VALIDATOR_REQUIRE()]}
         onInput={inputHandler}
+        initialValue=""
       />
       <Input
         element="input"
@@ -143,21 +154,26 @@ const Login = () => {
         placeholder="변경할 비밀번호"
         validators={[VALIDATOR_REQUIRE()]}
         onInput={inputHandler}
+        initialValue=""
       />
       <Input
         element="input"
         id="password-check"
         type="password"
         placeholder="비밀번호 확인"
-        validators={[VALIDATOR_REQUIRE()]}
+        validators={[
+          VALIDATOR_REQUIRE(),
+          VALIDATOR_SAME_VALUE("password-change"),
+        ]}
         onInput={inputHandler}
+        initialValue=""
+        errorText="비밀번호를 확인해주세요."
       />
     </React.Fragment>
   );
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={clearError} />
       <div className="authentication">
         <div>
           <div className="kutca-logo">
@@ -168,7 +184,6 @@ const Login = () => {
             />
           </div>
           <div className="authentication-form">
-            {isLoading && <LoadingSpinner asOverlay />}
             {isFirst && (
               <p className="form__firstlogin-text">
                 최초 로그인 시 비밀번호를 변경해주세요.

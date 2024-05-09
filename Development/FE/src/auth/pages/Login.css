@@ -38,3 +38,8 @@
 .authentication form > button {
   margin: 20px 0px;
 }
+
+.authentication-form .form-control--invalid p {
+  position: absolute;
+  margin: 2px 5px;
+}
