@@ -1,4 +1,4 @@
 # ignore FE node_modules folder
 Development/FE/node_modules/
-.DS_Store
 **/.DS_Store
+.DS_Store

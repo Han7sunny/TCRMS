@@ -5,13 +5,6 @@ import "./Input.css";
 
 const inputReducer = (state, action) => {
   switch (action.type) {
-    case "SETTING":
-      return {
-        ...state,
-        value: action.val,
-        isValid: false,
-        isTouched: false,
-      };
     case "CHANGE":
       return {
         ...state,
@@ -22,6 +15,7 @@ const inputReducer = (state, action) => {
       return {
         ...state,
         isTouched: true,
+        isValid: validate(action.val, action.validators),
       };
     }
     default:
@@ -36,7 +30,7 @@ const Input = (props) => {
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput } = props;
+  const { id, onInput, initialValue, validators } = props;
   const { value, isValid } = inputState;
 
   useEffect(() => {
@@ -45,22 +39,25 @@ const Input = (props) => {
 
   useEffect(() => {
     dispatch({
-      type: "SETTING",
-      val: props.initialValue || "",
+      type: "CHANGE",
+      val: initialValue,
+      validators: validators,
     });
-  }, [props.initialValue]);
+  }, [initialValue, validators]);
 
   const changeHandler = (event) => {
     dispatch({
       type: "CHANGE",
       val: event.target.value,
-      validators: props.validators,
+      validators: validators,
     });
   };
 
-  const touchHandler = () => {
+  const touchHandler = (event) => {
     dispatch({
       type: "TOUCH",
+      val: event.target.value,
+      validators: props.validators,
     });
   };
 
@@ -86,13 +83,15 @@ const Input = (props) => {
 
   return (
     <div
-      className={`form-control ${
-        !inputState.isValid && inputState.isTouched && "form-control--invalid"
+      className={`table-input ${
+        !inputState.isValid && inputState.isTouched && "table-input--invalid"
       }`}
     >
-      <label htmlFor={props.id}>{props.label}</label>
+      {/* <label htmlFor={props.id}>{props.label}</label> */}
       {element}
-      {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
+      {!inputState.isValid && inputState.isTouched && props.errorText && (
+        <p>{props.errorText}</p>
+      )}
     </div>
   );
 };
