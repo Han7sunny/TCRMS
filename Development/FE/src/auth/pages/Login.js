@@ -40,26 +40,26 @@ const Login = () => {
 
     if (!isFirst) {
       try {
-        const responseData = await http.sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/api/login`,
-          "POST",
-          JSON.stringify({
-            uniName: formState.inputs.uniname.value,
-            userName: formState.inputs.username.value,
-            userPass: formState.inputs.password.value,
-          }),
-          {
-            "Content-Type": "application/json",
-          }
-        );
+        // const responseData = await http.sendRequest(
+        //   `${process.env.REACT_APP_BACKEND_URL}/api/login`,
+        //   "POST",
+        //   JSON.stringify({
+        //     uniName: formState.inputs.uniname.value,
+        //     userName: formState.inputs.username.value,
+        //     userPass: formState.inputs.password.value,
+        //   }),
+        //   {
+        //     "Content-Type": "application/json",
+        //   }
+        // );
 
-        // // TODO : change Dummy DATA
-        // const responseData = {
-        //   is_first_login: true,
-        //   userId: 1,
-        //   token: "asdf",
-        //   isAdmin: false,
-        // };
+        // TODO : change Dummy DATA
+        const responseData = {
+          is_first_login: true,
+          userId: 1,
+          token: "asdf",
+          isAdmin: false,
+        };
 
         if (responseData.is_first_login) {
           setIsFirst(responseData.is_first_login);
