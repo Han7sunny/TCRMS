@@ -5,12 +5,18 @@ import { AuthContext } from "../context/auth-context";
 export const useHttpClient = () => {
   const auth = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
+  const [error, setError] = useState({ title: null, detail: null });
 
   const activeHttpRequests = useRef([]);
 
   const sendRequest = useCallback(
-    async (url, method = "GET", body = null, headers = {}) => {
+    async (
+      url,
+      method = "GET",
+      body = null,
+      headers = {},
+      errorModalTitle = null
+    ) => {
       setIsLoading(true);
       const httpAbortCtrl = new AbortController();
       activeHttpRequests.current.push(httpAbortCtrl);
@@ -34,15 +40,14 @@ export const useHttpClient = () => {
           throw new Error(responseData.message);
         }
 
-        console.log(responseData.success); // bool인지 STRING인지 타입 확인하기
-        if (!response.ok || !responseData.success) {
+        if (!response.ok || !responseData.isSuccess) {
           throw new Error(responseData.message);
         }
 
         setIsLoading(false);
         return responseData;
       } catch (err) {
-        setError(err.message);
+        setError({ title: errorModalTitle, detail: err.message });
         setIsLoading(false);
         throw err;
       }
@@ -51,7 +56,7 @@ export const useHttpClient = () => {
   );
 
   const clearError = () => {
-    setError(null);
+    setError({ title: null, detail: null });
   };
 
   useEffect(() => {
@@ -61,5 +66,5 @@ export const useHttpClient = () => {
     };
   }, []);
 
-  return { isLoading, error, sendRequest, clearError };
+  return { isLoading, error, sendRequest, setError, clearError };
 };

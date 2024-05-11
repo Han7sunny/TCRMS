@@ -19,12 +19,14 @@ import RegistMain from "./user/regist/pages/RegistMain";
 import RegistIndividual from "./user/regist/pages/RegistIndividual";
 
 const App = () => {
-  const { token, login, logout, userId, isAdmin } = useAuth();
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const { token, login, logout, userId, isAdmin, isFirstLogin } = useAuth();
+  const { isLoading, error, sendRequest, setError, clearError } =
+    useHttpClient();
 
   let routes;
+  let isLogin = !!token && !isFirstLogin;
 
-  if (token) {
+  if (isLogin) {
     if (isAdmin) {
       routes = (
         <Switch>
@@ -83,6 +85,7 @@ const App = () => {
         login: login,
         logout: logout,
         isAdmin: isAdmin,
+        isFirstLogin: isFirstLogin,
       }}
     >
       <HttpContext.Provider
@@ -90,14 +93,18 @@ const App = () => {
           isLoading,
           error,
           sendRequest,
+          setError,
           clearError,
         }}
       >
-        <ErrorModal error={error} onClear={clearError} />
+        <ErrorModal
+          title={error.title}
+          error={error.detail}
+          onClear={clearError}
+        />
         {isLoading && <LoadingSpinner asOverlay />}
         <Router>
-          {!!token && <MainNavigation />}
-          {/* <MainNavigation /> */}
+          {isLogin && <MainNavigation />}
           <main>{routes}</main>
         </Router>
       </HttpContext.Provider>

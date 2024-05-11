@@ -25,7 +25,10 @@ export const VALIDATOR_MAXLENGTH = (val) => ({
 export const VALIDATOR_MIN = (val) => ({ type: VALIDATOR_TYPE_MIN, val: val });
 export const VALIDATOR_MAX = (val) => ({ type: VALIDATOR_TYPE_MAX, val: val });
 export const VALIDATOR_EMAIL = () => ({ type: VALIDATOR_TYPE_EMAIL });
-export const VALIDATOR_SAME_VALUE = (id) => ({ type: VALIDATOR_TYPE_SAME_VALUE, id: id });
+export const VALIDATOR_SAME_VALUE = (id) => ({
+  type: VALIDATOR_TYPE_SAME_VALUE,
+  id: id,
+});
 
 export const validate = (value, validators) => {
   let isValid = true;
@@ -52,7 +55,8 @@ export const validate = (value, validators) => {
       isValid = isValid && /^\S+@\S+\.\S+$/.test(value);
     }
     if (validator.type === VALIDATOR_TYPE_SAME_VALUE) {
-      isValid = isValid && value === document.getElementById(validator.id).value;
+      isValid =
+        isValid && value === document.getElementById(validator.id).value;
     }
   }
   return isValid;

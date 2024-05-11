@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useRef } from "react";
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
@@ -15,9 +15,11 @@ import "./Login.css";
 const Login = () => {
   const auth = useContext(AuthContext);
   const http = useContext(HttpContext);
-  const [isFirst, setIsFirst] = useState(false);
 
-  const [formState, inputHandler] = useForm(
+  const inputPassInitRef = useRef(null);
+  const inputUniname = useRef(null);
+
+  const [formState, inputHandler, setFormData] = useForm(
     {
       uniname: {
         value: "",
@@ -38,9 +40,9 @@ const Login = () => {
   const authSubmitHandler = async (event) => {
     event.preventDefault();
 
-    if (!isFirst) {
+    if (!auth.isFirstLogin) {
       try {
-        const responseData = await sendRequest(
+        const responseData = await http.sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/api/login`,
           "POST",
           JSON.stringify({
@@ -50,7 +52,8 @@ const Login = () => {
           }),
           {
             "Content-Type": "application/json",
-          }
+          },
+          "로그인 실패"
         );
 
         // // TODO : change Dummy DATA
@@ -61,36 +64,68 @@ const Login = () => {
         //   isAdmin: false,
         // };
 
-        if (responseData.is_first_login) {
-          setIsFirst(responseData.is_first_login);
-          document.getElementById("uniname").focus();
-        } else {
-          auth.login(
-            responseData.userId,
-            responseData.token,
-            responseData.isAdmin
+        const responsePayload = responseData.payload;
+
+        const isAdmin = responsePayload.auth === "ADMIN" ? true : false;
+        if (responseData.isFirstLogin) {
+          inputUniname.current.focus();
+        }
+        auth.login(
+          responsePayload.userId,
+          responsePayload.token,
+          isAdmin,
+          responsePayload.isFirstLogin
+        );
+
+        if (responsePayload.isFirstLogin) {
+          inputPassInitRef.current.focus();
+          setFormData(
+            {
+              "password-initial": {
+                value: "",
+                isValid: false,
+              },
+              "password-change": {
+                value: "",
+                isValid: false,
+              },
+              "password-check": {
+                value: "",
+                isValid: false,
+              },
+            },
+            false
           );
         }
       } catch (err) {}
     } else {
       try {
-        const formData = new FormData();
-        formData.append("userId", auth.userId);
-        formData.append(
-          "initPassword",
-          formState.inputs["password-initial"].value
-        );
-        formData.append(
-          "newPassword",
-          formState.inputs["password-change"].value
-        );
+        // if (formState.inputs["password-initial"].value !== "password") {
+        // inputPassInitRef.current.focus();
+        inputPassInitRef.current.clear();
+        //   throw new Error(
+        //     "초기 비밀번호가 일치하지 않습니다. 다시 입력해주세요."
+        //   );
+        // }
+
         const responseData = await http.sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/api/changePW`,
-          "PATCH",
-          formData,
-          { Authorization: `Bearer ${auth.token}` }
+          "POST",
+          JSON.stringify({
+            userId: auth.userId,
+            initPassword: formState.inputs["password-initial"].value,
+            newPassword: formState.inputs["password-change"].value,
+          }),
+          {
+            Authorization: `Bearer ${auth.token}`,
+            "Content-Type": "application/json",
+          },
+          "비밀번호 변경 실패"
         );
 
+        if (responseData.isSuccess) {
+          alert("비밀번호가 변경되었습니다.");
+        }
         // // TODO : change Dummy DATA
         // const responseData = {
         //   userId: 1,
@@ -100,19 +135,18 @@ const Login = () => {
         // 비밀번호 변경 백에서 에러날 경우 에러 코드 수행 안되는지 확인하기
 
         //비밀번호 변경 후 로그인
-        auth.login(
-          responseData.userId,
-          responseData.token,
-          responseData.isAdmin
-        );
-      } catch (err) {}
+        auth.login(auth.userId, auth.token, auth.isAdmin, false);
+      } catch (err) {
+        // http.setError(err.message);
+      }
     }
   };
 
-  const formElement = !isFirst ? (
+  const formElement = !auth.isFirstLogin ? (
     <React.Fragment>
       <Input
         element="input"
+        ref={inputUniname}
         id="uniname"
         type="text"
         placeholder="학교명"
@@ -134,18 +168,21 @@ const Login = () => {
         placeholder="비밀번호"
         validators={[VALIDATOR_REQUIRE()]}
         onInput={inputHandler}
+        autoComplete="off"
       />
     </React.Fragment>
   ) : (
     <React.Fragment>
       <Input
         element="input"
+        ref={inputPassInitRef}
         id="password-initial"
         type="password"
         placeholder="초기 비밀번호"
         validators={[VALIDATOR_REQUIRE()]}
         onInput={inputHandler}
         initialValue=""
+        autoComplete="off"
       />
       <Input
         element="input"
@@ -155,6 +192,7 @@ const Login = () => {
         validators={[VALIDATOR_REQUIRE()]}
         onInput={inputHandler}
         initialValue=""
+        autoComplete="off"
       />
       <Input
         element="input"
@@ -168,6 +206,7 @@ const Login = () => {
         onInput={inputHandler}
         initialValue=""
         errorText="비밀번호를 확인해주세요."
+        autoComplete="off"
       />
     </React.Fragment>
   );
@@ -184,7 +223,7 @@ const Login = () => {
             />
           </div>
           <div className="authentication-form">
-            {isFirst && (
+            {auth.isFirstLogin && (
               <p className="form__firstlogin-text">
                 최초 로그인 시 비밀번호를 변경해주세요.
               </p>
@@ -192,7 +231,7 @@ const Login = () => {
             <form onSubmit={authSubmitHandler}>
               {formElement}
               <Button type="submit" disabled={!formState.isValid}>
-                {!isFirst ? "로그인" : "비밀번호 변경"}
+                {!auth.isFirstLogin ? "로그인" : "비밀번호 변경"}
               </Button>
             </form>
           </div>

@@ -1,4 +1,9 @@
-import React, { useReducer, useEffect } from "react";
+import React, {
+  useReducer,
+  useEffect,
+  useRef,
+  useImperativeHandle,
+} from "react";
 
 import { validate } from "../../util/validators";
 import "./Input.css";
@@ -29,7 +34,7 @@ const inputReducer = (state, action) => {
   }
 };
 
-const Input = (props) => {
+const Input = React.forwardRef((props, ref) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: props.initialValue || "",
     isTouched: false,
@@ -38,6 +43,21 @@ const Input = (props) => {
 
   const { id, onInput } = props;
   const { value, isValid } = inputState;
+
+  const inputRef = useRef();
+
+  // 외부에서 사용할 수 있는 메서드를 설정
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current.focus();
+    },
+    clear: () => {
+      dispatch({
+        type: "SETTING",
+        val: props.initialValue || "",
+      });
+    },
+  }));
 
   useEffect(() => {
     onInput(id, value, isValid);
@@ -68,15 +88,18 @@ const Input = (props) => {
     props.element === "input" ? (
       <input
         id={props.id}
+        ref={inputRef}
         type={props.type}
         placeholder={props.placeholder}
         onChange={changeHandler}
         onBlur={touchHandler}
         value={inputState.value}
+        autoComplete={props.autoComplete}
       />
     ) : (
       <textarea
         id={props.id}
+        ref={inputRef}
         rows={props.rows || 3}
         onChange={changeHandler}
         onBlur={touchHandler}
@@ -95,6 +118,6 @@ const Input = (props) => {
       {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
     </div>
   );
-};
+});
 
 export default Input;

@@ -11,9 +11,26 @@ const formReducer = (state, action) => {
         if (inputId === action.inputId) {
           formIsValid = formIsValid && action.isValid;
         } else {
-          formIsValid = formIsValid && state.inputs[inputId].isValid;
+          const form1Id = ["uniname", "username", "password"];
+          const form2Id = [
+            "password-initial",
+            "password-change",
+            "password-check",
+          ];
+          if (form1Id.includes(action.inputId)) {
+            if (form1Id.includes(inputId)) {
+              formIsValid = formIsValid && state.inputs[inputId].isValid;
+            }
+          } else if (form2Id.includes(action.inputId)) {
+            if (form2Id.includes(inputId)) {
+              formIsValid = formIsValid && state.inputs[inputId].isValid;
+            }
+          } else {
+            formIsValid = formIsValid && state.inputs[inputId].isValid;
+          }
         }
       }
+
       return {
         ...state,
         inputs: {

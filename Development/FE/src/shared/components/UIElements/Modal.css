@@ -7,6 +7,21 @@
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   /* border-radius: 8px; */
+  /* position: relative; */
+}
+
+.modal__clear-btn {
+  position: absolute;
+  right: 5px;
+  top: 6px;
+  border-radius: 50%;
+  padding: 0px 2px;
+  border: 0px solid black;
+  cursor: pointer;
+}
+
+.modal__clear-btn svg {
+  padding-top: 2px;
 }
 
 .modal__header {
@@ -37,7 +52,7 @@
 }
 
 .modal__footer {
-  padding: 1rem 0.5rem;
+  padding: 4px 8px;
 }
 
 @media (min-width: 768px) {

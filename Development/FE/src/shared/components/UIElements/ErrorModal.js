@@ -2,7 +2,9 @@ import React, { useEffect, useRef } from "react";
 
 import Modal from "./Modal";
 import Button from "../FormElements/Button";
-import ErrorIcon from "@material-ui/icons/Error";
+import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
+
+import "./ErrorModal.css";
 
 const ErrorModal = (props) => {
   const buttonRef = useRef(null); // 버튼에 대한 ref 생성
@@ -19,18 +21,20 @@ const ErrorModal = (props) => {
     <Modal
       onCancel={props.onClear}
       headerClass="modal__header-hide"
-      contentClass="modal__content-flex"
       show={show}
       footer={
         <Button ref={buttonRef} onClick={props.onClear}>
-          닫기
+          확인
         </Button>
       }
     >
-      <div className="error-icon">
-        <ErrorIcon color="error" fontSize="medium" />
+      <div className="error-icon modal__content-flex">
+        <ErrorOutlineOutlinedIcon htmlColor="#FFD400" fontSize="large" />
+        <div className="error-title">
+          {props.title ? props.title : "오류 발생 안내"}
+        </div>
       </div>
-      <div>{props.error}</div>
+      <div className="error-detail">{props.error}</div>
     </Modal>
   );
 };

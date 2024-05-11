@@ -1,0 +1,30 @@
+.error-icon {
+  justify-content: center;
+  margin: 8px;
+}
+
+.error-title {
+  margin-left: 4px;
+  padding-top: 2px;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.error-detail {
+  margin: 22px 5px;
+  padding: 18px 12px;
+  background-color: rgb(243, 243, 243);
+  border: 1px solid rgb(215, 215, 215);
+}
+
+.modal__content {
+  padding-bottom: 0px;
+}
+
+.modal__footer button {
+  font-size: 14px;
+  width: 80px;
+  margin: auto;
+  margin-bottom: 12px;
+  display: block;
+}
