@@ -22,7 +22,7 @@ public class IndividualParticipantResponseDto {
 
     private Long weightClassId;
 
-    public IndividualParticipantResponseDto fromEntity(Participant participant) {
+    public static IndividualParticipantResponseDto fromEntity(Participant participant) {
         return IndividualParticipantResponseDto.builder()
                 .participantId(participant.getParticipantId())
                 .participantName(participant.getName())

@@ -6,8 +6,8 @@ import java.util.List;
 public class ParticipantsResponseDto<T> {
     private final List<T> participants;
 
-    public ParticipantsResponseDto() {
-        this.participants = new ArrayList<>();
+    public ParticipantsResponseDto(List<T> participants) {
+        this.participants = participants;
     }
 
 }

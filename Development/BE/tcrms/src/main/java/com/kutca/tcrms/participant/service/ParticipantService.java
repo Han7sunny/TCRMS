@@ -11,9 +11,9 @@ import com.kutca.tcrms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,8 +47,6 @@ public class ParticipantService {
                     )
                     .build();
         }
-        
-        ParticipantsResponseDto<IndividualParticipantResponseDto> participantsResponseDto = new ParticipantsResponseDto();
 
         return ResponseDto.builder()
                 .isSuccess(true)
@@ -57,7 +55,7 @@ public class ParticipantService {
                                 .isEditable(user.getIsEditable())
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
-                                .participants(participantsResponseDto)
+                                .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(IndividualParticipantResponseDto::fromEntity).collect(Collectors.toList())))
                                 .build()
                 )
                 .build();
