@@ -6,12 +6,14 @@ import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDt
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
+import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,30 +24,38 @@ public class ParticipantService {
 
     public ResponseDto<?> getIndividualList(Long userId) {
 
-        List<Participant> findParticipantList = participantRepository.findAllByUserId(userId);
+        Optional<User> findUser = userRepository.findById(userId);
+        if(findUser.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("대표자 정보를 찾을 수 없습니다.")
+                    .build();
+        }
 
+        User user = findUser.get();
+        List<Participant> findParticipantList = participantRepository.findAllByUserId(userId);
         if(findParticipantList.isEmpty()){
             return ResponseDto.builder()
                     .isSuccess(true)
                     .payload(
                             ParticipantResponseDto.builder()
-//                                    .isEditable()
-//                                    .isDepositConfirmed()
+                                    .isEditable(user.getIsEditable())
+                                    .isDepositConfirmed(user.getIsDepositConfirmed())
                                     .isParticipantExists(false)
                                     .build()
 
                     )
                     .build();
         }
-
+        
         ParticipantsResponseDto<IndividualParticipantResponseDto> participantsResponseDto = new ParticipantsResponseDto();
 
         return ResponseDto.builder()
                 .isSuccess(true)
                 .payload(
                         ParticipantResponseDto.builder()
-//                                .isEditable()
-//                                .isDepositConfirmed()
+                                .isEditable(user.getIsEditable())
+                                .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
                                 .participants(participantsResponseDto)
                                 .build()
