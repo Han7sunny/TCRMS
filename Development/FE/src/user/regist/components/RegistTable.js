@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import Input from "../../../shared/components/TableInputElements/Input";
 import RadioGroup from "../../../shared/components/TableInputElements/RadioGroup";
@@ -18,6 +18,20 @@ const RegistTable = (props) => {
             key={key}
           >
             &nbsp;{initVal}&nbsp;
+          </div>
+        );
+      case "text-hidden":
+        return (
+          <div
+            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            key={key}
+          >
+            &nbsp;
+            {hideText
+              ? initVal.substr(0, colInfo.detail.showCharNum) +
+                "*".repeat(initVal.length - colInfo.detail.showCharNum)
+              : initVal}
+            &nbsp;
           </div>
         );
       case "input":
@@ -42,6 +56,7 @@ const RegistTable = (props) => {
             initialValue={initVal}
             onInput={props.inputHandler}
             showLabel={colInfo.detail.showLabel}
+            affector={colInfo.detail.affector}
           />
         );
       case "checkbox-group":
@@ -83,7 +98,7 @@ const RegistTable = (props) => {
             id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
           >
-            {colInfo.details.map((item, i) =>
+            {colInfo.detail.map((item, i) =>
               inputField(item, initVal[i], rowidx, colidx, colInfo.id + i)
             )}
           </div>
@@ -91,6 +106,8 @@ const RegistTable = (props) => {
       default:
     }
   };
+
+  const [hideText, setHideText] = useState(true);
 
   return (
     <table className="regist-table">
@@ -105,9 +122,25 @@ const RegistTable = (props) => {
       <thead>
         <tr>
           {props.showNumber && <th></th>}
-          {props.columns.map((col) => (
-            <th key={col.id}>{col.name}</th>
-          ))}
+          {props.columns.map((col) => {
+            if (col.type === "text-hidden") {
+              return (
+                <th key={col.id}>
+                  {col.name}{" "}
+                  <button
+                    className="table-column__hide-btn"
+                    onClick={() => {
+                      setHideText(!hideText);
+                    }}
+                  >
+                    {hideText ? "보이기" : "숨기기"}
+                  </button>
+                </th>
+              );
+            } else {
+              return <th key={col.id}>{col.name}</th>;
+            }
+          })}
         </tr>
       </thead>
       <tbody>

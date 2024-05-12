@@ -30,6 +30,28 @@ const RadioGroup = (props) => {
   }, [id, value, isValid, onInput]);
 
   useEffect(() => {
+    // affector //
+    if (props.affector && props.affector.type === "setting") {
+      // affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
+      const affectorId = id.split("-")[0] + props.affector.id;
+      const element = document.getElementById(affectorId);
+
+      const elementLength = element.length;
+      for (let i = 1; i < elementLength; i++) {
+        element.remove(1);
+      }
+
+      Object.keys(props.affector.value[value]).forEach((eventName) => {
+        let selectOption = document.createElement("option");
+        selectOption.text = eventName;
+        selectOption.value = eventName;
+        element.add(selectOption);
+      });
+    }
+    // ----------- //
+  }, [value, id, props.affector]);
+
+  useEffect(() => {
     dispatch({
       type: "CHANGE",
       val: initialValue,

@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from "react";
 
 import Modal from "./Modal";
 import Button from "../FormElements/Button";
-import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
+import WarningIcon from "@material-ui/icons/Warning";
+// import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
 
 import "./ErrorModal.css";
 
@@ -29,7 +30,7 @@ const ErrorModal = (props) => {
       }
     >
       <div className="error-icon modal__content-flex">
-        <ErrorOutlineOutlinedIcon htmlColor="#FFD400" fontSize="large" />
+        <WarningIcon htmlColor="#FF0000" fontSize="large" />
         <div className="error-title">
           {props.title ? props.title : "오류 발생 안내"}
         </div>

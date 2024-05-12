@@ -2,6 +2,7 @@ import {
   VALIDATOR_REQUIRE,
   VALIDATOR_REQUIRE_LENGTH,
 } from "../../shared/util/validators";
+import { WEIGHT_ID } from "./const-event";
 
 // individual
 export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
@@ -16,7 +17,11 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
     id: "sex",
     name: "성별",
     type: "radio-group",
-    detail: { items: ["남성", "여성"], showLabel: true },
+    detail: {
+      items: ["남성", "여성"],
+      showLabel: true,
+      affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
+    },
   },
   {
     id: "foreigner",
@@ -38,7 +43,7 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
     id: "idnumber",
     name: "주민등록번호",
     type: "multi-input",
-    details: [
+    detail: [
       {
         id: "idnumber-input0",
         type: "input",
@@ -88,7 +93,12 @@ export const TABLE_COLUMNS_CHECK_INDIVIDUAL = [
   { id: "sex", name: "성별", type: "text" },
   { id: "foreigner", name: "외국인", type: "text" },
   { id: "nationality", name: "국적", type: "text" },
-  { id: "idnumber", name: "주민등록번호", type: "text" },
+  {
+    id: "idnumber",
+    name: "주민등록번호",
+    type: "text-hidden",
+    detail: { showCharNum: 7 },
+  },
   { id: "event", name: "종목", type: "text" },
   { id: "weight", name: "체급(겨루기만)", type: "text" },
 ];

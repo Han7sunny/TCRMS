@@ -12,14 +12,17 @@ const NavLinks = () => {
 
   const logout = async () => {
     try {
-      const formData = new FormData();
-      formData.append("userId", auth.userId);
       // const responseData = await http.sendRequest(
       await http.sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/api/logout`,
         "POST",
-        formData,
-        { Authorization: `Bearer ${auth.token}` }
+        JSON.stringify({
+          userId: auth.userId,
+        }),
+        {
+          Authorization: `Bearer ${auth.token}`,
+          "Content-Type": "application/json",
+        }
       );
       auth.logout();
     } catch (err) {

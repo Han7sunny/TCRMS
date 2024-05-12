@@ -4,8 +4,8 @@ import {
   TABLE_COLUMNS_REGIST_INDIVIDUAL,
   TABLE_COLUMNS_CHECK_INDIVIDUAL,
 } from "../../../shared/util/regist-columns";
+import { EVENT_ID, WEIGHT_ID } from "../../../shared/util/const-event";
 import { useRegist } from "../../../shared/hooks/regist-hook";
-import { useHttpClient } from "../../../shared/hooks/http-hook";
 
 import RegistTable from "../components/RegistTable";
 import Button from "../../../shared/components/TableInputElements/Button";
@@ -15,18 +15,26 @@ import "./RegistIndividual.css";
 const RegistIndividual = () => {
   const [isFirst, setIsFirst] = useState(true);
   const [isRegistMode, setIsRegistMode] = useState(false);
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   // focus disabled  colinfo,control,     data,initialValue
   const [registState, inputHandler, addRow, deleteRow, setRegistData] =
     useRegist(
       [
+        // {
+        //   name: "홍길동",
+        //   sex: "남성",
+        //   foreigner: ["외국인"],
+        //   nationality: "영국",
+        //   idnumber: ["200101", "-", "2000000"],
+        //   event: ["겨루기"],
+        //   weight: "핀",
+        // },
         {
           name: "홍길동",
           sex: "남성",
           foreigner: ["외국인"],
           nationality: "영국",
-          idnumber: ["200101", "-", "2000000"],
+          idnumber: "200101-2000000",
           event: ["겨루기"],
           weight: "핀",
         },
@@ -51,6 +59,79 @@ const RegistIndividual = () => {
     event.preventDefault();
     const rowNum = Number(event.target.id.split("-")[0].replace("row", ""));
     deleteRow(rowNum);
+  };
+
+  const formatParticipant = (participant, mode) => {
+    if (mode === 1) {
+      let event = new Set();
+      if (participant.event) {
+        // 배열이라 length로 판단해야하나
+        participant.event.forEach((eventId) => {
+          let eventName = Object.keys(EVENT_ID).find(
+            (key) => EVENT_ID[key] === eventId
+          );
+          event.add(eventName.split(" ")[2]);
+        });
+      }
+      event = [...event];
+
+      let weight = "";
+      if (participant.weightClassId) {
+        if (participant.gender === "남성") {
+          weight = Object.keys(WEIGHT_ID["남성"]).find(
+            (key) => WEIGHT_ID["남성"][key] === participant.weightClassId
+          );
+        } else if (participant.gender === "여성") {
+          weight = Object.keys(WEIGHT_ID["여성"]).find(
+            (key) => WEIGHT_ID["여성"][key] === participant.weightClassId
+          );
+        }
+      }
+
+      return {
+        participantId: participant.participantId,
+        name: participant.name,
+        sex: participant.gender, // 남성,여성인지 체크
+        foreigner: participant.isForeigner ? ["외국인"] : [],
+        nationality: participant.nationality,
+        idnumber: participant.identityNumber
+          ? [
+              participant.identityNumber.substr(0, 6),
+              "-",
+              participant.identityNumber.substr(8, 14),
+            ]
+          : [],
+        event: event,
+        weight: weight,
+      };
+    }
+
+    if (mode === 2) {
+      let identityNumber = participant.idnumber.join("");
+      if (identityNumber === "-") identityNumber = undefined;
+
+      let eventId = [];
+      participant.event.forEach((eventname) => {
+        let eventKey = "개인전 " + participant.sex + " " + eventname;
+        eventId.push(EVENT_ID[eventKey]);
+      });
+
+      let weightClassId;
+      if (participant.sex === "남성")
+        weightClassId = WEIGHT_ID["남성"][participant.weight];
+      else weightClassId = WEIGHT_ID["여성"][participant.weight];
+
+      return {
+        participantId: participant.participantId,
+        name: participant.name,
+        gender: participant.sex,
+        isForeigner: participant.foreigner.length > 0 ? true : false,
+        nationality: participant.nationality,
+        identityNumber: identityNumber,
+        eventId: eventId,
+        weightClassId: weightClassId,
+      };
+    }
   };
 
   // 맨처음에 데이터 가져와서 세팅
@@ -123,7 +204,32 @@ const RegistIndividual = () => {
   // };
 
   const switchModeHandler = () => {
-    setIsRegistMode(true);
+    if (isRegistMode) {
+      setRegistData([
+        {
+          name: "홍길동",
+          sex: "남성",
+          foreigner: ["외국인"],
+          nationality: "영국",
+          idnumber: "200101-2000000",
+          event: ["겨루기"],
+          weight: "핀",
+        },
+      ]);
+    } else {
+      setRegistData([
+        {
+          name: "홍길동",
+          sex: "남성",
+          foreigner: ["외국인"],
+          nationality: "영국",
+          idnumber: ["200101", "-", "2000000"],
+          event: ["겨루기"],
+          weight: "핀",
+        },
+      ]);
+    }
+    setIsRegistMode(!isRegistMode);
   };
 
   return (
@@ -132,7 +238,7 @@ const RegistIndividual = () => {
         {isRegistMode ? "개인전 신청" : "개인전 신청확인"}
       </h2>
       {isRegistMode ? (
-        <form className="regist-form">
+        <form className="regist-form" onSubmit={setRegistData}>
           <div className="regist-btn-add-row">
             <Button onClick={addRowHandler}>선수 추가</Button>
           </div>
