@@ -6,6 +6,8 @@ import {
 } from "../../../shared/util/regist-columns";
 import { EVENT_ID, WEIGHT_ID } from "../../../shared/util/const-event";
 import { useRegist } from "../../../shared/hooks/regist-hook";
+import { HttpContext } from "../../shared/context/http-context";
+import { AuthContext } from "../../shared/context/auth-context";
 
 import RegistTable from "../components/RegistTable";
 import Button from "../../../shared/components/TableInputElements/Button";
@@ -13,6 +15,9 @@ import Button from "../../../shared/components/TableInputElements/Button";
 import "./RegistIndividual.css";
 
 const RegistIndividual = () => {
+  const auth = useContext(AuthContext);
+  const http = useContext(HttpContext);
+
   const [isFirst, setIsFirst] = useState(true);
   const [isRegistMode, setIsRegistMode] = useState(false);
 
@@ -134,7 +139,58 @@ const RegistIndividual = () => {
     }
   };
 
-  // 맨처음에 데이터 가져와서 세팅
+  // 개인전 페이지 들어오면 먼저 개인전 저장된 데이터 있는지 체크
+  const individualListHandler = async (event) => {
+    event.preventDefault();
+
+    try {
+    // const responseData = await http.sendRequest(
+    //   `${process.env.REACT_APP_BACKEND_URL}/api/user/individual-list`,
+    //   headers={
+    //     Authorization: `Bearer ${auth.token}`
+    //   },
+    //   errorModalTitle="개인전 선수 로드 실패"
+    // );
+
+    // TODO : change Dummy DATA
+    const responseData = {
+      isSuccess: true,
+      payload: {isParticipantExists: true, participants: [{
+        participantId: 1,
+        weightClassId: 1,
+        name: "조서영",
+        identityNumber: "961201-0000000",
+        gender: "여성",
+        isForeigner: false,
+        nationality: "",
+        eventId: [1, 2],
+      },
+      {
+        participantId: 2,
+        //weightClassId: ,
+        name: "조땡땡",
+        identityNumber: "961201-0000000",
+        gender: "남성",
+        isForeigner: true,
+        nationality: "영국",
+        eventId: [4],
+      }]},
+    };
+    // const responseData = {
+    //   isSuccess: true,
+    //   payload: {isParticipantExists: false}
+    // };
+
+    if (responseData.payload.isParticipantExists) {
+      setIsRegistMode(false);
+      setRegistData(responseData.payload.participants.map(participant => formatParticipant(participant, 1)));
+    } else {
+      setIsRegistMode(true); //useRegist 초기값 정하기
+    }
+
+  } catch (err) {
+  }};
+
   // Data submit : submit 전에 체크로직 확인
 
   // const authSubmitHandler = async (event) => {
@@ -203,8 +259,10 @@ const RegistIndividual = () => {
   //   }
   // };
 
-  const switchModeHandler = () => {
-    if (isRegistMode) {
+  const switchModeHandler = (event) => {
+    event.preventDefault();
+
+    if (isRegistMode) { // api post
       setRegistData([
         {
           name: "홍길동",
@@ -216,7 +274,7 @@ const RegistIndividual = () => {
           weight: "핀",
         },
       ]);
-    } else {
+    } else { // 기존 데이터 그대로 
       setRegistData([
         {
           name: "홍길동",
@@ -238,7 +296,7 @@ const RegistIndividual = () => {
         {isRegistMode ? "개인전 신청" : "개인전 신청확인"}
       </h2>
       {isRegistMode ? (
-        <form className="regist-form" onSubmit={setRegistData}>
+        <form className="regist-form" onSubmit={switchModeHandler}>
           <div className="regist-btn-add-row">
             <Button onClick={addRowHandler}>선수 추가</Button>
           </div>

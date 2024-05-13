@@ -21,6 +21,7 @@ const RegistTable = (props) => {
           </div>
         );
       case "text-hidden":
+        const val = initVal.join('');
         return (
           <div
             id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
@@ -28,9 +29,9 @@ const RegistTable = (props) => {
           >
             &nbsp;
             {hideText
-              ? initVal.substr(0, colInfo.detail.showCharNum) +
-                "*".repeat(initVal.length - colInfo.detail.showCharNum)
-              : initVal}
+              ? val.substr(0, colInfo.detail.showCharNum) +
+                "*".repeat(val.length - colInfo.detail.showCharNum)
+              : val}
             &nbsp;
           </div>
         );
@@ -144,7 +145,7 @@ const RegistTable = (props) => {
         </tr>
       </thead>
       <tbody>
-        {props.data.map((row, i) => (
+        { props.data.map((row, i) => (
           <tr key={i}>
             {props.showNumber && <td>{i + 1}</td>}
             {props.columns.map((col, j) => (
