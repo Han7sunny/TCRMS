@@ -8,6 +8,8 @@ import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
 import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
+import com.kutca.tcrms.weightclass.entity.WeightClass;
+import com.kutca.tcrms.weightclass.repository.WeightClassRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ public class ParticipantService {
 
     private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
+    private final WeightClassRepository weightClassRepository;
 
     public ResponseDto<?> getIndividualList(Long userId) {
 
@@ -55,7 +58,12 @@ public class ParticipantService {
                                 .isEditable(user.getIsEditable())
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
-                                .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(IndividualParticipantResponseDto::fromEntity).collect(Collectors.toList())))
+                                .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(participant -> {
+                                    Optional<WeightClass> weightClass = weightClassRepository.findById(participant.getWeightClass().getWeightClassId());
+                                    if(weightClass.isEmpty())
+                                        return ResponseDto.builder().isSuccess(false).message("체급 정보를 찾을 수 없습니다.").build();
+                                    return IndividualParticipantResponseDto.fromEntity(participant, weightClass.get());
+                                        }).collect(Collectors.toList())))
                                 .build()
                 )
                 .build();

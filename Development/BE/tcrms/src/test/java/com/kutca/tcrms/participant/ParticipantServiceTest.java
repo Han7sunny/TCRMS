@@ -9,6 +9,8 @@ import com.kutca.tcrms.participant.repository.ParticipantRepository;
 import com.kutca.tcrms.participant.service.ParticipantService;
 import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
+import com.kutca.tcrms.weightclass.entity.WeightClass;
+import com.kutca.tcrms.weightclass.repository.WeightClassRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,9 @@ public class ParticipantServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private WeightClassRepository weightClassRepository;
+
 //    @BeforeEach
 //    void setUp() {
 //        MockitoAnnotations.openMocks(this);
@@ -57,8 +62,19 @@ public class ParticipantServiceTest {
                 .isDepositConfirmed(false)
                 .build();
 
+        WeightClass weightClass1 = WeightClass.builder()
+                .weightClassId(1L)
+                .name("플라이")
+                .build();
+
+        WeightClass weightClass2 = WeightClass.builder()
+                .weightClassId(2L)
+                .name("라이트")
+                .build();
+
         //  추후 request participantsResponseDto로 수정
         Participant participant1 = Participant.builder()
+                .participantId(1L)
                 .name("이다빈")
                 .identityNumber("961207-2345678")
                 .gender("여성")
@@ -67,11 +83,12 @@ public class ParticipantServiceTest {
                 .nationality(null)
                 .phoneNumber("010-1234-5678")
                 .user(user)
-//                        .weightClass()
+                .weightClass(weightClass1)
                 .build();
 
 
         Participant participant2 = Participant.builder()
+                .participantId(2L)
                 .name("Tom")
                 .identityNumber("991010-1234567")
                 .gender("남성")
@@ -80,11 +97,13 @@ public class ParticipantServiceTest {
                 .nationality("영국")
                 .phoneNumber("010-1111-9876")
                 .user(user)
-//                        .weightClass()
+                .weightClass(weightClass2)
                 .build();
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(participantRepository.findAllByUser_UserId(userId)).willReturn(Arrays.asList(participant1, participant2));
+        given(weightClassRepository.findById(1L)).willReturn(Optional.of(weightClass1));
+        given(weightClassRepository.findById(2L)).willReturn(Optional.of(weightClass2));
 
         //  when
         ResponseDto<?> responseDto = participantService.getIndividualList(userId);
@@ -104,9 +123,11 @@ public class ParticipantServiceTest {
 //        assertNull(individualParticipantResponseDto.get(0).getNationality());  //  entity 설정에 default null로 설정해주기?
         assertEquals(individualParticipantResponseDto.get(0).getParticipantName(), participant1.getName());
         assertEquals(individualParticipantResponseDto.get(0).getIdentityNumber(), participant1.getIdentityNumber());
+        assertEquals(individualParticipantResponseDto.get(0).getWeightClassId(), weightClass1.getWeightClassId());
 
         assertTrue(individualParticipantResponseDto.get(1).getIsForeigner());
         assertEquals(individualParticipantResponseDto.get(1).getNationality(), participant2.getNationality());
+        assertEquals(individualParticipantResponseDto.get(1).getWeightClassId(), weightClass2.getWeightClassId());
 
     }
 }
