@@ -59,7 +59,9 @@ public class ParticipantService {
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
                                 .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(participant -> {
+//                                    if(participant.getWeightClass() != null)
                                     Optional<WeightClass> weightClass = weightClassRepository.findById(participant.getWeightClass().getWeightClassId());
+                                    //  종목이 겨루기일 경우에만 체급 정보 보유 (1,3)
                                     if(weightClass.isEmpty())
                                         return ResponseDto.builder().isSuccess(false).message("체급 정보를 찾을 수 없습니다.").build();
                                     return IndividualParticipantResponseDto.fromEntity(participant, weightClass.get());
