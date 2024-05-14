@@ -6,9 +6,11 @@ import com.kutca.tcrms.weightclass.entity.WeightClass;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Participant {
 
@@ -43,4 +45,5 @@ public class Participant {
 
     @OneToOne(mappedBy = "participant")
     private ParticipantFile participantFile;
+
 }
