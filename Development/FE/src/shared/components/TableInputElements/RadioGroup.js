@@ -31,7 +31,7 @@ const RadioGroup = (props) => {
 
   useEffect(() => {
     // affector //
-    if (props.affector && props.affector.type === "setting") {
+    if (props.affector && props.affector.type === "setting" && value) {
       // affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
       const affectorId = id.split("-")[0] + props.affector.id;
       const element = document.getElementById(affectorId);

@@ -26,20 +26,20 @@ const App = () => {
   let routes;
   let isLogin = !!token && !isFirstLogin;
 
-  if (isLogin) {
-    if (isAdmin) {
-      routes = (
-        <Switch>
-          <Route path="/" exact>
-            <Redirect to="/regist" />
-          </Route>
-          <Route path="/regist" exact>
-            <RegistMain />
-          </Route>
-          <Redirect to="/" />
-        </Switch>
-      );
-    } else {
+  // if (isLogin) {
+  //   if (isAdmin) {
+  //     routes = (
+  //       <Switch>
+  //         <Route path="/" exact>
+  //           <Redirect to="/regist" />
+  //         </Route>
+  //         <Route path="/regist" exact>
+  //           <RegistMain />
+  //         </Route>
+  //         <Redirect to="/" />
+  //       </Switch>
+  //     );
+  //   } else {
       // 일반 대표자
       routes = (
         <Switch>
@@ -61,20 +61,20 @@ const App = () => {
           <Redirect to="/" />
         </Switch>
       );
-    }
-  } else {
-    routes = (
-      <Switch>
-        <Route path="/" exact>
-          <Redirect to="/login" />
-        </Route>
-        <Route path="/login" exact>
-          <Login />
-        </Route>
-        <Redirect to="/login" />
-      </Switch>
-    );
-  }
+    // }
+  // } else {
+  //   routes = (
+  //     <Switch>
+  //       <Route path="/" exact>
+  //         <Redirect to="/login" />
+  //       </Route>
+  //       <Route path="/login" exact>
+  //         <Login />
+  //       </Route>
+  //       <Redirect to="/login" />
+  //     </Switch>
+  //   );
+  // }
 
   return (
     <AuthContext.Provider
@@ -104,7 +104,8 @@ const App = () => {
         />
         {isLoading && <LoadingSpinner asOverlay />}
         <Router>
-          {isLogin && <MainNavigation />}
+          {/* {isLogin && <MainNavigation />} */}
+          {<MainNavigation />}
           <main>{routes}</main>
         </Router>
       </HttpContext.Provider>

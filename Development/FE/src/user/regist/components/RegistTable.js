@@ -12,25 +12,37 @@ const RegistTable = (props) => {
   const inputField = (colInfo, initVal, rowidx, colidx, key) => {
     switch (colInfo.type) {
       case "text":
-        return (
-          <div
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
-            key={key}
-          >
-            &nbsp;{initVal}&nbsp;
-          </div>
-        );
+        if (Array.isArray(initVal)) {
+          return (
+            <div
+              id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+              key={key}
+            >
+              &nbsp;{initVal.join(", ")}&nbsp;
+            </div>
+          );
+        } else {
+          return (
+            <div
+              id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+              key={key}
+            >
+              &nbsp;{initVal}&nbsp;
+            </div>
+          );
+        }
       case "text-hidden":
+        const val = initVal.join("");
         return (
           <div
             id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
           >
             &nbsp;
-            {hideText
-              ? initVal.substr(0, colInfo.detail.showCharNum) +
-                "*".repeat(initVal.length - colInfo.detail.showCharNum)
-              : initVal}
+            {initVal[0] && hideText
+              ? val.substr(0, colInfo.detail.showCharNum) +
+                "*".repeat(val.length - colInfo.detail.showCharNum)
+              : val}
             &nbsp;
           </div>
         );
