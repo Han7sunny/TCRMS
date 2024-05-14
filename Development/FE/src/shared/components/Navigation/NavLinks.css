@@ -20,6 +20,13 @@
   float: right;
 }
 
+.nav-links__logout .text-remain-time {
+  float: right;
+  margin: 5px;
+  font-size: 13px;
+  font-weight: 300;
+}
+
 .nav-links > li {
   margin-top: 30px;
   margin-left: 20px;

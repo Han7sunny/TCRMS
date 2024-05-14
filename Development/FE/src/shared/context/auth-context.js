@@ -8,4 +8,5 @@ export const AuthContext = createContext({
   logout: () => {},
   isAdmin: false,
   isFirstLogin: true,
+  tokenExpirationDate: null,
 });

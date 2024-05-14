@@ -19,28 +19,23 @@ import RegistMain from "./user/regist/pages/RegistMain";
 import RegistIndividual from "./user/regist/pages/RegistIndividual";
 
 const App = () => {
-  const { token, login, logout, userId, isAdmin, isFirstLogin } = useAuth();
+  const {
+    token,
+    login,
+    logout,
+    userId,
+    isAdmin,
+    isFirstLogin,
+    tokenExpirationDate,
+  } = useAuth();
   const { isLoading, error, sendRequest, setError, clearError } =
     useHttpClient();
 
   let routes;
   let isLogin = !!token && !isFirstLogin;
 
-  // if (isLogin) {
-  //   if (isAdmin) {
-  //     routes = (
-  //       <Switch>
-  //         <Route path="/" exact>
-  //           <Redirect to="/regist" />
-  //         </Route>
-  //         <Route path="/regist" exact>
-  //           <RegistMain />
-  //         </Route>
-  //         <Redirect to="/" />
-  //       </Switch>
-  //     );
-  //   } else {
-      // 일반 대표자
+  if (isLogin) {
+    if (isAdmin) {
       routes = (
         <Switch>
           <Route path="/" exact>
@@ -49,9 +44,19 @@ const App = () => {
           <Route path="/regist" exact>
             <RegistMain />
           </Route>
-          <Route path="/regist/individual" exact>
-            <RegistIndividual />
+          <Redirect to="/" />
+        </Switch>
+      );
+    } else {
+      // 일반 대표자
+      routes = (
+        <Switch>
+          <Route path="/" exact>
+            <Redirect to="/regist" />
           </Route>
+          <Route path="/regist" exact component={RegistMain} />
+          <Route path="/regist/individual" exact component={RegistIndividual} />
+
           <Route path="/docu" exact>
             {/* <NewPlace /> */}
           </Route>
@@ -61,20 +66,20 @@ const App = () => {
           <Redirect to="/" />
         </Switch>
       );
-    // }
-  // } else {
-  //   routes = (
-  //     <Switch>
-  //       <Route path="/" exact>
-  //         <Redirect to="/login" />
-  //       </Route>
-  //       <Route path="/login" exact>
-  //         <Login />
-  //       </Route>
-  //       <Redirect to="/login" />
-  //     </Switch>
-  //   );
-  // }
+    }
+  } else {
+    routes = (
+      <Switch>
+        <Route path="/" exact>
+          <Redirect to="/login" />
+        </Route>
+        <Route path="/login" exact>
+          <Login />
+        </Route>
+        <Redirect to="/login" />
+      </Switch>
+    );
+  }
 
   return (
     <AuthContext.Provider
@@ -86,6 +91,7 @@ const App = () => {
         logout: logout,
         isAdmin: isAdmin,
         isFirstLogin: isFirstLogin,
+        tokenExpirationDate: tokenExpirationDate,
       }}
     >
       <HttpContext.Provider
@@ -104,8 +110,8 @@ const App = () => {
         />
         {isLoading && <LoadingSpinner asOverlay />}
         <Router>
-          {/* {isLogin && <MainNavigation />} */}
-          {<MainNavigation />}
+          {isLogin && <MainNavigation />}
+          {/* {<MainNavigation />} */}
           <main>{routes}</main>
         </Router>
       </HttpContext.Provider>

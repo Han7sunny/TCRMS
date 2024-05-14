@@ -1,8 +1,9 @@
 import { createContext } from "react";
 
 export const HttpContext = createContext({
-  isLoading: false, 
-  error: null, 
-  sendRequest: () => {}, 
+  isLoading: false,
+  error: null,
+  sendRequest: () => {},
+  setError: () => {},
   clearError: () => {},
 });

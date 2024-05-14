@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import { AuthContext } from "../../context/auth-context";
@@ -9,6 +9,29 @@ import "./NavLinks.css";
 const NavLinks = () => {
   const auth = useContext(AuthContext);
   const http = useContext(HttpContext);
+
+  const calculateRemainingTime = useCallback(() => {
+    const remainingTime =
+      auth.tokenExpirationDate.getTime() - new Date().getTime();
+    const remainingHours = Math.floor(remainingTime / (1000 * 60 * 60));
+    const remainingMinutes = Math.floor(
+      (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
+    );
+
+    return remainingHours + "시간 " + remainingMinutes + "분";
+  }, [auth.tokenExpirationDate]);
+
+  const [remainingTime, setRemainingTime] = useState(calculateRemainingTime());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRemainingTime(calculateRemainingTime());
+    }, 5000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [auth.tokenExpirationDate, calculateRemainingTime]);
 
   const logout = async () => {
     try {
@@ -83,6 +106,7 @@ const NavLinks = () => {
       </div>
       <ul className="nav-links">{auth.isAdmin ? adminMenu : userMenu}</ul>
       <div className="nav-links__logout" onClick={logout}>
+        <div className="text-remain-time">남은 시간 : {remainingTime}</div>
         <Button type="submit">로그아웃</Button>
       </div>
     </React.Fragment>

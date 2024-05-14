@@ -11,13 +11,13 @@ export const useAuth = () => {
 
   const login = useCallback(
     (uid, token, isAdmin, isFirstLogin, expirationDate) => {
-      setToken(token);
       setUserId(uid);
       setIsAdmin(isAdmin);
       setIsFirstLogin(isFirstLogin);
       const tokenExpirationDate =
         expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60 * 2);
       setTokenExpirationDate(tokenExpirationDate);
+      setToken(token);
       localStorage.setItem(
         "userData",
         JSON.stringify({
@@ -43,7 +43,10 @@ export const useAuth = () => {
     if (token && tokenExpirationDate) {
       const remainingTime =
         tokenExpirationDate.getTime() - new Date().getTime();
-      logoutTimer = setTimeout(logout, remainingTime);
+      logoutTimer = setTimeout(() => {
+        logout();
+        alert("토큰 시간이 만료되어 로그인되었습니다. 재로그인해주세요.");
+      }, remainingTime);
     } else {
       clearTimeout(logoutTimer);
     }
@@ -66,5 +69,13 @@ export const useAuth = () => {
     }
   }, [login]);
 
-  return { token, login, logout, userId, isAdmin, isFirstLogin };
+  return {
+    token,
+    login,
+    logout,
+    userId,
+    isAdmin,
+    isFirstLogin,
+    tokenExpirationDate,
+  };
 };

@@ -100,14 +100,10 @@ const Login = () => {
       } catch (err) {}
     } else {
       try {
-        // if (formState.inputs["password-initial"].value !== "password") {
-        // inputPassInitRef.current.focus();
         inputPassInitRef.current.clear();
-        //   throw new Error(
-        //     "초기 비밀번호가 일치하지 않습니다. 다시 입력해주세요."
-        //   );
-        // }
+        inputPassInitRef.current.focus();
 
+        console.log(document.activeElement);
         const responseData = await http.sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/api/changePW`,
           "POST",
@@ -126,19 +122,17 @@ const Login = () => {
         if (responseData.isSuccess) {
           alert("비밀번호가 변경되었습니다.");
         }
-        // // TODO : change Dummy DATA
-        // const responseData = {
-        //   userId: 1,
-        //   token: "asdf",
-        //   isAdmin: false,
-        // };
-        // 비밀번호 변경 백에서 에러날 경우 에러 코드 수행 안되는지 확인하기
+        // // // TODO : change Dummy DATA
+        // // const responseData = {
+        // //   userId: 1,
+        // //   token: "asdf",
+        // //   isAdmin: false,
+        // // };
+        // // 비밀번호 변경 백에서 에러날 경우 에러 코드 수행 안되는지 확인하기
 
         //비밀번호 변경 후 로그인
         auth.login(auth.userId, auth.token, auth.isAdmin, false);
-      } catch (err) {
-        // http.setError(err.message);
-      }
+      } catch (err) {}
     }
   };
 

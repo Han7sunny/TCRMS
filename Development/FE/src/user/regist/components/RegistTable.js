@@ -12,14 +12,25 @@ const RegistTable = (props) => {
   const inputField = (colInfo, initVal, rowidx, colidx, key) => {
     switch (colInfo.type) {
       case "text":
-        return (
-          <div
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
-            key={key}
-          >
-            &nbsp;{initVal}&nbsp;
-          </div>
-        );
+        if (Array.isArray(initVal)) {
+          return (
+            <div
+              id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+              key={key}
+            >
+              &nbsp;{initVal.join(", ")}&nbsp;
+            </div>
+          );
+        } else {
+          return (
+            <div
+              id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+              key={key}
+            >
+              &nbsp;{initVal}&nbsp;
+            </div>
+          );
+        }
       case "text-hidden":
         const val = initVal.join("");
         return (
@@ -28,7 +39,7 @@ const RegistTable = (props) => {
             key={key}
           >
             &nbsp;
-            {hideText
+            {initVal[0] && hideText
               ? val.substr(0, colInfo.detail.showCharNum) +
                 "*".repeat(val.length - colInfo.detail.showCharNum)
               : val}
@@ -87,6 +98,7 @@ const RegistTable = (props) => {
           <Button
             id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
+            type="button"
             onClick={props.buttonHandler}
           >
             {colInfo.detail.content}
