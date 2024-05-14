@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
-    List<Participant> findAllByUserId(Long user_id);
+    List<Participant> findAllByUser_UserId(Long user_id);
 }

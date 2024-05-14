@@ -33,7 +33,7 @@ public class ParticipantService {
         }
 
         User user = findUser.get();
-        List<Participant> findParticipantList = participantRepository.findAllByUserId(userId);
+        List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(userId);
         if(findParticipantList.isEmpty()){
             return ResponseDto.builder()
                     .isSuccess(true)

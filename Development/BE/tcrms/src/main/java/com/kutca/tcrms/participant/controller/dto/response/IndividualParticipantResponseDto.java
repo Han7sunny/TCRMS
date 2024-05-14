@@ -2,8 +2,10 @@ package com.kutca.tcrms.participant.controller.dto.response;
 
 import com.kutca.tcrms.participant.entity.Participant;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class IndividualParticipantResponseDto {
 
     private Long participantId;
