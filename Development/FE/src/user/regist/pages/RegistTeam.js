@@ -15,7 +15,7 @@ import Button from "../../../shared/components/TableInputElements/Button";
 
 import "./RegistIndividual.css";
 
-const RegistIndividual = () => {
+const RegistTeam = () => {
   const auth = useContext(AuthContext);
   const { sendRequest, setError } = useContext(HttpContext);
 
@@ -133,15 +133,15 @@ const RegistIndividual = () => {
   // 개인전 페이지 들어오면 먼저 개인전 저장된 데이터 있는지 체크
   const individualListHandler = useCallback(async () => {
     try {
-      // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/individual-list`,
-      //   "GET",
-      //   null,
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //   },
-      //   "개인전 선수 로드 실패"
-      // );
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/individual-list`,
+        "GET",
+        null,
+        {
+          Authorization: `Bearer ${auth.token}`,
+        },
+        "개인전 선수 로드 실패"
+      );
 
       // // TODO : change Dummy DATA
       // const responseData = {
@@ -172,10 +172,10 @@ const RegistIndividual = () => {
       //     ],
       //   },
       // };
-      const responseData = {
-        isSuccess: true,
-        payload: { isParticipantExists: false },
-      };
+      // const responseData = {
+      //   isSuccess: true,
+      //   payload: { isParticipantExists: false },
+      // };
 
       if (responseData.payload.isParticipantExists) {
         setIsRegistMode(false);
@@ -309,4 +309,4 @@ const RegistIndividual = () => {
   );
 };
 
-export default RegistIndividual;
+export default RegistTeam;

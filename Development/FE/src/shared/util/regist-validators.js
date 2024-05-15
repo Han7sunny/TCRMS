@@ -76,3 +76,55 @@ export const checkValidityIndividual = (participant) => {
 
   return { result: true };
 };
+
+export const checkValiditySecond = (participant) => {
+  const { name, sex, idnumber } = participant;
+
+  if (!name) {
+    return {
+      result: false,
+      message: "이름을 입력해주세요.",
+      focusCol: "-col0-name",
+    };
+  }
+  if (!sex) {
+    return {
+      result: false,
+      message: "성별을 선택해주세요.",
+      focusCol: "-col1-sex",
+    };
+  }
+
+  if (idnumber[0] || idnumber[2]) {
+    if (/[^0-9]/.test(idnumber[0])) {
+      return {
+        result: false,
+        message: "주민번호에 숫자만 입력해주세요.",
+        focusCol: "-col4-idnumber-input0",
+      };
+    }
+    if (/[^0-9]/.test(idnumber[2])) {
+      return {
+        result: false,
+        message: "주민번호에 숫자만 입력해주세요.",
+        focusCol: "-col4-idnumber-input2",
+      };
+    }
+    if (idnumber[0].length !== 6) {
+      return {
+        result: false,
+        message: "주민번호 자리수가 맞지 않습니다.",
+        focusCol: "-col4-idnumber-input0",
+      };
+    }
+    if (idnumber[2].length !== 7) {
+      return {
+        result: false,
+        message: "주민번호 자리수가 맞지 않습니다.",
+        focusCol: "-col4-idnumber-input2",
+      };
+    }
+  }
+
+  return { result: true };
+};
