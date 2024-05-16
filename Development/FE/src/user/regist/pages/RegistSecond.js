@@ -56,6 +56,8 @@ const RegistSecond = () => {
 
   const formatParticipant = (participant, mode) => {
     if (mode === 1) {
+      let idnumber = participant.identityNumber && participant.identityNumber.split("-");
+
       return {
         participantId: participant.participantId,
         name: participant.name,
@@ -64,9 +66,9 @@ const RegistSecond = () => {
         nationality: participant.nationality,
         idnumber: participant.identityNumber
           ? [
-              participant.identityNumber.substr(0, 6),
+              idnumber[0],
               "-",
-              participant.identityNumber.substr(8, 14),
+              idnumber[1],
             ]
           : [],
       };
@@ -74,7 +76,7 @@ const RegistSecond = () => {
 
     if (mode === 2) {
       let identityNumber = participant.idnumber.join("");
-      if (identityNumber === "-") identityNumber = undefined;
+      if (identityNumber === "-") identityNumber = null;
 
       return {
         participantId: participant.participantId,
@@ -101,7 +103,7 @@ const RegistSecond = () => {
       //   "세컨 정보 로드 실패"
       // );
 
-      // // TODO : change Dummy DATA
+      // TODO : change Dummy DATA
       const responseData = {
         isSuccess: true,
         payload: {

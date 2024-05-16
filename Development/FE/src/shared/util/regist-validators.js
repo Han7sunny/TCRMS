@@ -128,3 +128,55 @@ export const checkValiditySecond = (participant) => {
 
   return { result: true };
 };
+
+export const checkValidityVolunteer = (participant) => {
+  const { name, sex, phoneNumber } = participant;
+
+  if (!name) {
+    return {
+      result: false,
+      message: "이름을 입력해주세요.",
+      focusCol: "-col0-name",
+    };
+  }
+  if (!sex) {
+    return {
+      result: false,
+      message: "성별을 선택해주세요.",
+      focusCol: "-col1-sex",
+    };
+  }
+
+  if (phoneNumber[0] || phoneNumber[2] || phoneNumber[4]) {
+    if (/[^0-9]/.test(phoneNumber[0])) {
+      return {
+        result: false,
+        message: "전화번호에 숫자만 입력해주세요.",
+        focusCol: "-col2-phoneNumber-input0",
+      };
+    }
+    if (/[^0-9]/.test(phoneNumber[2])) {
+      return {
+        result: false,
+        message: "전화번호에 숫자만 입력해주세요.",
+        focusCol: "-col2-phoneNumber-input1",
+      };
+    }
+    if (/[^0-9]/.test(phoneNumber[4])) {
+      return {
+        result: false,
+        message: "전화번호에 숫자만 입력해주세요.",
+        focusCol: "-col2-phoneNumber-input2",
+      };
+    }
+    if (phoneNumber[0].length !== 3) {
+      return {
+        result: false,
+        message: "전화번호 자리수가 맞지 않습니다.",
+        focusCol: "-col2-phoneNumber-input0",
+      };
+    }
+  }
+
+  return { result: true };
+};

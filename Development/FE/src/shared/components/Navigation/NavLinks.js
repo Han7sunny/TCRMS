@@ -21,17 +21,17 @@ const NavLinks = () => {
     return remainingHours + "시간 " + remainingMinutes + "분";
   }, [auth.tokenExpirationDate]);
 
-  const [remainingTime, setRemainingTime] = useState(calculateRemainingTime());
+  // const [remainingTime, setRemainingTime] = useState(calculateRemainingTime());
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingTime(calculateRemainingTime());
-    }, 5000);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setRemainingTime(calculateRemainingTime());
+  //   }, 5000);
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, [auth.tokenExpirationDate, calculateRemainingTime]);
+    // return () => {
+    //   clearInterval(timer);
+    // };
+  // }, [auth.tokenExpirationDate, calculateRemainingTime]);
 
   const logout = async () => {
     try {
@@ -106,7 +106,7 @@ const NavLinks = () => {
       </div>
       <ul className="nav-links">{auth.isAdmin ? adminMenu : userMenu}</ul>
       <div className="nav-links__logout" onClick={logout}>
-        <div className="text-remain-time">남은 시간 : {remainingTime}</div>
+        {/* <div className="text-remain-time">남은 시간 : {remainingTime}</div> */}
         <Button type="submit">로그아웃</Button>
       </div>
     </React.Fragment>

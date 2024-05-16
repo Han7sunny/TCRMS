@@ -423,3 +423,57 @@ export const TABLE_COLUMNS_CHECK_SECOND = [
     detail: { showCharNum: 7 },
   },
 ];
+
+// volunteer
+export const TABLE_COLUMNS_REGIST_VOLUNTEER = [
+  {
+    id: "name",
+    name: "성명",
+    type: "input",
+    detail: { validators: [VALIDATOR_REQUIRE()], placeholder: "성명" },
+  },
+  {
+    id: "sex",
+    name: "성별",
+    type: "radio-group",
+    detail: {
+      items: ["남성", "여성"],
+      showLabel: true,
+    },
+  },
+  {
+    id: "idnumber",
+    name: "주민등록번호",
+    type: "multi-input",
+    detail: [
+      {
+        id: "idnumber-input0",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(3)] },
+      },
+      { id: "idnum-hypen1", type: "text" },
+      {
+        id: "idnumber-input1",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(4)] },
+      },
+      { id: "idnum-hypen2", type: "text" },
+      {
+        id: "idnumber-input2",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(4)] },
+      },
+    ],
+  },
+  { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
+];
+
+export const TABLE_COLUMNS_CHECK_VOLUNTEER = [
+  { id: "name", name: "성명", type: "text" },
+  { id: "sex", name: "성별", type: "text" },
+  {
+    id: "phoneNumber",
+    name: "전화번호",
+    type: "text",
+  },
+];

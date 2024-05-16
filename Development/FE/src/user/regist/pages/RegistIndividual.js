@@ -83,6 +83,8 @@ const RegistIndividual = () => {
           );
         }
       }
+    
+      let idnumber = participant.identityNumber && participant.identityNumber.split("-");
 
       return {
         participantId: participant.participantId,
@@ -92,9 +94,9 @@ const RegistIndividual = () => {
         nationality: participant.nationality,
         idnumber: participant.identityNumber
           ? [
-              participant.identityNumber.substr(0, 6),
+              idnumber[0],
               "-",
-              participant.identityNumber.substr(8, 14),
+              idnumber[1],
             ]
           : [],
         event: event,
@@ -104,7 +106,7 @@ const RegistIndividual = () => {
 
     if (mode === 2) {
       let identityNumber = participant.idnumber.join("");
-      if (identityNumber === "-") identityNumber = undefined;
+      if (identityNumber === "-") identityNumber = null;
 
       let eventId = [];
       participant.event.forEach((eventname) => {

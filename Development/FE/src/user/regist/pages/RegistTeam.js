@@ -84,6 +84,8 @@ const RegistTeam = () => {
         }
       }
 
+      let idnumber = participant.identityNumber && participant.identityNumber.split("-");
+
       return {
         participantId: participant.participantId,
         name: participant.name,
@@ -92,10 +94,10 @@ const RegistTeam = () => {
         nationality: participant.nationality,
         idnumber: participant.identityNumber
           ? [
-              participant.identityNumber.substr(0, 6),
-              "-",
-              participant.identityNumber.substr(8, 14),
-            ]
+            idnumber[0],
+            "-",
+            idnumber[1],
+          ]
           : [],
         event: event,
         weight: weight,
@@ -104,7 +106,7 @@ const RegistTeam = () => {
 
     if (mode === 2) {
       let identityNumber = participant.idnumber.join("");
-      if (identityNumber === "-") identityNumber = undefined;
+      if (identityNumber === "-") identityNumber = null;
 
       let eventId = [];
       participant.event.forEach((eventname) => {
