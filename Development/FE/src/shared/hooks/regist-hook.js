@@ -13,6 +13,7 @@ const registReducer = (state, action) => {
       }
       if (idArr.length === 4) {
         let subidx = Number(idArr[3].replace("input", ""));
+
         data[row][idArr[2]][subidx] = action.value;
       }
 

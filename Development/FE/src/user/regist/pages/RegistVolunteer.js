@@ -29,14 +29,14 @@ const RegistVolunteer = () => {
         {
           name: "",
           sex: "",
-          phoneNumber: ["", "-", "", "-", ""]
+          phoneNumber: ["", "-", "", "-", ""],
           // idnumber: ["", "-", ""],
         },
       ],
       {
         name: "",
         sex: "",
-        phoneNumber: ["", "-", "", "-", ""]
+        phoneNumber: ["", "-", "", "-", ""],
       }
     );
 
@@ -53,20 +53,15 @@ const RegistVolunteer = () => {
 
   const formatParticipant = (participant, mode) => {
     if (mode === 1) {
-      let phoneNumber = participant.phoneNumber && participant.phoneNumber.split("-");
-      
+      let phoneNumber =
+        participant.phoneNumber && participant.phoneNumber.split("-");
+
       return {
         participantId: participant.participantId,
         name: participant.name,
         sex: participant.gender, // 남성,여성인지 체크
         phoneNumber: participant.phoneNumber
-          ? [
-              phoneNumber[0],
-              "-",
-              phoneNumber[1],
-              "-",
-              phoneNumber[2],
-            ]
+          ? [phoneNumber[0], "-", phoneNumber[1], "-", phoneNumber[2]]
           : [],
       };
     }
@@ -79,6 +74,7 @@ const RegistVolunteer = () => {
         participantId: participant.participantId,
         name: participant.name,
         gender: participant.sex,
+        phoneNumber: phoneNumber,
         eventId: EVENT_ID["자원봉사자"],
       };
     }
@@ -87,32 +83,32 @@ const RegistVolunteer = () => {
   // 자원봉사자 페이지 들어오면 먼저 자원봉사자 저장된 데이터 있는지 체크
   const volunteerListHandler = useCallback(async () => {
     try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/volunteer-list`,
-        "GET",
-        null,
-        {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        "자원봉사자 정보 로드 실패"
-      );
-
-      // // TODO : change Dummy DATA
-      // const responseData = {
-      //   isSuccess: true,
-      //   payload: {
-      //     isParticipantExists: true,
-      //     participants: [
-      //       {
-      //         participantId: 1,
-      //         name: "조서영",
-      //         gender: "여성",
-      //         phoneNumber: "010-5137-8081",
-      //         eventId: 11,
-      //       },
-      //     ],
+      // const responseData = await sendRequest(
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/volunteer-list`,
+      //   "GET",
+      //   null,
+      //   {
+      //     Authorization: `Bearer ${auth.token}`,
       //   },
-      // };
+      //   "자원봉사자 정보 로드 실패"
+      // );
+
+      // TODO : change Dummy DATA
+      const responseData = {
+        isSuccess: true,
+        payload: {
+          isParticipantExists: true,
+          participants: [
+            {
+              participantId: 1,
+              name: "조서영",
+              gender: "여성",
+              phoneNumber: "010-5137-8081",
+              eventId: 11,
+            },
+          ],
+        },
+      };
       // const responseData = {
       //   isSuccess: true,
       //   payload: { isParticipantExists: false },

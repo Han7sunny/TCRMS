@@ -353,7 +353,7 @@ export const TABLE_COLUMNS_CHECK_INDIVIDUAL = [
     type: "text-hidden",
     detail: { showCharNum: 7 },
   },
-  { id: "event", name: "종목", type: "text" },
+  { id: "event", name: "종목", type: "text", detail: { separator: ", " } },
   { id: "weight", name: "체급(겨루기만)", type: "text" },
 ];
 
@@ -442,24 +442,24 @@ export const TABLE_COLUMNS_REGIST_VOLUNTEER = [
     },
   },
   {
-    id: "idnumber",
-    name: "주민등록번호",
+    id: "phoneNumber",
+    name: "전화번호",
     type: "multi-input",
     detail: [
       {
-        id: "idnumber-input0",
+        id: "phoneNumber-input0",
         type: "input",
         detail: { validators: [VALIDATOR_REQUIRE_LENGTH(3)] },
       },
-      { id: "idnum-hypen1", type: "text" },
+      { id: "phoneNumber-hypen1", type: "text" },
       {
-        id: "idnumber-input1",
+        id: "phoneNumber-input2",
         type: "input",
         detail: { validators: [VALIDATOR_REQUIRE_LENGTH(4)] },
       },
-      { id: "idnum-hypen2", type: "text" },
+      { id: "phoneNumber-hypen3", type: "text" },
       {
-        id: "idnumber-input2",
+        id: "phoneNumber-input4",
         type: "input",
         detail: { validators: [VALIDATOR_REQUIRE_LENGTH(4)] },
       },

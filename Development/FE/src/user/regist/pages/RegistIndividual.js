@@ -83,8 +83,9 @@ const RegistIndividual = () => {
           );
         }
       }
-    
-      let idnumber = participant.identityNumber && participant.identityNumber.split("-");
+
+      let idnumber =
+        participant.identityNumber && participant.identityNumber.split("-");
 
       return {
         participantId: participant.participantId,
@@ -93,11 +94,7 @@ const RegistIndividual = () => {
         foreigner: participant.isForeigner ? ["외국인"] : [],
         nationality: participant.nationality,
         idnumber: participant.identityNumber
-          ? [
-              idnumber[0],
-              "-",
-              idnumber[1],
-            ]
+          ? [idnumber[0], "-", idnumber[1]]
           : [],
         event: event,
         weight: weight,
@@ -146,38 +143,38 @@ const RegistIndividual = () => {
       // );
 
       // // TODO : change Dummy DATA
-      // const responseData = {
-      //   isSuccess: true,
-      //   payload: {
-      //     isParticipantExists: true,
-      //     participants: [
-      //       {
-      //         participantId: 1,
-      //         weightClassId: 1,
-      //         name: "조서영",
-      //         identityNumber: "961201-0000000",
-      //         gender: "여성",
-      //         isForeigner: false,
-      //         nationality: "",
-      //         eventId: [1, 2],
-      //       },
-      //       {
-      //         participantId: 2,
-      //         //weightClassId: ,
-      //         name: "조땡땡",
-      //         identityNumber: "961201-0000001",
-      //         gender: "남성",
-      //         isForeigner: true,
-      //         nationality: "영국",
-      //         eventId: [4],
-      //       },
-      //     ],
-      //   },
-      // };
       const responseData = {
         isSuccess: true,
-        payload: { isParticipantExists: false },
+        payload: {
+          isParticipantExists: true,
+          participants: [
+            {
+              participantId: 1,
+              weightClassId: 1,
+              name: "조서영",
+              identityNumber: "961201-0000000",
+              gender: "여성",
+              isForeigner: false,
+              nationality: "",
+              eventId: [1, 2],
+            },
+            {
+              participantId: 2,
+              //weightClassId: ,
+              name: "조땡땡",
+              identityNumber: "961201-0000001",
+              gender: "남성",
+              isForeigner: true,
+              nationality: "영국",
+              eventId: [4],
+            },
+          ],
+        },
       };
+      // const responseData = {
+      //   isSuccess: true,
+      //   payload: { isParticipantExists: false },
+      // };
 
       if (responseData.payload.isParticipantExists) {
         setIsRegistMode(false);

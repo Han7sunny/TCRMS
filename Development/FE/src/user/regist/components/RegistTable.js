@@ -18,7 +18,9 @@ const RegistTable = (props) => {
               id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
               key={key}
             >
-              &nbsp;{initVal.join(", ")}&nbsp;
+              &nbsp;
+              {initVal.join(colInfo.detail ? colInfo.detail.separator : "")}
+              &nbsp;
             </div>
           );
         } else {
