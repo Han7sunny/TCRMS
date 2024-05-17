@@ -1,11 +1,14 @@
 package com.kutca.tcrms.participant.service;
 
 import com.kutca.tcrms.common.dto.response.ResponseDto;
+import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.participant.controller.dto.response.IndividualParticipantResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
+import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
+import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
 import com.kutca.tcrms.weightclass.entity.WeightClass;
@@ -24,6 +27,7 @@ public class ParticipantService {
     private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
     private final WeightClassRepository weightClassRepository;
+    private final ParticipantApplicationRepository participantApplicationRepository;
 
     public ResponseDto<?> getIndividualList(Long userId) {
 
@@ -59,12 +63,9 @@ public class ParticipantService {
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
                                 .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(participant -> {
-//                                    if(participant.getWeightClass() != null)
-                                    Optional<WeightClass> weightClass = weightClassRepository.findById(participant.getWeightClass().getWeightClassId());
-                                    //  종목이 겨루기일 경우에만 체급 정보 보유 (1,3)
-                                    if(weightClass.isEmpty())
-                                        return ResponseDto.builder().isSuccess(false).message("체급 정보를 찾을 수 없습니다.").build();
-                                    return IndividualParticipantResponseDto.fromEntity(participant, weightClass.get());
+                                    List<ParticipantApplication> findParticipantApplicationList = participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(), 1L, 4L);
+                                    List<Event> eventList = findParticipantApplicationList.stream().map(ParticipantApplication::getEvent).toList();
+                                    return IndividualParticipantResponseDto.fromEntity(participant, participant.getWeightClass().getWeightClassId(), eventList);
                                         }).collect(Collectors.toList())))
                                 .build()
                 )

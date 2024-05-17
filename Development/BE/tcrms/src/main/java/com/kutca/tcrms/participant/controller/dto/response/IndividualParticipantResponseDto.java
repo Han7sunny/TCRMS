@@ -1,9 +1,13 @@
 package com.kutca.tcrms.participant.controller.dto.response;
 
+import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.weightclass.entity.WeightClass;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @Getter
@@ -21,11 +25,11 @@ public class IndividualParticipantResponseDto {
 
     private String identityNumber;
 
-    private Long[] eventId;
+    private List<Long> eventIds;
 
     private Long weightClassId;
 
-    public static IndividualParticipantResponseDto fromEntity(Participant participant, WeightClass weightClass) {
+    public static IndividualParticipantResponseDto fromEntity(Participant participant, Long weightClassId, List<Event> eventList) {
         return IndividualParticipantResponseDto.builder()
                 .participantId(participant.getParticipantId())
                 .participantName(participant.getName())
@@ -33,8 +37,8 @@ public class IndividualParticipantResponseDto {
                 .isForeigner(participant.getIsForeigner())
                 .nationality(participant.getNationality())
                 .identityNumber(participant.getIdentityNumber())
-//                .eventId(participant.eventId)
-                .weightClassId(weightClass.getWeightClassId())
+                .eventIds(eventList.stream().map(Event::getEventId).collect(Collectors.toList()))
+                .weightClassId(weightClassId)
                 .build();
     }
 

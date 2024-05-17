@@ -4,9 +4,11 @@ import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.participant.entity.Participant;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ParticipantApplication {
 
@@ -27,4 +29,5 @@ public class ParticipantApplication {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
+
 }

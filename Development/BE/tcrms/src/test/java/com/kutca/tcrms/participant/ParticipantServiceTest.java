@@ -2,15 +2,18 @@ package com.kutca.tcrms.participant;
 
 import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.common.enums.Role;
+import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.participant.controller.dto.response.IndividualParticipantResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
 import com.kutca.tcrms.participant.service.ParticipantService;
+import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
 import com.kutca.tcrms.weightclass.entity.WeightClass;
 import com.kutca.tcrms.weightclass.repository.WeightClassRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,10 +43,27 @@ public class ParticipantServiceTest {
     @Mock
     private WeightClassRepository weightClassRepository;
 
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//    }
+    @Mock
+    private ParticipantApplicationRepository participantApplicationRepository;
+
+//    @Mock
+//    private EventRepository eventRepository;
+
+    @BeforeEach
+    void setUp() {
+        Event event1 = Event.builder().eventId(1L).eventName("개인전 여자 겨루기").build();
+        Event event2 = Event.builder().eventId(2L).eventName("개인전 여자 품새").build();
+        Event event3 = Event.builder().eventId(3L).eventName("개인전 남자 겨루기").build();
+        Event event4 = Event.builder().eventId(4L).eventName("개인전 남자 품새").build();
+        Event event5 = Event.builder().eventId(5L).eventName("단체전 여자 겨루기").build();
+        Event event6 = Event.builder().eventId(6L).eventName("단체전 여자 품새").build();
+        Event event7 = Event.builder().eventId(7L).eventName("단체전 남자 겨루기").build();
+        Event event8 = Event.builder().eventId(8L).eventName("단체전 남자 품새").build();
+        Event event9 = Event.builder().eventId(9L).eventName("단체전 혼성 품새").build();
+        Event event10 = Event.builder().eventId(10L).eventName("세컨").build();
+        Event event11 = Event.builder().eventId(11L).eventName("자원봉사자").build();
+
+    }
 
     @Test
     @DisplayName("개인전 신청 확인 성공")
