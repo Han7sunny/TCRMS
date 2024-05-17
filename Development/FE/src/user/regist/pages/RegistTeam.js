@@ -1,11 +1,11 @@
 import React, { useState, useContext, useEffect, useCallback } from "react";
 
 import {
-  TABLE_COLUMNS_REGIST_INDIVIDUAL,
-  TABLE_COLUMNS_CHECK_INDIVIDUAL,
+  TABLE_COLUMNS_REGIST_TEAM,
+  TABLE_COLUMNS_CHECK_TEAM,
 } from "../../../shared/util/regist-columns";
 import { EVENT_ID, WEIGHT_ID } from "../../../shared/util/const-event";
-import { checkValidityIndividual } from "../../../shared/util/regist-validators";
+import { checkValidityTeam } from "../../../shared/util/regist-validators";
 import { useRegist } from "../../../shared/hooks/regist-hook";
 import { HttpContext } from "../../../shared/context/http-context";
 import { AuthContext } from "../../../shared/context/auth-context";
@@ -27,13 +27,47 @@ const RegistTeam = () => {
     useRegist(
       [
         {
-          name: "",
-          sex: "",
-          foreigner: [],
-          nationality: "",
-          idnumber: ["", "-", ""],
-          event: [],
-          weight: "",
+          event_team_number: null,
+          event: null,
+
+          team_members: [
+            {
+              index: "1번 선수",
+              name: "",
+              // sex: "", 혼성도 적지 말아? 아니면 자동체크
+              foreigner: [],
+              nationality: "",
+              idnumber: ["", "-", ""],
+              weight: "",
+            },
+            {
+              index: "2번 선수",
+              name: "",
+              // sex: "", 혼성도 적지 말아? 아니면 자동체크
+              foreigner: [],
+              nationality: "",
+              idnumber: ["", "-", ""],
+              weight: "",
+            },
+            {
+              index: "3번 선수",
+              name: "",
+              // sex: "", 혼성도 적지 말아? 아니면 자동체크
+              foreigner: [],
+              nationality: "",
+              idnumber: ["", "-", ""],
+              weight: "",
+            },
+            {
+              index: "후보 선수",
+              name: "",
+              // sex: "", 혼성도 적지 말아? 아니면 자동체크
+              foreigner: [],
+              nationality: "",
+              idnumber: ["", "-", ""],
+              weight: "",
+            },
+          ]
         },
       ],
       {
