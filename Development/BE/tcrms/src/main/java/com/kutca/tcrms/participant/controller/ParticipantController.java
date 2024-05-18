@@ -3,6 +3,7 @@ package com.kutca.tcrms.participant.controller;
 import com.kutca.tcrms.common.dto.request.RequestDto;
 import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
 import com.kutca.tcrms.participant.service.ParticipantService;
+import com.kutca.tcrms.participantapplication.service.ParticipantApplicationService;
 import io.jsonwebtoken.security.Request;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class ParticipantController {
 
     private final ParticipantService participantService;
+    private final ParticipantApplicationService participantApplicationService;
 
     @GetMapping("/api/user/individual")
     public ResponseEntity<?> getIndividualList(@RequestParam Long userId) {
@@ -32,6 +34,16 @@ public class ParticipantController {
         }
         catch (Exception e) {
             return new ResponseEntity<>("개인전 신청 예외 발생", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/api/user/individual")
+    public ResponseEntity<?> deleteIndividual() {
+        try {
+            return new ResponseEntity<>(participantApplicationService.deleteParticipantApplication(), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("개인전 신청 삭제 예외 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
