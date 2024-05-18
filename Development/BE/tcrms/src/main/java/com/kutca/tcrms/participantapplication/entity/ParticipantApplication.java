@@ -3,12 +3,12 @@ package com.kutca.tcrms.participantapplication.entity;
 import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.participant.entity.Participant;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ParticipantApplication {
 
