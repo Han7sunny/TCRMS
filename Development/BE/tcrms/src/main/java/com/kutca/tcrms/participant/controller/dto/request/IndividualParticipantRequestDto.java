@@ -4,22 +4,35 @@ import lombok.Getter;
 
 import java.util.List;
 
-@Getter
+
 public class IndividualParticipantRequestDto {
 
-    private String name;
+    @Getter
+    public static class Regist {
 
-    private String gender;
+        private String name;
 
-    private Boolean isForeigner;
+        private String gender;
 
-    private String nationality;
+        private Boolean isForeigner;
 
-    private String identityNumber;
+        private String nationality;
 
-    private String phoneNumber;
+        private String identityNumber;
 
-    private List<Long> eventIds;
+        private String phoneNumber;
 
-    private Long weightClassId;
+        private List<Long> eventIds;
+
+        private Long weightClassId;
+    }
+
+    @Getter
+    public static class Delete {
+
+        private Long participantId;
+
+        private List<Long> participantApplicationIds;
+    }
+
 }

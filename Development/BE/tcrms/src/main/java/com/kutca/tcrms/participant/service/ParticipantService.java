@@ -76,7 +76,7 @@ public class ParticipantService {
                 .build();
     }
 
-    public ResponseDto<?> registIndividualList(RequestDto<IndividualParticipantRequestDto> individualParticipantRequestDto) {
+    public ResponseDto<?> registIndividualList(RequestDto<IndividualParticipantRequestDto.Regist> individualParticipantRequestDto) {
 
         Optional<User> findUser = userRepository.findById(individualParticipantRequestDto.getUserId());
         if(findUser.isEmpty()){

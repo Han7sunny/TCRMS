@@ -28,7 +28,7 @@ public class ParticipantController {
     }
 
     @PostMapping("/api/user/individual")
-    public ResponseEntity<?> registIndividualList(@RequestBody RequestDto<IndividualParticipantRequestDto> individualParticipantRequestDto) {
+    public ResponseEntity<?> registIndividualList(@RequestBody RequestDto<IndividualParticipantRequestDto.Regist> individualParticipantRequestDto) {
         try {
             return new ResponseEntity<>(participantService.registIndividualList(individualParticipantRequestDto), HttpStatus.OK);
         }
@@ -38,9 +38,9 @@ public class ParticipantController {
     }
 
     @DeleteMapping("/api/user/individual")
-    public ResponseEntity<?> deleteIndividual() {
+    public ResponseEntity<?> deleteIndividual(@RequestBody IndividualParticipantRequestDto.Delete individualParticipantRequestDto) {
         try {
-            return new ResponseEntity<>(participantApplicationService.deleteParticipantApplication(), HttpStatus.OK);
+            return new ResponseEntity<>(participantApplicationService.deleteParticipantApplication(individualParticipantRequestDto), HttpStatus.OK);
         }
         catch (Exception e) {
             return new ResponseEntity<>("개인전 신청 삭제 예외 발생", HttpStatus.INTERNAL_SERVER_ERROR);

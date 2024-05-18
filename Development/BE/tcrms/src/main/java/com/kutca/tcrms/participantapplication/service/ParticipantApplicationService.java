@@ -1,6 +1,8 @@
 package com.kutca.tcrms.participantapplication.service;
 
 import com.kutca.tcrms.common.dto.response.ResponseDto;
+import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
+import com.kutca.tcrms.participant.repository.ParticipantRepository;
 import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,10 +12,24 @@ import org.springframework.stereotype.Service;
 public class ParticipantApplicationService {
 
     private final ParticipantApplicationRepository participantApplicationRepository;
+    private final ParticipantRepository participantRepository;
 
-    public ResponseDto<?> deleteParticipantApplication(){
-        //  1. participantApplication (참가자 신청 종목) 삭제
-        //  2. participantApplication에서 participant 하나도 없으면 parcitipant 삭제
+    public ResponseDto<?> deleteParticipantApplication(IndividualParticipantRequestDto.Delete individualParticipantRequestDto){
+
+        individualParticipantRequestDto.getParticipantApplicationIds().stream().forEach(participantApplicationId -> {
+            participantApplicationRepository.deleteById(participantApplicationId);
+            //  학교별 신청 종목 팀 데이터 변경
+                //  2차 수정 및 취소 기간
+        });
+
+//        Boolean isOtherParticipantApplicationExist = participantApplicationRepository.existsByParticipantApplicationId(individualParticipantRequestDto.getParticipantId());
+
+//        if(!isOtherParticipantApplicationExist){
+//            participantRepository.deleteById(individualParticipantRequestDto.getParticipantId());
+//            //  participant_file
+//            //  file
+//        }
+
         return ResponseDto.builder()
                 .isSuccess(true)
                 .build();
