@@ -44,14 +44,15 @@
 .regist-form .regist-team {
   background-color: #fafafa;
   border-radius: 4px;
-  padding: 7px 12px 12px 12px;
-  margin-bottom: 8px;
+  padding: 8px 18px 18px 18px;
+  margin-bottom: 16px;
   border: 1px solid #969696;
 }
 
 .regist-form .regist-team .regist-team-subtitle {
   padding: 5px;
-  font-weight: 300;
+  font-size: 17px;
+  font-weight: 400;
   display: flex;
 }
 

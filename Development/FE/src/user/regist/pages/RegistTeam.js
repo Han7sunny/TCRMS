@@ -10,8 +10,13 @@ import { useRegist } from "../../../shared/hooks/regist-hook";
 import { HttpContext } from "../../../shared/context/http-context";
 import { AuthContext } from "../../../shared/context/auth-context";
 
-import RegistTable from "../components/RegistTable";
+import RegistTeamTable from "../components/RegistTeamTable";
 import Button from "../../../shared/components/TableInputElements/Button";
+
+import "./RegistTeam.css";
+
+// popup 에서 누르면 addRow하고 member 숫자만큼 데이터 추가하기
+// 단체전 별 member 숫자는 util에서 정해주는 걸루
 
 const RegistTeam = () => {
   const auth = useContext(AuthContext);
@@ -20,6 +25,10 @@ const RegistTeam = () => {
   const [isFirst, setIsFirst] = useState(true);
   const [isRegistMode, setIsRegistMode] = useState(false);
   const [apiFail, setApiFail] = useState(false);
+
+  const errMsgPersonName = "팀";
+  const englishTitle = "team";
+  const checkValidity = checkValidityTeam;
 
   const [registState, inputHandler, addRow, deleteRow, setRegistData] =
     useRegist(
@@ -84,8 +93,38 @@ const RegistTeam = () => {
 
   const deleteTeamHandler = (event) => {
     event.preventDefault();
-    const teamNum = Number(event.target.id.split("-")[2]);
+    const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
     deleteRow(teamNum);
+  };
+
+  const deleteDataHandler = async (event) => {
+    event.preventDefault();
+    const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
+
+    try {
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
+        "DELETE",
+        JSON.stringify({
+          userId: auth.userId,
+          eventTeamNumber: registState.inputs[teamNum].eventTeamNumber,
+        }),
+        {
+          Authorization: `Bearer ${auth.token}`,
+          "Content-Type": "application/json",
+        },
+        `${errMsgPersonName} 삭제 실패`
+      );
+
+      if (responseData.isSuccess) {
+        deleteRow(teamNum);
+      } else {
+        setError({
+          title: `${errMsgPersonName} 삭제 실패`,
+          detail: responseData.message,
+        });
+      }
+    } catch (error) {}
   };
 
   const formatTeam = (team, mode) => {
@@ -117,7 +156,7 @@ const RegistTeam = () => {
       return {
         eventTeamNumber: team.eventTeamNumber,
         event: EVENT_ID[eventName].name,
-
+        editable: false,
         teamMembers: team.teamMembers.map((member) => {
           return {
             index: member.index,
@@ -315,6 +354,68 @@ const RegistTeam = () => {
     }
   };
 
+  const modifyModeHandler = (event) => {
+    event.preventDefault();
+    const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
+    let teamsData = registState.inputs;
+    teamsData[teamNum].editable = true;
+    setRegistData(teamsData);
+  };
+
+  const modifyTeamHandler = async (event) => {
+    try {
+      const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
+      const teamData = registState.inputs[teamNum];
+
+      // validity check
+      const teamMemberNumber = teamData.teamMembers.length;
+
+      for (let i = 0; i < teamMemberNumber; i++) {
+        const { result, message, focusCol } = checkValidity(
+          teamData.teamMembers[i]
+        );
+        if (!result) {
+          // 포커스 틀린 컬럼으로
+          document.getElementById(`team${teamNum}-row${i}${focusCol}`).focus();
+          setError({ title: "입력정보 확인", detail: message });
+          return;
+        }
+      }
+
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
+        "PUT",
+        JSON.stringify({
+          userId: auth.userId,
+          teams: [formatTeam(teamData, 2)],
+        }),
+        {
+          Authorization: `Bearer ${auth.token}`,
+          "Content-Type": "application/json",
+        },
+
+        `${errMsgPersonName} 수정 실패`
+      );
+      // const responseData = {
+      //   isSuccess: true,
+      //   message: "check please",
+      // };
+
+      if (responseData.isSuccess) {
+        let teamsData = registState.inputs;
+        teamsData[teamNum].editable = false;
+        setRegistData(teamsData);
+      } else {
+        setError({
+          title: `${errMsgPersonName} 수정 실패`,
+          detail: responseData.message,
+        });
+      }
+    } catch (err) {
+      // throw err;
+    }
+  };
+
   const switchModeHandler = (event) => {
     event.preventDefault();
 
@@ -351,7 +452,7 @@ const RegistTeam = () => {
         .then(() => {
           // list get
           teamListHandler();
-          setIsRegistMode(!isRegistMode);
+          // setIsRegistMode(!isRegistMode);
         })
         .catch(() => {});
     } else {
@@ -381,14 +482,14 @@ const RegistTeam = () => {
               <div className="regist-team-subtitle">
                 <div>{team.event}</div>
                 <Button
-                  id={`btn-team-${i}`}
+                  id={`btn-team${i}-delete`}
                   onClick={deleteTeamHandler}
                   type="button"
                 >
                   팀 삭제
                 </Button>
               </div>
-              <RegistTable
+              <RegistTeamTable
                 columns={TABLE_COLUMNS_REGIST_TEAM}
                 data={team.teamMembers}
                 inputHandler={inputHandler}
@@ -409,10 +510,43 @@ const RegistTeam = () => {
             <div className="regist-team" key={team.eventTeamNumber}>
               <div className="regist-team-subtitle">
                 <div>{team.event}</div>
+                {team.editable ? (
+                  <React.Fragment>
+                    <Button
+                      id={`btn-team${i}-modify`}
+                      className="btn-team-modify"
+                      onClick={modifyTeamHandler}
+                      type="button"
+                    >
+                      수정완료
+                    </Button>
+                    <Button
+                      id={`btn-team${i}-delete`}
+                      className="btn-team-delete"
+                      onClick={deleteDataHandler}
+                      type="button"
+                    >
+                      삭제하기
+                    </Button>
+                  </React.Fragment>
+                ) : (
+                  <Button
+                    id={`btn-team${i}-modechange`}
+                    className="btn-team-modechange"
+                    onClick={modifyModeHandler}
+                    type="button"
+                  >
+                    수정하기
+                  </Button>
+                )}
               </div>
-              <RegistTable
+              <RegistTeamTable
+                version="check"
                 columns={TABLE_COLUMNS_CHECK_TEAM}
+                modifyColumns={TABLE_COLUMNS_REGIST_TEAM}
                 data={team.teamMembers}
+                inputHandler={inputHandler}
+                editMode={team.editable}
                 teamId={`team${i}-`}
               />
             </div>

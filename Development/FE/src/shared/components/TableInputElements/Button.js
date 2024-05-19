@@ -8,7 +8,7 @@ const Button = (props) => {
       id={props.id}
       className={`table-button table-button--${props.size || "default"} ${
         props.inverse && "table-button--inverse"
-      } ${props.danger && "table-button--danger"} ${props.className}`}
+      } ${props.danger && "table-button--danger"} ${props.className} `}
       type={props.type}
       onClick={props.onClick}
       disabled={props.disabled}
