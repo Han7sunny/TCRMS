@@ -2,7 +2,8 @@ table.regist-table {
   border-spacing: 0px;
   border-style: none;
   border-collapse: collapse;
-  width: fit-content;
+  /* width: fit-content; */
+  width: 100%;
   box-shadow: 1px 1px 2px #9f9e9e;
 }
 
@@ -48,4 +49,21 @@ td {
 
 .regist-table .table-column__hide-btn:hover {
   color: black;
+}
+
+.regist-table .td-flex {
+  display: flex;
+}
+
+.regist-table .btn-modify {
+  /* font-size: 10px;
+  padding: 1px;
+  width: 75px; */
+  margin-right: 3px;
+}
+
+.regist-table .btn-delete {
+  /* font-size: 10px;
+  padding: 1px;
+  width: 75px; */
 }

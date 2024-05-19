@@ -7,7 +7,6 @@ const registReducer = (state, action) => {
       let row = Number(idArr[0].replace("row", ""));
 
       let data = state.inputs;
-
       if (idArr.length === 3) {
         data[row][idArr[2]] = action.value;
       }
@@ -24,7 +23,8 @@ const registReducer = (state, action) => {
 
     case "ADD_ROW":
       let addRow = state.inputs;
-      addRow.push(action.value);
+      const newRow = JSON.parse(JSON.stringify(action.value));
+      addRow.push(newRow);
 
       return {
         ...state,
@@ -55,13 +55,17 @@ export const useRegist = (initialInputs, defaultInputs) => {
     inputs: initialInputs,
   });
 
-  const inputHandler = useCallback((id, value, isValid) => {
-    dispatch({
-      type: "INPUT_CHANGE",
-      value: value,
-      isValid: isValid,
-      inputId: id,
-    });
+  const inputHandler = useCallback((id, value, isValid, teamId) => {
+    if (teamId) {
+      console.log("HE");
+    } else {
+      dispatch({
+        type: "INPUT_CHANGE",
+        value: value,
+        isValid: isValid,
+        inputId: id,
+      });
+    }
   }, []);
 
   const addRow = useCallback(() => {

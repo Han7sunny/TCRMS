@@ -19,6 +19,10 @@
   font-size: 14px;
 }
 
+.regist-form .regist-btn-add-row button {
+  padding: 4px 12px;
+}
+
 .regist-form .regist-btn-submit,
 .check-btn-submit {
   padding: 16px 0;
@@ -35,4 +39,24 @@
   width: 140px;
   height: 40px;
   font-weight: 400;
+}
+
+.regist-form .regist-team {
+  background-color: #fafafa;
+  border-radius: 4px;
+  padding: 7px 12px 12px 12px;
+  margin-bottom: 8px;
+  border: 1px solid #969696;
+}
+
+.regist-form .regist-team .regist-team-subtitle {
+  padding: 5px;
+  font-weight: 300;
+  display: flex;
+}
+
+.regist-form .regist-team .regist-team-subtitle .table-button {
+  margin-left: 8px;
+  width: 60px;
+  font-size: 12px;
 }

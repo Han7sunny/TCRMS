@@ -13,8 +13,6 @@ import { AuthContext } from "../../../shared/context/auth-context";
 import RegistTable from "../components/RegistTable";
 import Button from "../../../shared/components/TableInputElements/Button";
 
-import "./RegistIndividual.css";
-
 const RegistTeam = () => {
   const auth = useContext(AuthContext);
   const { sendRequest, setError } = useContext(HttpContext);
@@ -27,10 +25,10 @@ const RegistTeam = () => {
     useRegist(
       [
         {
-          event_team_number: null,
-          event: null,
+          eventTeamNumber: 2,
+          event: 5,
 
-          team_members: [
+          teamMembers: [
             {
               index: "1번 선수",
               name: "",
@@ -67,158 +65,223 @@ const RegistTeam = () => {
               idnumber: ["", "-", ""],
               weight: "",
             },
-          ]
+          ],
         },
       ],
       {
-        name: "",
-        sex: "",
-        foreigner: [],
-        nationality: "",
-        idnumber: ["", "-", ""],
-        event: [],
-        weight: "",
+        eventTeamNumber: null,
+        event: null,
+
+        teamMembers: [],
       }
     );
 
-  const addRowHandler = (event) => {
+  const addTeamHandler = (event) => {
     event.preventDefault();
-    addRow();
+    // modal 띄우기
+    // addRow();
   };
 
-  const deleteRowHandler = (event) => {
+  const deleteTeamHandler = (event) => {
     event.preventDefault();
-    const rowNum = Number(event.target.id.split("-")[0].replace("row", ""));
-    deleteRow(rowNum);
+    const teamNum = Number(event.target.id.split("-")[2]);
+    deleteRow(teamNum);
   };
 
-  const formatParticipant = (participant, mode) => {
+  const formatTeam = (team, mode) => {
     if (mode === 1) {
-      let event = new Set();
-      if (participant.eventId) {
-        participant.eventId.forEach((eventId) => {
-          let eventName = Object.keys(EVENT_ID).find(
-            (key) => EVENT_ID[key] === eventId
-          );
-          event.add(eventName.split(" ")[2]);
-        });
+      let eventName;
+      if (team.eventId) {
+        eventName = Object.keys(EVENT_ID).find(
+          (key) => EVENT_ID[key].id === team.eventId
+        );
       }
-      event = [...event];
 
-      let weight = "";
-      if (participant.weightClassId) {
-        if (participant.gender === "남성") {
-          weight = Object.keys(WEIGHT_ID["남성"]).find(
-            (key) => WEIGHT_ID["남성"][key] === participant.weightClassId
-          );
-        } else if (participant.gender === "여성") {
-          weight = Object.keys(WEIGHT_ID["여성"]).find(
-            (key) => WEIGHT_ID["여성"][key] === participant.weightClassId
+      const getWeight = (weightId, sex) => {
+        let weight = "";
+        if (weightId) {
+          weight = Object.keys(WEIGHT_ID[sex]).find(
+            (key) => WEIGHT_ID[sex][key] === weightId
           );
         }
-      }
+        return weight;
+      };
 
-      let idnumber = participant.identityNumber && participant.identityNumber.split("-");
+      const getIdNumber = (identityNumber) => {
+        if (!identityNumber) return "";
+
+        let idnumber = identityNumber.split("-");
+        return [idnumber[0], "-", idnumber[1]];
+      };
 
       return {
-        participantId: participant.participantId,
-        name: participant.name,
-        sex: participant.gender, // 남성,여성인지 체크
-        foreigner: participant.isForeigner ? ["외국인"] : [],
-        nationality: participant.nationality,
-        idnumber: participant.identityNumber
-          ? [
-            idnumber[0],
-            "-",
-            idnumber[1],
-          ]
-          : [],
-        event: event,
-        weight: weight,
+        eventTeamNumber: team.eventTeamNumber,
+        event: EVENT_ID[eventName].name,
+
+        teamMembers: team.teamMembers.map((member) => {
+          return {
+            index: member.index,
+            name: member.name,
+            sex: member.gender,
+            foreigner: member.isForeigner ? ["외국인"] : [],
+            nationality: member.nationality,
+            idnumber: getIdNumber(member.identityNumber),
+            weight: getWeight(member.weightClassId, member.gender),
+          };
+        }),
       };
     }
 
     if (mode === 2) {
-      let identityNumber = participant.idnumber.join("");
-      if (identityNumber === "-") identityNumber = null;
+      let eventName;
+      if (team.eventId) {
+        eventName = Object.keys(EVENT_ID).find(
+          (key) => EVENT_ID[key].name === team.event
+        );
+      }
 
-      let eventId = [];
-      participant.event.forEach((eventname) => {
-        let eventKey = "개인전 " + participant.sex + " " + eventname;
-        eventId.push(EVENT_ID[eventKey]);
-      });
+      const getIdNumber = (idnumber) => {
+        let identityNumber = idnumber.join("");
+        if (identityNumber === "-") identityNumber = null;
+        return identityNumber;
+      };
 
-      let weightClassId;
-      if (participant.sex === "남성")
-        weightClassId = WEIGHT_ID["남성"][participant.weight];
-      else weightClassId = WEIGHT_ID["여성"][participant.weight];
+      console.log(team);
 
       return {
-        participantId: participant.participantId,
-        name: participant.name,
-        gender: participant.sex,
-        isForeigner: participant.foreigner.length > 0 ? true : false,
-        nationality: participant.nationality,
-        identityNumber: identityNumber,
-        eventId: eventId,
-        weightClassId: weightClassId,
+        eventTeamNumber: team.eventTeamNumber,
+        eventId: EVENT_ID[eventName].id,
+
+        teamMembers: team.teamMembers.map((member) => {
+          return {
+            index: member.index,
+            name: member.name,
+            gender: member.sex,
+            isForeigner: member.foreigner.length > 0 ? true : false,
+            nationality: member.nationality,
+            identityNumber: getIdNumber(member.idnumber),
+            weightClassId: WEIGHT_ID[member.sex][member.weight],
+          };
+        }),
       };
     }
   };
 
-  // 개인전 페이지 들어오면 먼저 개인전 저장된 데이터 있는지 체크
-  const individualListHandler = useCallback(async () => {
+  // 단체전 페이지 들어오면 먼저 단체전 저장된 데이터 있는지 체크
+  const teamListHandler = useCallback(async () => {
     try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/individual-list`,
-        "GET",
-        null,
-        {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        "개인전 선수 로드 실패"
-      );
+      // const responseData = await sendRequest(
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/team-list`,
+      //   "GET",
+      //   null,
+      //   {
+      //     Authorization: `Bearer ${auth.token}`,
+      //   },
+      //   "단체전 선수 로드 실패"
+      // );
 
       // // TODO : change Dummy DATA
+      const responseData = {
+        isSuccess: true,
+        payload: {
+          isTeamExists: true,
+          teams: [
+            {
+              eventTeamNumber: 2,
+              eventId: 5,
+
+              teamMembers: [
+                {
+                  participantId: 1,
+                  index: "1번 선수",
+                  name: "조서영",
+                  gender: "여성",
+                  isForeigner: false,
+                  nationality: "",
+                  identityNumber: "961201-0000000",
+                  weightClassId: 1,
+                },
+                {
+                  participantId: 2,
+                  index: "2번 선수",
+                  name: "조투투",
+                  gender: "여성",
+                  isForeigner: false,
+                  nationality: "",
+                  identityNumber: "961202-0000000",
+                  weightClassId: 5,
+                },
+                {
+                  participantId: 3,
+                  index: "3번 선수",
+                  name: "조삼삼",
+                  gender: "여성",
+                  isForeigner: false,
+                  nationality: "",
+                  identityNumber: "961203-0000000",
+                  weightClassId: 6,
+                },
+                {
+                  participantId: 4,
+                  index: "후보 선수",
+                  name: "조후보",
+                  gender: "여성",
+                  isForeigner: false,
+                  nationality: "",
+                  identityNumber: "961204-0000000",
+                  weightClassId: 9,
+                },
+              ],
+            },
+            {
+              eventTeamNumber: 3,
+              eventId: 8,
+
+              teamMembers: [
+                {
+                  participantId: 1,
+                  index: "1번 선수",
+                  name: "조서영",
+                  gender: "남성",
+                  isForeigner: false,
+                  nationality: "",
+                  identityNumber: "961201-0000000",
+                  weightClassId: 7,
+                },
+                {
+                  participantId: 2,
+                  index: "2번 선수",
+                  name: "조투투",
+                  gender: "남성",
+                  isForeigner: false,
+                  nationality: "",
+                  identityNumber: "961202-0000000",
+                  weightClassId: 8,
+                },
+                {
+                  participantId: 3,
+                  index: "3번 선수",
+                  name: "조삼삼",
+                  gender: "남성",
+                  isForeigner: false,
+                  nationality: "",
+                  identityNumber: "961203-0000000",
+                  weightClassId: 6,
+                },
+              ],
+            },
+          ],
+        },
+      };
       // const responseData = {
       //   isSuccess: true,
-      //   payload: {
-      //     isParticipantExists: true,
-      //     participants: [
-      //       {
-      //         participantId: 1,
-      //         weightClassId: 1,
-      //         name: "조서영",
-      //         identityNumber: "961201-0000000",
-      //         gender: "여성",
-      //         isForeigner: false,
-      //         nationality: "",
-      //         eventId: [1, 2],
-      //       },
-      //       {
-      //         participantId: 2,
-      //         //weightClassId: ,
-      //         name: "조땡땡",
-      //         identityNumber: "961201-0000001",
-      //         gender: "남성",
-      //         isForeigner: true,
-      //         nationality: "영국",
-      //         eventId: [4],
-      //       },
-      //     ],
-      //   },
-      // };
-      // const responseData = {
-      //   isSuccess: true,
-      //   payload: { isParticipantExists: false },
+      //   payload: { isTeamExists: false },
       // };
 
-      if (responseData.payload.isParticipantExists) {
+      if (responseData.payload.isTeamExists) {
         setIsRegistMode(false);
         setRegistData(
-          responseData.payload.participants.map((participant) =>
-            formatParticipant(participant, 1)
-          )
+          responseData.payload.teams.map((team) => formatTeam(team, 1))
         );
       } else {
         setIsRegistMode(true); //useRegist 초기값 정하기
@@ -231,22 +294,21 @@ const RegistTeam = () => {
     }
   }, [auth.token, sendRequest, setRegistData]);
 
-  const individualRegistHandler = async () => {
+  const teamRegistHandler = async () => {
     try {
       // const responseData = await http.sendRequest(
       await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/individual-regist`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/team-regist`,
         "POST",
         JSON.stringify({
-          participants: registState.inputs.map((participant) =>
-            formatParticipant(participant, 2)
-          ),
+          userId: auth.userId,
+          teams: registState.inputs.map((team) => formatTeam(team, 2)),
         }),
         {
           Authorization: `Bearer ${auth.token}`,
           "Content-Type": "application/json",
         },
-        "개인전 선수 등록 실패"
+        "단체전 선수 등록 실패"
       );
     } catch (err) {
       throw err;
@@ -260,23 +322,23 @@ const RegistTeam = () => {
       // submit 전에 참가자 데이터 유효성 검증
       let isValidity = true;
       let errMsg;
-      const participantNumber = registState.inputs.length;
-      for (let i = 0; i < participantNumber; i++) {
-        const { result, message, focusCol } = checkValidityIndividual(
+      const teamNumber = registState.inputs.length;
+      for (let i = 0; i < teamNumber; i++) {
+        const { result, message, focusCol } = checkValidityTeam(
           registState.inputs[i]
         );
         isValidity = isValidity & result;
         if (!isValidity) {
-          errMsg = `${i + 1}번째 선수 : ` + message;
+          errMsg = `${i + 1}번째 팀 : ` + message;
           // 포커스 틀린 컬럼으로
           document.getElementById(`row${i}${focusCol}`).focus();
           break;
         }
       }
 
-      if (!participantNumber) {
+      if (!teamNumber) {
         isValidity = false;
-        errMsg = "선수를 한 명 이상 신청해주세요.";
+        errMsg = "단체전 한 팀 이상 신청해주세요.";
       }
 
       if (!isValidity) {
@@ -285,10 +347,10 @@ const RegistTeam = () => {
       }
 
       // register
-      individualRegistHandler()
+      teamRegistHandler()
         .then(() => {
           // list get
-          individualListHandler();
+          teamListHandler();
           setIsRegistMode(!isRegistMode);
         })
         .catch(() => {});
@@ -299,28 +361,42 @@ const RegistTeam = () => {
 
   // 컴포넌트 열자마자 리스트 불러오기
   useEffect(() => {
-    individualListHandler();
-  }, [individualListHandler]);
+    teamListHandler();
+  }, [teamListHandler]);
 
   return (
     <div className="regist-event">
       <h2 className="regist-event-title">
-        {isRegistMode ? "개인전 신청" : "개인전 신청확인"}
+        {isRegistMode ? "단체전 신청" : "단체전 신청확인"}
       </h2>
       {isRegistMode ? (
         <form className="regist-form">
           <div className="regist-btn-add-row">
-            <Button type="button" onClick={addRowHandler}>
-              선수 추가
+            <Button type="button" onClick={addTeamHandler}>
+              팀 추가
             </Button>
           </div>
-          <RegistTable
-            columns={TABLE_COLUMNS_REGIST_INDIVIDUAL}
-            data={registState.inputs}
-            inputHandler={inputHandler}
-            buttonHandler={deleteRowHandler}
-            showNumber
-          />
+          {registState.inputs.map((team, i) => (
+            <div className="regist-team" key={team.eventTeamNumber}>
+              <div className="regist-team-subtitle">
+                <div>{team.event}</div>
+                <Button
+                  id={`btn-team-${i}`}
+                  onClick={deleteTeamHandler}
+                  type="button"
+                >
+                  팀 삭제
+                </Button>
+              </div>
+              <RegistTable
+                columns={TABLE_COLUMNS_REGIST_TEAM}
+                data={team.teamMembers}
+                inputHandler={inputHandler}
+                teamId={`team${i}-`}
+              />
+            </div>
+          ))}
+
           <div className="regist-btn-submit">
             <Button type="button" onClick={switchModeHandler}>
               {isFirst ? "신청하기" : "수정완료"}
@@ -329,11 +405,18 @@ const RegistTeam = () => {
         </form>
       ) : (
         <div className="regist-form">
-          <RegistTable
-            columns={TABLE_COLUMNS_CHECK_INDIVIDUAL}
-            data={registState.inputs}
-            showNumber
-          />
+          {registState.inputs.map((team, i) => (
+            <div className="regist-team" key={team.eventTeamNumber}>
+              <div className="regist-team-subtitle">
+                <div>{team.event}</div>
+              </div>
+              <RegistTable
+                columns={TABLE_COLUMNS_CHECK_TEAM}
+                data={team.teamMembers}
+                teamId={`team${i}-`}
+              />
+            </div>
+          ))}
           <div className="check-btn-submit">
             <Button onClick={switchModeHandler} disabled={apiFail}>
               추가 및 수정하기

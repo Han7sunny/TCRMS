@@ -9,13 +9,15 @@ import Button from "../../../shared/components/TableInputElements/Button";
 import "./RegistTable.css";
 
 const RegistTable = (props) => {
+  const teamId = props.teamId || "";
+
   const inputField = (colInfo, initVal, rowidx, colidx, key) => {
     switch (colInfo.type) {
       case "text":
         if (Array.isArray(initVal)) {
           return (
             <div
-              id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+              id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
               key={key}
             >
               &nbsp;
@@ -26,7 +28,7 @@ const RegistTable = (props) => {
         } else {
           return (
             <div
-              id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+              id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
               key={key}
             >
               &nbsp;{initVal}&nbsp;
@@ -37,7 +39,7 @@ const RegistTable = (props) => {
         const val = initVal.join("");
         return (
           <div
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
           >
             &nbsp;
@@ -51,11 +53,12 @@ const RegistTable = (props) => {
       case "input":
         return (
           <Input
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
             element="input"
             type="text"
             onInput={props.inputHandler}
+            teamId={teamId}
             validators={colInfo.detail.validators}
             placeholder={colInfo.detail.placeholder}
             initialValue={initVal}
@@ -64,11 +67,12 @@ const RegistTable = (props) => {
       case "radio-group":
         return (
           <RadioGroup
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
             items={colInfo.detail.items}
             initialValue={initVal}
             onInput={props.inputHandler}
+            teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
           />
@@ -76,11 +80,12 @@ const RegistTable = (props) => {
       case "checkbox-group":
         return (
           <CheckboxGroup
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
             items={colInfo.detail.items}
             initialValue={initVal}
             onInput={props.inputHandler}
+            teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
           />
@@ -88,17 +93,18 @@ const RegistTable = (props) => {
       case "dropdown":
         return (
           <Dropdown
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
             items={colInfo.detail.items}
             onInput={props.inputHandler}
+            teamId={teamId}
             initialValue={initVal}
           />
         );
       case "button":
         return (
           <Button
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
             type="button"
             onClick={props.buttonHandler}
@@ -110,7 +116,7 @@ const RegistTable = (props) => {
         return (
           <div
             className="div-flex"
-            id={"row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+            id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
             key={key}
           >
             {colInfo.detail.map((item, i) =>
@@ -124,8 +130,90 @@ const RegistTable = (props) => {
 
   const [hideText, setHideText] = useState(true);
 
+  let bodyElement;
+  if (props.version === "check") {
+    bodyElement = props.data.map((row, i) => (
+      <tr key={i}>
+        {props.showNumber && <td>{i + 1}</td>}
+        {row.editable
+          ? props.modifyColumns.map((col, j) => (
+              <td key={"row" + i + "col" + j}>
+                {inputField(col, row[col.id], i, j)}
+              </td>
+            ))
+          : props.columns.map((col, j) => (
+              <td key={"row" + i + "col" + j}>
+                {inputField(col, row[col.id], i, j)}
+              </td>
+            ))}
+        {row.editable ? (
+          <React.Fragment>
+            <td>
+              <div className="td-flex">
+                <Button
+                  id={teamId + "row" + i + "-btn-modifyRow"}
+                  type="button"
+                  className="btn-modify"
+                  onClick={props.modifyHandler}
+                >
+                  수정완료
+                </Button>
+                <Button
+                  id={teamId + "row" + i + "-btn-delete"}
+                  type="button"
+                  className="btn-delete"
+                  onClick={props.deleteHandler}
+                >
+                  삭제
+                </Button>
+              </div>
+            </td>
+          </React.Fragment>
+        ) : (
+          <td>
+            <Button
+              id={teamId + "row" + i + "-btn-switchRow"}
+              type="button"
+              onClick={props.switchRowHanlder}
+            >
+              수정
+            </Button>
+          </td>
+        )}
+      </tr>
+    ));
+  } else if (props.version === "regist") {
+    bodyElement = props.data.map((row, i) => (
+      <tr key={i}>
+        {props.showNumber && <td>{i + 1}</td>}
+        {row.isNew
+          ? props.columns.map((col, j) => (
+              <td key={"row" + i + "col" + j}>
+                {inputField(col, row[col.id], i, j)}
+              </td>
+            ))
+          : props.checkColumns.map((col, j) => (
+              <td key={"row" + i + "col" + j}>
+                {inputField(col, row[col.id], i, j)}
+              </td>
+            ))}
+        <td>
+          {row.isNew && (
+            <Button
+              id={teamId + "row" + i + "-btn-deleteRow"}
+              type="button"
+              onClick={props.deleteHandler}
+            >
+              삭제
+            </Button>
+          )}
+        </td>
+      </tr>
+    ));
+  }
+
   return (
-    <table className="regist-table">
+    <table id={props.tableId} className="regist-table">
       <colgroup>
         {props.columns.map((col, i) => (
           <col key={col.id} className={"table-col-" + i} />
@@ -156,20 +244,10 @@ const RegistTable = (props) => {
               return <th key={col.id}>{col.name}</th>;
             }
           })}
+          <th></th>
         </tr>
       </thead>
-      <tbody>
-        {props.data.map((row, i) => (
-          <tr key={i}>
-            {props.showNumber && <td>{i + 1}</td>}
-            {props.columns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
+      <tbody>{bodyElement}</tbody>
     </table>
   );
 };

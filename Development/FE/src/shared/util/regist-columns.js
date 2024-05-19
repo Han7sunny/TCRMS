@@ -339,7 +339,7 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
       ],
     },
   },
-  { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
+  // { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
 ];
 
 export const TABLE_COLUMNS_CHECK_INDIVIDUAL = [
@@ -354,6 +354,98 @@ export const TABLE_COLUMNS_CHECK_INDIVIDUAL = [
     detail: { showCharNum: 7 },
   },
   { id: "event", name: "종목", type: "text", detail: { separator: ", " } },
+  { id: "weight", name: "체급(겨루기만)", type: "text" },
+];
+
+// team
+export const TABLE_COLUMNS_REGIST_TEAM = [
+  {
+    id: "index",
+    name: "",
+    type: "text",
+  },
+  {
+    id: "name",
+    name: "성명",
+    type: "input",
+    detail: { validators: [VALIDATOR_REQUIRE()], placeholder: "성명" },
+  },
+  {
+    id: "sex",
+    name: "성별",
+    type: "radio-group",
+    detail: {
+      items: ["남성", "여성"],
+      showLabel: true,
+      affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
+    },
+  },
+  {
+    id: "foreigner",
+    name: "외국인",
+    type: "checkbox-group",
+    detail: {
+      items: ["외국인"],
+      showLabel: true,
+      affector: { id: "-col4-nationality", type: "disabled", value: "외국인" },
+    },
+  },
+  {
+    id: "nationality",
+    name: "국적",
+    type: "dropdown",
+    detail: { items: nationalityCandidate },
+  },
+  {
+    id: "idnumber",
+    name: "주민등록번호",
+    type: "multi-input",
+    detail: [
+      {
+        id: "idnumber-input0",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(6)] },
+      },
+      { id: "idnum-hypen", type: "text" },
+      {
+        id: "idnumber-input2",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(7)] },
+      },
+    ],
+  },
+  {
+    id: "weight",
+    name: "체급(겨루기만)",
+    type: "dropdown",
+    detail: {
+      items: [
+        "체급선택",
+        "핀",
+        "플라이",
+        "밴텀",
+        "페더",
+        "라이트",
+        "웰터",
+        "미들",
+        "헤비",
+      ],
+    },
+  },
+];
+
+export const TABLE_COLUMNS_CHECK_TEAM = [
+  { id: "index", name: "", type: "text" },
+  { id: "name", name: "성명", type: "text" },
+  { id: "sex", name: "성별", type: "text" },
+  { id: "foreigner", name: "외국인", type: "text" },
+  { id: "nationality", name: "국적", type: "text" },
+  {
+    id: "idnumber",
+    name: "주민등록번호",
+    type: "text-hidden",
+    detail: { showCharNum: 7 },
+  },
   { id: "weight", name: "체급(겨루기만)", type: "text" },
 ];
 
@@ -408,7 +500,7 @@ export const TABLE_COLUMNS_REGIST_SECOND = [
       },
     ],
   },
-  { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
+  // { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
 ];
 
 export const TABLE_COLUMNS_CHECK_SECOND = [
@@ -465,7 +557,7 @@ export const TABLE_COLUMNS_REGIST_VOLUNTEER = [
       },
     ],
   },
-  { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
+  // { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
 ];
 
 export const TABLE_COLUMNS_CHECK_VOLUNTEER = [
