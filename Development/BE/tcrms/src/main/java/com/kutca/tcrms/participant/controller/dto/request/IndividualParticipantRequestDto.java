@@ -1,5 +1,6 @@
 package com.kutca.tcrms.participant.controller.dto.request;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -28,7 +29,10 @@ public class IndividualParticipantRequestDto {
     }
 
     @Getter
+    @Builder
     public static class Delete {
+
+        private Long userId;
 
         private Long participantId;
 

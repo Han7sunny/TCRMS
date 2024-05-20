@@ -133,8 +133,8 @@ public class ParticipantServiceTest {
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(participantRepository.findAllByUser_UserId(userId)).willReturn(Arrays.asList(participant1, participant2));
-        given(weightClassRepository.findById(1L)).willReturn(Optional.of(weightClass1));
-        given(weightClassRepository.findById(2L)).willReturn(Optional.of(weightClass2));
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant1.getParticipantId(), event1.getEventId(), event4.getEventId())).willReturn(Arrays.asList(participantApplication1, participantApplication2));
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant2.getParticipantId(), event1.getEventId(), event4.getEventId())).willReturn(Arrays.asList(participantApplication3));
 
         //  when
         ResponseDto<?> responseDto = participantService.getIndividualList(userId);
@@ -153,10 +153,12 @@ public class ParticipantServiceTest {
 //        assertNull(individualParticipantResponseDto.get(0).getNationality());  //  entity 설정에 default null로 설정해주기?
         assertEquals(individualParticipantResponseDto.get(0).getParticipantName(), participant1.getName());
         assertEquals(individualParticipantResponseDto.get(0).getIdentityNumber(), participant1.getIdentityNumber());
+        assertEquals(individualParticipantResponseDto.get(0).getEventIds().size(), 2);
         assertEquals(individualParticipantResponseDto.get(0).getWeightClassId(), weightClass1.getWeightClassId());
 
         assertTrue(individualParticipantResponseDto.get(1).getIsForeigner());
         assertEquals(individualParticipantResponseDto.get(1).getNationality(), participant2.getNationality());
+        assertEquals(individualParticipantResponseDto.get(1).getEventIds().size(), 1);
         assertEquals(individualParticipantResponseDto.get(1).getWeightClassId(), weightClass2.getWeightClassId());
 
     }
