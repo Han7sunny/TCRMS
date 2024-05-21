@@ -95,23 +95,23 @@ export const checkValidityTeam = (participant, event) => {
     return {
       result: false,
       message: "이름을 입력해주세요.",
-      focusCol: "-col0-name",
+      focusCol: "-col1-name",
     };
   }
   if (!sex) {
     return {
       result: false,
       message: "성별을 선택해주세요.",
-      focusCol: "-col1-sex",
+      focusCol: "-col2-sex",
     };
   }
 
   if (foreigner.join("") === "외국인") {
-    if (nationality === "국적선택") {
+    if (nationality === "국적선택" || !nationality) {
       return {
         result: false,
         message: "외국인 선수의 국적을 선택해주세요.",
-        focusCol: "-col3-nationality",
+        focusCol: "-col4-nationality",
       };
     }
   }
@@ -121,28 +121,28 @@ export const checkValidityTeam = (participant, event) => {
       return {
         result: false,
         message: "주민번호에 숫자만 입력해주세요.",
-        focusCol: "-col4-idnumber-input0",
+        focusCol: "-col5-idnumber-input0",
       };
     }
     if (/[^0-9]/.test(idnumber[2])) {
       return {
         result: false,
         message: "주민번호에 숫자만 입력해주세요.",
-        focusCol: "-col4-idnumber-input2",
+        focusCol: "-col5-idnumber-input2",
       };
     }
     if (idnumber[0].length !== 6) {
       return {
         result: false,
         message: "주민번호 자리수가 맞지 않습니다.",
-        focusCol: "-col4-idnumber-input0",
+        focusCol: "-col5-idnumber-input0",
       };
     }
     if (idnumber[2].length !== 7) {
       return {
         result: false,
         message: "주민번호 자리수가 맞지 않습니다.",
-        focusCol: "-col4-idnumber-input2",
+        focusCol: "-col5-idnumber-input2",
       };
     }
     if (
@@ -152,7 +152,7 @@ export const checkValidityTeam = (participant, event) => {
       return {
         result: false,
         message: "성별과 주민번호가 일치하지 않습니다.",
-        focusCol: "-col4-idnumber-input2",
+        focusCol: "-col5-idnumber-input2",
       };
     }
   }
@@ -162,7 +162,7 @@ export const checkValidityTeam = (participant, event) => {
       return {
         result: false,
         message: "체급을 선택해주세요.",
-        focusCol: "-col5-weight",
+        focusCol: "-col6-weight",
       };
     }
   }
@@ -189,7 +189,7 @@ export const checkValiditySecond = (participant) => {
   }
 
   if (foreigner.join("") === "외국인") {
-    if (nationality === "국적선택") {
+    if (nationality === "국적선택" || !nationality) {
       return {
         result: false,
         message: "외국인 선수의 국적을 선택해주세요.",

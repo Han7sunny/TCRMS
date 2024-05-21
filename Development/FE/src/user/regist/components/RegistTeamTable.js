@@ -8,16 +8,6 @@ import Button from "../../../shared/components/TableInputElements/Button";
 
 import "./RegistTable.css";
 
-{
-  /* <RegistTeamTable
-    columns={TABLE_COLUMNS_CHECK_TEAM}
-    modifyColumns={TABLE_COLUMNS_REGIST_TEAM}
-    data={team.teamMembers}
-    inputHandler={inputHandler}
-    editMode={team.editable}
-    teamId={`team${i}-`}
-  /> */
-}
 
 const RegistTeamTable = (props) => {
   const teamId = props.teamId || "";
@@ -110,6 +100,7 @@ const RegistTeamTable = (props) => {
             onInput={props.inputHandler}
             teamId={teamId}
             initialValue={initVal}
+            disabled={colInfo.detail.disabled}
           />
         );
       case "button":
@@ -141,42 +132,23 @@ const RegistTeamTable = (props) => {
 
   const [hideText, setHideText] = useState(true);
 
-  let bodyElement;
-  if (props.version === "check") {
-    bodyElement = props.data.map((row, i) => (
-      <tr key={i}>
-        {props.showNumber && <td>{i + 1}</td>}
-        {row.editable
-          ? props.modifyColumns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))
-          : props.columns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))}
-      </tr>
-    ));
-  } else if (props.version === "regist") {
-    bodyElement = props.data.map((row, i) => (
-      <tr key={i}>
-        {props.showNumber && <td>{i + 1}</td>}
-        {row.isNew
-          ? props.columns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))
-          : props.checkColumns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))}
-      </tr>
-    ));
-  }
+  let bodyElement = props.data.map((row, i) => (
+    <tr key={i}>
+      {props.showNumber && <td>{i + 1}</td>}
+      {props.editMode
+        ? props.modifyColumns.map((col, j) => (
+            <td key={"row" + i + "col" + j}>
+              {inputField(col, row[col.id], i, j)}
+            </td>
+          ))
+        : props.columns.map((col, j) => (
+            <td key={"row" + i + "col" + j}>
+              {inputField(col, row[col.id], i, j)}
+            </td>
+          ))}
+    </tr>
+  ));
+  
 
   return (
     <table id={props.tableId} className="regist-table">

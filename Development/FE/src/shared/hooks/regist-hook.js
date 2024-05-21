@@ -20,6 +20,25 @@ const registReducer = (state, action) => {
         ...state,
         inputs: data,
       };
+    
+    case "INPUT_CHANGE_TEAM":
+      let idArrTeam = action.inputId.split("-");
+      let teamIdx = Number(idArrTeam[0].replace("team", ""));
+      let memberIdx = Number(idArrTeam[1].replace("row", ""));
+
+      let dataTeam = state.inputs;
+      if (idArrTeam.length === 4) {
+        dataTeam[teamIdx].teamMembers[memberIdx][idArrTeam[3]] = action.value;
+      }
+      if (idArrTeam.length === 5) {
+        let subidx = Number(idArrTeam[4].replace("input", ""));
+        dataTeam[teamIdx].teamMembers[memberIdx][idArrTeam[3]][subidx] = action.value;
+      }
+
+      return {
+        ...state,
+        inputs: dataTeam,
+      };
 
     case "ADD_ROW":
       let addRow = state.inputs;
@@ -57,7 +76,12 @@ export const useRegist = (initialInputs, defaultInputs) => {
 
   const inputHandler = useCallback((id, value, isValid, teamId) => {
     if (teamId) {
-      console.log("HE");
+      dispatch({
+        type: "INPUT_CHANGE_TEAM",
+        value: value,
+        isValid: isValid,
+        inputId: id,
+      })
     } else {
       dispatch({
         type: "INPUT_CHANGE",

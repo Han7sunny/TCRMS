@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect, useCallback } from "react";
 
 import {
-  TABLE_COLUMNS_REGIST_TEAM,
   TABLE_COLUMNS_CHECK_TEAM,
+  TABLE_COLUMNS_REGIST_TEAM_SPARRING,
+  TABLE_COLUMNS_REGIST_TEAM_FORM,
 } from "../../../shared/util/regist-columns";
 import { EVENT_ID, WEIGHT_ID } from "../../../shared/util/const-event";
 import { checkValidityTeam } from "../../../shared/util/regist-validators";
@@ -14,6 +15,7 @@ import RegistTeamTable from "../components/RegistTeamTable";
 import Button from "../../../shared/components/TableInputElements/Button";
 
 import "./RegistTeam.css";
+import AddTeamModal from "../components/AddTeamModal";
 
 // popup 에서 누르면 addRow하고 member 숫자만큼 데이터 추가하기
 // 단체전 별 member 숫자는 util에서 정해주는 걸루
@@ -25,6 +27,7 @@ const RegistTeam = () => {
   const [isFirst, setIsFirst] = useState(true);
   const [isRegistMode, setIsRegistMode] = useState(false);
   const [apiFail, setApiFail] = useState(false);
+  const [teamSelectModalShow, setTeamSelectModalShow] = useState(false);
 
   const errMsgPersonName = "팀";
   const englishTitle = "team";
@@ -88,8 +91,19 @@ const RegistTeam = () => {
   const addTeamHandler = (event) => {
     event.preventDefault();
     // modal 띄우기
+    setTeamSelectModalShow(true);
+    // popup 에서 누르면 addRow하고 member 숫자만큼 데이터 추가하기
+    // 단체전 별 member 숫자는 util에서 정해주는 걸루
+    // addRow에 데이터 전달하면 그 데이터로 ADDROW하는 걸로
+    // modal에 addRow 전달해주고 modal에서 util 파라미터 불러와서 추가하는걸로
     // addRow();
   };
+
+  const closeSelectModal = event => {
+    event.preventDefault();
+    setTeamSelectModalShow(false);
+  }
+  
 
   const deleteTeamHandler = (event) => {
     event.preventDefault();
@@ -115,6 +129,10 @@ const RegistTeam = () => {
         },
         `${errMsgPersonName} 삭제 실패`
       );
+      // const responseData = {
+      //   isSuccess: false,
+      //   message: "NO"
+      // }
 
       if (responseData.isSuccess) {
         deleteRow(teamNum);
@@ -155,7 +173,8 @@ const RegistTeam = () => {
 
       return {
         eventTeamNumber: team.eventTeamNumber,
-        event: EVENT_ID[eventName].name,
+        event: EVENT_ID[eventName].name, //왜 처음에 숫자가 들어가지????
+        eventId: team.eventId,
         editable: false,
         teamMembers: team.teamMembers.map((member) => {
           return {
@@ -173,7 +192,7 @@ const RegistTeam = () => {
 
     if (mode === 2) {
       let eventName;
-      if (team.eventId) {
+      if (team.event) {
         eventName = Object.keys(EVENT_ID).find(
           (key) => EVENT_ID[key].name === team.event
         );
@@ -185,14 +204,12 @@ const RegistTeam = () => {
         return identityNumber;
       };
 
-      console.log(team);
-
       return {
         eventTeamNumber: team.eventTeamNumber,
         eventId: EVENT_ID[eventName].id,
 
-        teamMembers: team.teamMembers.map((member) => {
-          return {
+        teamMembers: team.teamMembers.map((member) => (
+          {
             index: member.index,
             name: member.name,
             gender: member.sex,
@@ -200,8 +217,8 @@ const RegistTeam = () => {
             nationality: member.nationality,
             identityNumber: getIdNumber(member.idnumber),
             weightClassId: WEIGHT_ID[member.sex][member.weight],
-          };
-        }),
+          }
+        )),
       };
     }
   };
@@ -363,16 +380,15 @@ const RegistTeam = () => {
   };
 
   const modifyTeamHandler = async (event) => {
-    try {
+   
       const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
       const teamData = registState.inputs[teamNum];
 
       // validity check
       const teamMemberNumber = teamData.teamMembers.length;
-
       for (let i = 0; i < teamMemberNumber; i++) {
         const { result, message, focusCol } = checkValidity(
-          teamData.teamMembers[i]
+          teamData.teamMembers[i], teamData.event
         );
         if (!result) {
           // 포커스 틀린 컬럼으로
@@ -382,6 +398,7 @@ const RegistTeam = () => {
         }
       }
 
+      try {
       const responseData = await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
         "PUT",
@@ -425,7 +442,7 @@ const RegistTeam = () => {
       let errMsg;
       const teamNumber = registState.inputs.length;
       for (let i = 0; i < teamNumber; i++) {
-        const { result, message, focusCol } = checkValidityTeam(
+        const { result, message, focusCol } = checkValidity(
           registState.inputs[i]
         );
         isValidity = isValidity & result;
@@ -456,7 +473,19 @@ const RegistTeam = () => {
         })
         .catch(() => {});
     } else {
-      setIsRegistMode(!isRegistMode);
+      let isEditting = false;
+
+      registState.inputs.forEach((team) => {
+        isEditting = isEditting || team.editable;
+      });
+      if (isEditting) {
+        setError({
+          title: "",
+          detail: "수정 완료 후 추가하기 버튼을 눌러주세요.",
+        });
+      } else {
+        setIsRegistMode(!isRegistMode);
+      }
     }
   };
 
@@ -467,6 +496,7 @@ const RegistTeam = () => {
 
   return (
     <div className="regist-event">
+      <AddTeamModal show={teamSelectModalShow} onClear={closeSelectModal} />
       <h2 className="regist-event-title">
         {isRegistMode ? "단체전 신청" : "단체전 신청확인"}
       </h2>
@@ -481,18 +511,23 @@ const RegistTeam = () => {
             <div className="regist-team" key={team.eventTeamNumber}>
               <div className="regist-team-subtitle">
                 <div>{team.event}</div>
-                <Button
-                  id={`btn-team${i}-delete`}
-                  onClick={deleteTeamHandler}
-                  type="button"
-                >
-                  팀 삭제
-                </Button>
+                {
+                  team.editable &&
+                  <Button
+                    id={`btn-team${i}-delete`}
+                    onClick={deleteTeamHandler}
+                    type="button"
+                  >
+                    팀 삭제
+                  </Button>
+                }
               </div>
               <RegistTeamTable
-                columns={TABLE_COLUMNS_REGIST_TEAM}
+                columns={TABLE_COLUMNS_CHECK_TEAM}
+                modifyColumns={typeof(team.event)==='string' && team.event.includes('겨루기') ? TABLE_COLUMNS_REGIST_TEAM_SPARRING : TABLE_COLUMNS_REGIST_TEAM_FORM}
                 data={team.teamMembers}
                 inputHandler={inputHandler}
+                editMode={team.editable}
                 teamId={`team${i}-`}
               />
             </div>
@@ -506,7 +541,8 @@ const RegistTeam = () => {
         </form>
       ) : (
         <div className="regist-form">
-          {registState.inputs.map((team, i) => (
+          {registState.inputs.map((team, i) => {
+            return (
             <div className="regist-team" key={team.eventTeamNumber}>
               <div className="regist-team-subtitle">
                 <div>{team.event}</div>
@@ -541,19 +577,18 @@ const RegistTeam = () => {
                 )}
               </div>
               <RegistTeamTable
-                version="check"
                 columns={TABLE_COLUMNS_CHECK_TEAM}
-                modifyColumns={TABLE_COLUMNS_REGIST_TEAM}
+                modifyColumns={typeof(team.event)==='string' && team.event.includes('겨루기') ? TABLE_COLUMNS_REGIST_TEAM_SPARRING : TABLE_COLUMNS_REGIST_TEAM_FORM}
                 data={team.teamMembers}
                 inputHandler={inputHandler}
                 editMode={team.editable}
                 teamId={`team${i}-`}
               />
             </div>
-          ))}
+          )})}
           <div className="check-btn-submit">
             <Button onClick={switchModeHandler} disabled={apiFail}>
-              추가 및 수정하기
+              추가하기
             </Button>
           </div>
         </div>
