@@ -9,6 +9,7 @@ import java.util.List;
 public class IndividualParticipantRequestDto {
 
     @Getter
+    @Builder
     public static class Regist {
 
         private String name;

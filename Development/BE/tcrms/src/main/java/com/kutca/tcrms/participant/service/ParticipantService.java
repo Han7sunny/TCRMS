@@ -99,14 +99,15 @@ public class ParticipantService {
             Participant individualParticipant = findParticipant.isEmpty()
                     ? participantRepository.save(
                         Participant.builder()
-                            .name(participant.getName())
-                            .identityNumber(participant.getIdentityNumber())
-                            .gender(participant.getGender())
-                            .isForeigner(participant.getIsForeigner())
-                            .nationality(participant.getNationality())
-                            .user(user)
-                            .weightClass(participant.getWeightClassId() == null ? null : weightClassRepository.findById(participant.getWeightClassId()).get())
-                            .build())
+                                .name(participant.getName())
+                                .identityNumber(participant.getIdentityNumber())
+                                .gender(participant.getGender())
+                                .universityName(user.getUniversityName())
+                                .isForeigner(participant.getIsForeigner())
+                                .nationality(participant.getNationality())
+                                .user(user)
+                                .weightClass(participant.getWeightClassId() == null ? null : weightClassRepository.findById(participant.getWeightClassId()).get())
+                                .build())
                     : findParticipant.get();
 
             participant.getEventIds().stream().forEach(eventId -> {
