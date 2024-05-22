@@ -66,11 +66,9 @@ public class ParticipantService {
                                 .isEditable(user.getIsEditable())
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
-                                .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(participant -> {
-                                    List<ParticipantApplication> findParticipantApplicationList = participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(), 1L, 4L);
-                                    List<Event> eventList = findParticipantApplicationList.stream().map(ParticipantApplication::getEvent).toList();
-                                    return IndividualParticipantResponseDto.fromEntity(participant, participant.getWeightClass().getWeightClassId(), eventList);
-                                        }).collect(Collectors.toList())))
+                                .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(
+                                        participant -> IndividualParticipantResponseDto.fromEntity(participant, participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(), 1L, 4L))
+                                ).collect(Collectors.toList())))
                                 .build()
                 )
                 .build();

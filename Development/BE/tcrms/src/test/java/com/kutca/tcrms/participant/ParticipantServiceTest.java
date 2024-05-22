@@ -160,6 +160,7 @@ public class ParticipantServiceTest {
         assertEquals(individualParticipantResponseDto.get(0).getParticipantName(), participant1.getName());
         assertEquals(individualParticipantResponseDto.get(0).getIdentityNumber(), participant1.getIdentityNumber());
         assertEquals(individualParticipantResponseDto.get(0).getEventIds().size(), 2);
+        assertEquals(individualParticipantResponseDto.get(0).getParticipantApplicationIds().size(), individualParticipantResponseDto.get(0).getEventIds().size());
         assertEquals(individualParticipantResponseDto.get(0).getWeightClassId(), weightClass1.getWeightClassId());
 
         assertTrue(individualParticipantResponseDto.get(1).getIsForeigner());
