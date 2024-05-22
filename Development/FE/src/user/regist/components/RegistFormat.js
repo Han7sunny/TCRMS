@@ -65,46 +65,46 @@ const RegistFormat = (props) => {
   // 개인전 페이지 들어오면 먼저 개인전 저장된 데이터 있는지 체크
   const listHandler = useCallback(async () => {
     try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
-        "GET",
-        null,
-        {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        `${errMsgPersonName} 로드 실패`
-      );
-
-      // // TODO : change Dummy DATA
-      // const responseData = {
-      //   isSuccess: true,
-      //   payload: {
-      //     isParticipantExists: true,
-      //     participants: [
-      //       {
-      //         participantId: 1,
-      //         weightClassId: 1,
-      //         name: "조서영",
-      //         identityNumber: "961201-0000000",
-      //         gender: "여성",
-      //         isForeigner: false,
-      //         phoneNumber: "010-5137-8081",
-      //         nationality: "",
-      //         eventId: [1, 2],
-      //       },
-      //       {
-      //         participantId: 2,
-      //         //weightClassId: ,
-      //         name: "조땡땡",
-      //         identityNumber: "961201-0000001",
-      //         gender: "남성",
-      //         isForeigner: true,
-      //         nationality: "영국",
-      //         eventId: [4],
-      //       },
-      //     ],
+      // const responseData = await sendRequest(
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
+      //   "GET",
+      //   null,
+      //   {
+      //     Authorization: `Bearer ${auth.token}`,
       //   },
-      // };
+      //   `${errMsgPersonName} 로드 실패`
+      // );
+
+      // TODO : change Dummy DATA
+      const responseData = {
+        isSuccess: true,
+        payload: {
+          isParticipantExists: true,
+          participants: [
+            {
+              participantId: 1,
+              weightClassId: 1,
+              name: "조서영",
+              identityNumber: "961201-0000000",
+              gender: "여성",
+              isForeigner: false,
+              phoneNumber: "010-5137-8081",
+              nationality: "",
+              eventId: [1, 2],
+            },
+            {
+              participantId: 2,
+              //weightClassId: ,
+              name: "조땡땡",
+              identityNumber: "961201-0000001",
+              gender: "남성",
+              isForeigner: true,
+              nationality: "영국",
+              eventId: [4],
+            },
+          ],
+        },
+      };
       // const responseData = {
       //   isSuccess: true,
       //   payload: { isParticipantExists: false },

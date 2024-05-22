@@ -92,10 +92,10 @@ export const useRegist = (initialInputs, defaultInputs) => {
     }
   }, []);
 
-  const addRow = useCallback(() => {
+  const addRow = useCallback((input) => {
     dispatch({
       type: "ADD_ROW",
-      value: defaultInputs,
+      value: input ? input : defaultInputs,
     });
   }, [defaultInputs]);
 

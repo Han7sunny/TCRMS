@@ -496,7 +496,7 @@ const RegistTeam = () => {
 
   return (
     <div className="regist-event">
-      <AddTeamModal show={teamSelectModalShow} onClear={closeSelectModal} />
+      <AddTeamModal show={teamSelectModalShow} onClear={closeSelectModal} onClick={addRow} />
       <h2 className="regist-event-title">
         {isRegistMode ? "단체전 신청" : "단체전 신청확인"}
       </h2>
