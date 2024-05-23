@@ -376,6 +376,7 @@ export const TABLE_COLUMNS_REGIST_TEAM_SPARRING = [
     type: "radio-group",
     detail: {
       items: ["남성", "여성"],
+      disabled: true,
       showLabel: true,
       affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
     },
@@ -452,6 +453,7 @@ export const TABLE_COLUMNS_REGIST_TEAM_FORM = [
     type: "radio-group",
     detail: {
       items: ["남성", "여성"],
+      disabled: true,
       showLabel: true,
       affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
     },

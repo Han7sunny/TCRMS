@@ -8,7 +8,6 @@ import Button from "../../../shared/components/TableInputElements/Button";
 
 import "./RegistTable.css";
 
-
 const RegistTeamTable = (props) => {
   const teamId = props.teamId || "";
 
@@ -76,6 +75,7 @@ const RegistTeamTable = (props) => {
             teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
+            disabled={colInfo.detail.disabled}
           />
         );
       case "checkbox-group":
@@ -148,7 +148,6 @@ const RegistTeamTable = (props) => {
           ))}
     </tr>
   ));
-  
 
   return (
     <table id={props.tableId} className="regist-table">

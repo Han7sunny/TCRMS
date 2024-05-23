@@ -24,14 +24,35 @@ const RegistTeam = () => {
   const auth = useContext(AuthContext);
   const { sendRequest, setError } = useContext(HttpContext);
 
-  const [isFirst, setIsFirst] = useState(true);
   const [isRegistMode, setIsRegistMode] = useState(false);
   const [apiFail, setApiFail] = useState(false);
   const [teamSelectModalShow, setTeamSelectModalShow] = useState(false);
 
   const errMsgPersonName = "팀";
   const englishTitle = "team";
-  const checkValidity = checkValidityTeam;
+  const checkValidity = (teamNum) => {
+    const teamData = registState.inputs[teamNum];
+
+    // each teamMember validity check
+    const teamMemberNumber = teamData.teamMembers.length;
+    for (let i = 0; i < teamMemberNumber; i++) {
+      const { result, message, focusCol } = checkValidityTeam(
+        teamData.teamMembers[i],
+        teamData.event
+      );
+      if (!result) {
+        // 포커스 틀린 컬럼으로
+        document.getElementById(`team${teamNum}-row${i}${focusCol}`).focus();
+        return {
+          isValidity: false,
+          message: message,
+          teamMemberIndex: teamData.teamMembers[i].index,
+        };
+      }
+    }
+
+    return { isValidity: true };
+  };
 
   const [registState, inputHandler, addRow, deleteRow, setRegistData] =
     useRegist(
@@ -99,11 +120,10 @@ const RegistTeam = () => {
     // addRow();
   };
 
-  const closeSelectModal = event => {
+  const closeSelectModal = (event) => {
     event.preventDefault();
     setTeamSelectModalShow(false);
-  }
-  
+  };
 
   const deleteTeamHandler = (event) => {
     event.preventDefault();
@@ -208,17 +228,15 @@ const RegistTeam = () => {
         eventTeamNumber: team.eventTeamNumber,
         eventId: EVENT_ID[eventName].id,
 
-        teamMembers: team.teamMembers.map((member) => (
-          {
-            index: member.index,
-            name: member.name,
-            gender: member.sex,
-            isForeigner: member.foreigner.length > 0 ? true : false,
-            nationality: member.nationality,
-            identityNumber: getIdNumber(member.idnumber),
-            weightClassId: WEIGHT_ID[member.sex][member.weight],
-          }
-        )),
+        teamMembers: team.teamMembers.map((member) => ({
+          index: member.index,
+          name: member.name,
+          gender: member.sex,
+          isForeigner: member.foreigner.length > 0 ? true : false,
+          nationality: member.nationality,
+          identityNumber: getIdNumber(member.idnumber),
+          weightClassId: WEIGHT_ID[member.sex][member.weight],
+        })),
       };
     }
   };
@@ -227,7 +245,7 @@ const RegistTeam = () => {
   const teamListHandler = useCallback(async () => {
     try {
       // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/team-list`,
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
       //   "GET",
       //   null,
       //   {
@@ -341,7 +359,6 @@ const RegistTeam = () => {
         );
       } else {
         setIsRegistMode(true); //useRegist 초기값 정하기
-        setIsFirst(true);
       }
       setApiFail(false);
     } catch (err) {
@@ -352,13 +369,14 @@ const RegistTeam = () => {
 
   const teamRegistHandler = async () => {
     try {
-      // const responseData = await http.sendRequest(
-      await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/team-regist`,
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
         "POST",
         JSON.stringify({
           userId: auth.userId,
-          teams: registState.inputs.map((team) => formatTeam(team, 2)),
+          teams: registState.inputs
+            .filter((team) => team.editable)
+            .map((team) => formatTeam(team, 2)),
         }),
         {
           Authorization: `Bearer ${auth.token}`,
@@ -366,6 +384,12 @@ const RegistTeam = () => {
         },
         "단체전 선수 등록 실패"
       );
+      if (!responseData.isSuccess) {
+        setError({
+          title: `${errMsgPersonName} 등록 실패`,
+          detail: responseData.message,
+        });
+      }
     } catch (err) {
       throw err;
     }
@@ -380,31 +404,24 @@ const RegistTeam = () => {
   };
 
   const modifyTeamHandler = async (event) => {
-   
-      const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
-      const teamData = registState.inputs[teamNum];
+    const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
+    const { isValidity, message, teamMemberIndex } = checkValidity(teamNum);
 
-      // validity check
-      const teamMemberNumber = teamData.teamMembers.length;
-      for (let i = 0; i < teamMemberNumber; i++) {
-        const { result, message, focusCol } = checkValidity(
-          teamData.teamMembers[i], teamData.event
-        );
-        if (!result) {
-          // 포커스 틀린 컬럼으로
-          document.getElementById(`team${teamNum}-row${i}${focusCol}`).focus();
-          setError({ title: "입력정보 확인", detail: message });
-          return;
-        }
-      }
+    if (!isValidity) {
+      setError({
+        title: "입력정보 확인",
+        detail: `${teamMemberIndex} : ${message}`,
+      });
+      return;
+    }
 
-      try {
+    try {
       const responseData = await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
         "PUT",
         JSON.stringify({
           userId: auth.userId,
-          teams: [formatTeam(teamData, 2)],
+          teams: [formatTeam(registState.inputs[teamNum], 2)],
         }),
         {
           Authorization: `Bearer ${auth.token}`,
@@ -441,15 +458,16 @@ const RegistTeam = () => {
       let isValidity = true;
       let errMsg;
       const teamNumber = registState.inputs.length;
+
       for (let i = 0; i < teamNumber; i++) {
-        const { result, message, focusCol } = checkValidity(
-          registState.inputs[i]
-        );
-        isValidity = isValidity & result;
-        if (!isValidity) {
-          errMsg = `${i + 1}번째 팀 : ` + message;
-          // 포커스 틀린 컬럼으로
-          document.getElementById(`row${i}${focusCol}`).focus();
+        const {
+          isValidity: isTeamValid,
+          message,
+          teamMemberIndex,
+        } = checkValidity(i);
+        isValidity = isValidity & isTeamValid;
+        if (!isTeamValid) {
+          errMsg = `${i + 1}번째 팀의 ${teamMemberIndex} : ` + message;
           break;
         }
       }
@@ -463,13 +481,13 @@ const RegistTeam = () => {
         setError({ title: "입력정보 확인", detail: errMsg });
         return;
       }
+      console.log("HERE API");
 
       // register
       teamRegistHandler()
         .then(() => {
           // list get
           teamListHandler();
-          // setIsRegistMode(!isRegistMode);
         })
         .catch(() => {});
     } else {
@@ -494,9 +512,18 @@ const RegistTeam = () => {
     teamListHandler();
   }, [teamListHandler]);
 
+  const addTeamCloseModalHandler = (eventName) => {
+    addRow(eventName);
+    setTeamSelectModalShow(false);
+  };
+
   return (
-    <div className="regist-event">
-      <AddTeamModal show={teamSelectModalShow} onClear={closeSelectModal} onClick={addRow} />
+    <div className="regist-team-event">
+      <AddTeamModal
+        show={teamSelectModalShow}
+        onClear={closeSelectModal}
+        onClick={addTeamCloseModalHandler}
+      />
       <h2 className="regist-event-title">
         {isRegistMode ? "단체전 신청" : "단체전 신청확인"}
       </h2>
@@ -508,11 +535,10 @@ const RegistTeam = () => {
             </Button>
           </div>
           {registState.inputs.map((team, i) => (
-            <div className="regist-team" key={team.eventTeamNumber}>
+            <div className="regist-team" key={`team${i}`}>
               <div className="regist-team-subtitle">
                 <div>{team.event}</div>
-                {
-                  team.editable &&
+                {team.editable && (
                   <Button
                     id={`btn-team${i}-delete`}
                     onClick={deleteTeamHandler}
@@ -520,11 +546,16 @@ const RegistTeam = () => {
                   >
                     팀 삭제
                   </Button>
-                }
+                )}
               </div>
               <RegistTeamTable
                 columns={TABLE_COLUMNS_CHECK_TEAM}
-                modifyColumns={typeof(team.event)==='string' && team.event.includes('겨루기') ? TABLE_COLUMNS_REGIST_TEAM_SPARRING : TABLE_COLUMNS_REGIST_TEAM_FORM}
+                modifyColumns={
+                  typeof team.event === "string" &&
+                  team.event.includes("겨루기")
+                    ? TABLE_COLUMNS_REGIST_TEAM_SPARRING
+                    : TABLE_COLUMNS_REGIST_TEAM_FORM
+                }
                 data={team.teamMembers}
                 inputHandler={inputHandler}
                 editMode={team.editable}
@@ -535,7 +566,7 @@ const RegistTeam = () => {
 
           <div className="regist-btn-submit">
             <Button type="button" onClick={switchModeHandler}>
-              {isFirst ? "신청하기" : "수정완료"}
+              신청하기
             </Button>
           </div>
         </form>
@@ -543,49 +574,55 @@ const RegistTeam = () => {
         <div className="regist-form">
           {registState.inputs.map((team, i) => {
             return (
-            <div className="regist-team" key={team.eventTeamNumber}>
-              <div className="regist-team-subtitle">
-                <div>{team.event}</div>
-                {team.editable ? (
-                  <React.Fragment>
+              <div className="regist-team" key={`team${i}`}>
+                <div className="regist-team-subtitle">
+                  <div>{team.event}</div>
+                  {team.editable ? (
+                    <React.Fragment>
+                      <Button
+                        id={`btn-team${i}-modify`}
+                        className="btn-team-modify"
+                        onClick={modifyTeamHandler}
+                        type="button"
+                      >
+                        수정완료
+                      </Button>
+                      <Button
+                        id={`btn-team${i}-delete`}
+                        className="btn-team-delete"
+                        onClick={deleteDataHandler}
+                        type="button"
+                      >
+                        삭제하기
+                      </Button>
+                    </React.Fragment>
+                  ) : (
                     <Button
-                      id={`btn-team${i}-modify`}
-                      className="btn-team-modify"
-                      onClick={modifyTeamHandler}
+                      id={`btn-team${i}-modechange`}
+                      className="btn-team-modechange"
+                      onClick={modifyModeHandler}
                       type="button"
                     >
-                      수정완료
+                      수정하기
                     </Button>
-                    <Button
-                      id={`btn-team${i}-delete`}
-                      className="btn-team-delete"
-                      onClick={deleteDataHandler}
-                      type="button"
-                    >
-                      삭제하기
-                    </Button>
-                  </React.Fragment>
-                ) : (
-                  <Button
-                    id={`btn-team${i}-modechange`}
-                    className="btn-team-modechange"
-                    onClick={modifyModeHandler}
-                    type="button"
-                  >
-                    수정하기
-                  </Button>
-                )}
+                  )}
+                </div>
+                <RegistTeamTable
+                  columns={TABLE_COLUMNS_CHECK_TEAM}
+                  modifyColumns={
+                    typeof team.event === "string" &&
+                    team.event.includes("겨루기")
+                      ? TABLE_COLUMNS_REGIST_TEAM_SPARRING
+                      : TABLE_COLUMNS_REGIST_TEAM_FORM
+                  }
+                  data={team.teamMembers}
+                  inputHandler={inputHandler}
+                  editMode={team.editable}
+                  teamId={`team${i}-`}
+                />
               </div>
-              <RegistTeamTable
-                columns={TABLE_COLUMNS_CHECK_TEAM}
-                modifyColumns={typeof(team.event)==='string' && team.event.includes('겨루기') ? TABLE_COLUMNS_REGIST_TEAM_SPARRING : TABLE_COLUMNS_REGIST_TEAM_FORM}
-                data={team.teamMembers}
-                inputHandler={inputHandler}
-                editMode={team.editable}
-                teamId={`team${i}-`}
-              />
-            </div>
-          )})}
+            );
+          })}
           <div className="check-btn-submit">
             <Button onClick={switchModeHandler} disabled={apiFail}>
               추가하기

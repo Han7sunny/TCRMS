@@ -1,3 +1,7 @@
+.regist-team-event {
+  margin: 24px;
+}
+
 .regist-team .btn-team-modechange {
   width: 64px !important;
 }
@@ -8,4 +12,12 @@
 
 .regist-team .btn-team-delete {
   width: 64px !important;
+}
+
+.regist-team-event .check-btn-submit {
+  padding: 0px;
+}
+
+.regist-team-event .regist-btn-submit {
+  padding: 0px;
 }
