@@ -37,6 +37,16 @@ public class ParticipantController {
         }
     }
 
+    @PutMapping("/api/user/individual")
+    public ResponseEntity<?> modifyIndividual(@RequestBody IndividualParticipantRequestDto.Modify individualParticipantRequestDto) {
+        try {
+            return new ResponseEntity<>(participantService.modifyIndividual(individualParticipantRequestDto), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("개인전 수정 예외 발생", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @DeleteMapping("/api/user/individual")
     public ResponseEntity<?> deleteIndividual(@RequestBody IndividualParticipantRequestDto.Delete individualParticipantRequestDto) {
         try {

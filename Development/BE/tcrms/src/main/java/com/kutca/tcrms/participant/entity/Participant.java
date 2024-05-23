@@ -46,4 +46,8 @@ public class Participant {
     @OneToOne(mappedBy = "participant")
     private ParticipantFile participantFile;
 
+    public Participant updateWeightClass(WeightClass weightClassId) {
+        this.weightClass = weightClassId;
+        return this;
+    }
 }

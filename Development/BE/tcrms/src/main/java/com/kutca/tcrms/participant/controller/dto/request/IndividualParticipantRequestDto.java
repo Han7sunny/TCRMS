@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 
 public class IndividualParticipantRequestDto {
@@ -25,6 +26,37 @@ public class IndividualParticipantRequestDto {
         private String phoneNumber;
 
         private List<Long> eventIds;
+
+        private Long weightClassId;
+    }
+
+    @Getter
+    @Builder
+    public static class Modify {
+
+        private Long userId;    //  useless
+
+        private Boolean isParticipantChange;
+
+        private Long participantId;
+
+        private String name;
+
+        private String gender;
+
+        private Boolean isForeigner;
+
+        private String nationality;
+
+        private String identityNumber;
+
+        private String phoneNumber;
+
+        private Boolean isEventChange;
+
+        private Map<Long, Long> participantApplicationInfos;
+
+        private Boolean isWeightClassChange;
 
         private Long weightClassId;
     }

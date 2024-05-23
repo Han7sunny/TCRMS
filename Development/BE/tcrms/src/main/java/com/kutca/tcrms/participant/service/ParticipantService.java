@@ -18,8 +18,10 @@ import com.kutca.tcrms.weightclass.entity.WeightClass;
 import com.kutca.tcrms.weightclass.repository.WeightClassRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -127,6 +129,62 @@ public class ParticipantService {
 
         return ResponseDto.builder()
                 .isSuccess(true)
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> modifyIndividual(IndividualParticipantRequestDto.Modify individualParticipantRequestDto) {
+        //  2차떄 종목 변경 불가능 (event)
+            //  값 넘어올 수도 있고 (1차), 안 넘어올 수도 있음(2차)
+            //  값 넘어올 경우 ParticipantApplicationId : eventId
+
+        //  체급은 둘 다 변경 가능 (weightclass)
+
+        Participant findParticipant = null;
+
+        if(individualParticipantRequestDto.getIsParticipantChange()) {
+        }
+
+        if(individualParticipantRequestDto.getIsEventChange()) {
+            //  participantApplicationId과 event_id는 일대일
+
+            Map<Long, Long> participantApplicationInfos = individualParticipantRequestDto.getParticipantApplicationInfos();
+
+            for (Map.Entry<Long, Long> participantApplicationInfo: participantApplicationInfos.entrySet()) {
+                Long participantApplicationId = participantApplicationInfo.getKey();
+                Long eventId = participantApplicationInfo.getValue();
+
+//                participantApplicationRepository.save();
+            }
+        }
+
+        if(individualParticipantRequestDto.getIsWeightClassChange()) {
+            Optional<WeightClass> findWeightClass = weightClassRepository.findById(individualParticipantRequestDto.getWeightClassId());
+            if(findWeightClass.isPresent()) {
+                return ResponseDto.builder()
+                        .isSuccess(false)
+                        .message("체급 정보를 찾을 수 없습니다.")
+                        .build();
+            }
+
+            WeightClass weightClass = findWeightClass.get();
+
+            if(findParticipant == null) {
+                participantRepository.findById(individualParticipantRequestDto.getParticipantId()).get();
+            }
+
+            findParticipant.updateWeightClass(weightClass);
+        }
+
+        if(findParticipant != null) {
+            participantRepository.save(findParticipant);
+        }
+
+        //  바뀐 값을 response 객체로 전송
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .message("참가자 정보가 성공적으로 수정되었습니다.")
+//                .payload()
                 .build();
     }
 
