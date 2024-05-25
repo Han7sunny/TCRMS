@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -134,33 +135,69 @@ public class ParticipantService {
 
     @Transactional
     public ResponseDto<?> modifyIndividual(IndividualParticipantRequestDto.Modify individualParticipantRequestDto) {
-        //  2차떄 종목 변경 불가능 (event)
+        //  2차 기간에 종목 변경 불가능 (event) -> 종목 disabled
             //  값 넘어올 수도 있고 (1차), 안 넘어올 수도 있음(2차)
             //  값 넘어올 경우 ParticipantApplicationId : eventId
 
         //  체급은 둘 다 변경 가능 (weightclass)
 
-        Participant findParticipant = null;
-
-        if(individualParticipantRequestDto.getIsParticipantChange()) {
+        Optional<Participant> findParticipant = participantRepository.findById(individualParticipantRequestDto.getParticipantId());
+        if(findParticipant.isEmpty()) {
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("참가자 정보를 찾을 수 없습니다.")
+                    .build();
         }
 
+        Participant participant = findParticipant.get();
+
+        if(individualParticipantRequestDto.getIsParticipantChange()) {
+            participant.updateParticipant(individualParticipantRequestDto);
+        }
+
+        List<ParticipantApplication> participantApplicationList = new ArrayList<>();
         if(individualParticipantRequestDto.getIsEventChange()) {
-            //  participantApplicationId과 event_id는 일대일
 
             Map<Long, Long> participantApplicationInfos = individualParticipantRequestDto.getParticipantApplicationInfos();
 
             for (Map.Entry<Long, Long> participantApplicationInfo: participantApplicationInfos.entrySet()) {
+
                 Long participantApplicationId = participantApplicationInfo.getKey();
                 Long eventId = participantApplicationInfo.getValue();
 
-//                participantApplicationRepository.save();
+                Optional<Event> findEvent = eventRepository.findById(eventId);
+                if(findEvent.isEmpty()) {
+                    return ResponseDto.builder()
+                            .isSuccess(false)
+                            .message("종목 정보를 찾을 수 없습니다.")
+                            .build();
+                }
+
+                Event event = findEvent.get();
+                int eventTeamNumber = participantApplicationRepository.findTopByEvent_EventId(eventId).map(pa -> pa.getEventTeamNumber() + 1).orElse(1);
+                
+                //  학교별 신청 종목 팀의 팀개수 갱신 로직 추가
+                
+                ParticipantApplication participantApplication = null;
+
+                if(participantApplicationId == null) {
+                    participantApplication = ParticipantApplication.builder()
+                            .participant(participant)
+                            .event(event)
+                            .eventTeamNumber(eventTeamNumber)
+                            .build();
+                }
+                else{
+                    participantApplication = participantApplicationRepository.findById(participantApplicationId).get().updateEvent(event).updateEventTeamNumber(eventTeamNumber);
+                }
+
+                participantApplicationList.add(participantApplicationRepository.save(participantApplication));
             }
         }
 
         if(individualParticipantRequestDto.getIsWeightClassChange()) {
             Optional<WeightClass> findWeightClass = weightClassRepository.findById(individualParticipantRequestDto.getWeightClassId());
-            if(findWeightClass.isPresent()) {
+            if(findWeightClass.isEmpty()) {
                 return ResponseDto.builder()
                         .isSuccess(false)
                         .message("체급 정보를 찾을 수 없습니다.")
@@ -168,23 +205,15 @@ public class ParticipantService {
             }
 
             WeightClass weightClass = findWeightClass.get();
-
-            if(findParticipant == null) {
-                participantRepository.findById(individualParticipantRequestDto.getParticipantId()).get();
-            }
-
-            findParticipant.updateWeightClass(weightClass);
+            participant.updateWeightClass(weightClass);
         }
 
-        if(findParticipant != null) {
-            participantRepository.save(findParticipant);
-        }
+        Participant modifiedParticipant = participantRepository.save(participant);
 
-        //  바뀐 값을 response 객체로 전송
         return ResponseDto.builder()
                 .isSuccess(true)
                 .message("참가자 정보가 성공적으로 수정되었습니다.")
-//                .payload()
+                .payload(IndividualParticipantResponseDto.fromEntity(modifiedParticipant, participantApplicationList))
                 .build();
     }
 

@@ -30,4 +30,13 @@ public class ParticipantApplication {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    public ParticipantApplication updateEvent(Event event){
+        this.event = event;
+        return this;
+    }
+
+    public ParticipantApplication updateEventTeamNumber(int eventTeamNumber){
+        this.eventTeamNumber = eventTeamNumber;
+        return this;
+    }
 }
