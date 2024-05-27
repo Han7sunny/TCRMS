@@ -13,4 +13,16 @@ public class VolunteerParticipantRequestDto {
 
         private String phoneNumber;
     }
+
+    @Getter
+    public static class Modify {
+
+        private Long participantId;
+
+        private String name;
+
+        private String gender;
+
+        private String phoneNumber;
+    }
 }
