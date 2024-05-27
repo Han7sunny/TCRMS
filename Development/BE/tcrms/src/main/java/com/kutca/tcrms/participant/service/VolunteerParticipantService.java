@@ -31,8 +31,6 @@ public class VolunteerParticipantService {
 
     public ResponseDto<?> registVolunteer(RequestDto<VolunteerParticipantRequestDto.Regist> volunteerParticipantRequestDto) {
 
-        //  자원봉사자의 정보가 기존에 있을 가능성 없다는 가정 하에 로직 작성
-
         Optional<User> findUser = userRepository.findById(volunteerParticipantRequestDto.getUserId());
         if(findUser.isEmpty()) {
             return ResponseDto.builder()
@@ -45,17 +43,21 @@ public class VolunteerParticipantService {
         AtomicInteger eventTeamNumber = new AtomicInteger(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).map(pa -> pa.getEventTeamNumber() + 1).orElse(1));
 
         volunteerParticipantRequestDto.getRequestDtoList().stream().forEach(volunteer -> {
-            Participant savedParticipant = participantRepository.save(Participant.builder()
-                    .user(user)
-                    .name(volunteer.getName())
-                    .gender(volunteer.getGender())
-                    .universityName(user.getUniversityName())
-                    .phoneNumber(volunteer.getPhoneNumber())
-                    .build());
+
+            Optional<Participant> findParticipant = participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), volunteer.getName(), volunteer.getPhoneNumber());
+
+            Participant participant = findParticipant.orElseGet(() -> participantRepository.save(
+                    Participant.builder()
+                            .user(user)
+                            .name(volunteer.getName())
+                            .gender(volunteer.getGender())
+                            .universityName(user.getUniversityName())
+                            .phoneNumber(volunteer.getPhoneNumber())
+                            .build()));
 
             participantApplicationRepository.save(
                     ParticipantApplication.builder()
-                            .participant(savedParticipant)
+                            .participant(participant)
                             .event(VOLUNTEER_EVENT)
                             .eventTeamNumber(eventTeamNumber.getAndIncrement())
                             .build()
