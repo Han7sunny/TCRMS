@@ -10,38 +10,76 @@ import { checkValiditySecond } from "../../../shared/util/regist-validators";
 import RegistFormat from "../components/RegistFormat";
 
 const RegistSecond = () => {
-  const formatParticipant = useCallback((participant, mode) => {
-    if (mode === 1) {
-      let idnumber =
-        participant.identityNumber && participant.identityNumber.split("-");
+  const formatParticipant = useCallback(
+    (participant, mode, saveParticipant) => {
+      if (mode === 1) {
+        let idnumber =
+          participant.identityNumber && participant.identityNumber.split("-");
 
-      return {
-        participantId: participant.participantId,
-        name: participant.name,
-        sex: participant.gender, // 남성,여성인지 체크
-        foreigner: participant.isForeigner ? ["외국인"] : [],
-        nationality: participant.nationality,
-        idnumber: participant.identityNumber
-          ? [idnumber[0], "-", idnumber[1]]
-          : [],
-      };
-    }
+        return {
+          participantId: participant.participantId,
+          participantApplicationId: participant.participantApplicationId,
+          name: participant.name,
+          sex: participant.gender, // 남성,여성인지 체크
+          foreigner: participant.isForeigner ? ["외국인"] : [],
+          nationality: participant.nationality,
+          idnumber: participant.identityNumber
+            ? [idnumber[0], "-", idnumber[1]]
+            : [],
+        };
+      }
 
-    if (mode === 2) {
-      let identityNumber = participant.idnumber.join("");
-      if (identityNumber === "-") identityNumber = null;
+      if (mode === 2 || mode === 3) {
+        //regist (POST) //modify (PUT)
+        let identityNumber = participant.idnumber.join("");
+        if (identityNumber === "-") identityNumber = null;
 
-      return {
-        participantId: participant.participantId,
-        name: participant.name,
-        gender: participant.sex,
-        isForeigner: participant.foreigner.length > 0 ? true : false,
-        nationality: participant.nationality,
-        identityNumber: identityNumber,
-        eventId: EVENT_ID["세컨"],
-      };
-    }
-  }, []);
+        let sendData = {
+          name: participant.name,
+          gender: participant.sex,
+          isForeigner: participant.foreigner.length > 0 ? true : false,
+          nationality: participant.nationality,
+          identityNumber: identityNumber,
+          eventId: EVENT_ID["세컨"],
+        };
+
+        if (mode === 2) {
+          return sendData;
+        }
+
+        if (mode === 3) {
+          //modify (PUT)
+          // const isNullData = (data) => {
+          //   if (data === null || data === "" || data === undefined) return true;
+          //   else return data;
+          // };
+
+          // let isParticipantChange = false;
+          // let isEventChange = false;
+          // let isWeightClassChange = false;
+          // if (
+          //   sendData.name !== saveParticipant.name ||
+          //   sendData.gender !== saveParticipant.gender ||
+          //   sendData.isForeigner !== saveParticipant.isForeigner ||
+          //   isNullData(sendData.nationality) !==
+          //     isNullData(saveParticipant.nationality) ||
+          //   isNullData(sendData.identityNumber) !==
+          //     isNullData(saveParticipant.identityNumber)
+          // ) {
+          //   isParticipantChange = true;
+          // }
+
+          return {
+            ...sendData,
+            participantId: participant.participantId,
+            // participantApplicationId: participant.participantApplicationId,
+            // isParticipantChange: isParticipantChange,
+          };
+        }
+      }
+    },
+    []
+  );
 
   const newPersonFormat = useCallback(
     {
@@ -50,6 +88,7 @@ const RegistSecond = () => {
       foreigner: [],
       nationality: "",
       idnumber: ["", "-", ""],
+      isNew: true,
     },
     []
   );

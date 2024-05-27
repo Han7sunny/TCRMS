@@ -5,6 +5,7 @@ import RadioGroup from "../../../shared/components/TableInputElements/RadioGroup
 import CheckboxGroup from "../../../shared/components/TableInputElements/CheckboxGroup";
 import Dropdown from "../../../shared/components/TableInputElements/Dropdown";
 import Button from "../../../shared/components/TableInputElements/Button";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import "./RegistTable.css";
 
@@ -221,6 +222,7 @@ const RegistTable = (props) => {
         {props.showNumber && (
           <col className={"table-col-" + props.columns.length} />
         )}
+        <col className="table-col-btn" />
       </colgroup>
       <thead>
         <tr>
@@ -238,6 +240,21 @@ const RegistTable = (props) => {
                   >
                     {hideText ? "보이기" : "숨기기"}
                   </button>
+                </th>
+              );
+            } else if (col.name === "비고") {
+              return (
+                <th key={col.id}>
+                  {col.name}
+                  <Tooltip
+                    title="외국인 선수이며 외국인등록번호가 없는 경우 개인식별을 위해 폰번호나 이메일 주소 기입"
+                    placement="top"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/img/info_24dp.png`}
+                      width={"14px"}
+                    />
+                  </Tooltip>{" "}
                 </th>
               );
             } else {

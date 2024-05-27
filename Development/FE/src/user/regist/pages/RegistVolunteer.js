@@ -44,6 +44,7 @@ const RegistVolunteer = () => {
       name: "",
       sex: "",
       phoneNumber: ["", "-", "", "-", ""],
+      isNew: true,
     },
     []
   );

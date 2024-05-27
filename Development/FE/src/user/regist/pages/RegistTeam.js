@@ -458,21 +458,25 @@ const RegistTeam = () => {
       let isValidity = true;
       let errMsg;
       const teamNumber = registState.inputs.length;
+      let isNewTeam = false;
 
       for (let i = 0; i < teamNumber; i++) {
-        const {
-          isValidity: isTeamValid,
-          message,
-          teamMemberIndex,
-        } = checkValidity(i);
-        isValidity = isValidity & isTeamValid;
-        if (!isTeamValid) {
-          errMsg = `${i + 1}번째 팀의 ${teamMemberIndex} : ` + message;
-          break;
+        if (registState.inputs[i].editable) {
+          isNewTeam = true;
+          const {
+            isValidity: isTeamValid,
+            message,
+            teamMemberIndex,
+          } = checkValidity(i);
+          isValidity = isValidity & isTeamValid;
+          if (!isTeamValid) {
+            errMsg = `${i + 1}번째 팀의 ${teamMemberIndex} : ` + message;
+            break;
+          }
         }
       }
 
-      if (!teamNumber) {
+      if (!isNewTeam) {
         isValidity = false;
         errMsg = "단체전 한 팀 이상 신청해주세요.";
       }
@@ -481,7 +485,6 @@ const RegistTeam = () => {
         setError({ title: "입력정보 확인", detail: errMsg });
         return;
       }
-      console.log("HERE API");
 
       // register
       teamRegistHandler()
@@ -518,7 +521,7 @@ const RegistTeam = () => {
   };
 
   return (
-    <div className="regist-team-event">
+    <div className="regist-team-event regist-event" id="team-regist-event">
       <AddTeamModal
         show={teamSelectModalShow}
         onClear={closeSelectModal}

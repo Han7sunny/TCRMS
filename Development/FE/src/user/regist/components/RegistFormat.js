@@ -16,6 +16,8 @@ const RegistFormat = (props) => {
   const [isRegistMode, setIsRegistMode] = useState(false);
   const [apiFail, setApiFail] = useState(false);
 
+  const [saveParticipant, setSaveParticipant] = useState([]);
+
   const [registState, inputHandler, addRow, deleteRow, setRegistData] =
     useRegist([], props.newPersonFormat);
 
@@ -37,6 +39,8 @@ const RegistFormat = (props) => {
         JSON.stringify({
           userId: auth.userId,
           participantId: registState.inputs[rowNum].participantId,
+          participantApplicationId:
+            registState.inputs[rowNum].participantApplicationId,
         }),
         {
           Authorization: `Bearer ${auth.token}`,
@@ -91,6 +95,7 @@ const RegistFormat = (props) => {
               phoneNumber: "010-5137-8081",
               nationality: "",
               eventId: [1, 2],
+              participantApplicationId: [5, 6],
             },
             {
               participantId: 2,
@@ -101,6 +106,7 @@ const RegistFormat = (props) => {
               isForeigner: true,
               nationality: "영국",
               eventId: [4],
+              participantApplicationId: [8],
             },
           ],
         },
@@ -117,10 +123,10 @@ const RegistFormat = (props) => {
             formatParticipant(participant, 1)
           )
         );
+        setSaveParticipant(responseData.payload.participants);
       } else {
         setIsRegistMode(true); //useRegist 초기값 정하기
         addRow();
-        // setIsFirst(true);
       }
       setApiFail(false);
     } catch (err) {
@@ -189,8 +195,8 @@ const RegistFormat = (props) => {
         `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
         "PUT",
         JSON.stringify({
-          userId: auth.userId,
-          participants: [formatParticipant(participantData, 2)],
+          // userId: auth.userId,
+          ...formatParticipant(participantData, 3, saveParticipant[rowNum]),
         }),
         {
           Authorization: `Bearer ${auth.token}`,
@@ -202,12 +208,27 @@ const RegistFormat = (props) => {
       // const responseData = {
       //   isSuccess: true,
       //   message: "check please",
+      //   payload: {
+      //     participantId: 2,
+      //     // weightClassId: ,
+      //     name: "조땡땡",
+      //     identityNumber: "000000-0000001",
+      //     gender: "남성",
+      //     isForeigner: true,
+      //     nationality: "영국",
+      //     eventId: [4],
+      //     participantApplicationId: [8],
+      //   },
       // };
 
       if (responseData.isSuccess) {
         let participantsData = registState.inputs;
-        participantsData[rowNum].editable = false;
+        participantsData[rowNum] = formatParticipant(responseData.payload, 1);
         setRegistData(participantsData);
+
+        let saveParticipantData = saveParticipant;
+        saveParticipantData[rowNum] = responseData.payload;
+        setSaveParticipant(saveParticipantData);
       } else {
         setError({
           title: `${props.errMsgPersonName} 수정 실패`,
@@ -235,20 +256,24 @@ const RegistFormat = (props) => {
       let isValidity = true;
       let errMsg;
       const participantNumber = registState.inputs.length;
+      let isNewPeople = false;
       for (let i = 0; i < participantNumber; i++) {
-        const { result, message, focusCol } = props.checkValidity(
-          registState.inputs[i]
-        );
-        isValidity = isValidity & result;
-        if (!isValidity) {
-          errMsg = `${i + 1}번째 ${props.personName} : ` + message;
-          // 포커스 틀린 컬럼으로
-          document.getElementById(`row${i}${focusCol}`).focus();
-          break;
+        if (registState.inputs[i].isNew) {
+          isNewPeople = true;
+          const { result, message, focusCol } = props.checkValidity(
+            registState.inputs[i]
+          );
+          isValidity = isValidity & result;
+          if (!isValidity) {
+            errMsg = `${i + 1}번째 ${props.personName} : ` + message;
+            // 포커스 틀린 컬럼으로
+            document.getElementById(`row${i}${focusCol}`).focus();
+            break;
+          }
         }
       }
 
-      if (!participantNumber) {
+      if (!isNewPeople) {
         isValidity = false;
         errMsg = `${props.personName} 한 명 이상 신청해주세요.`;
       }
@@ -277,7 +302,7 @@ const RegistFormat = (props) => {
           detail: "수정 완료 후 추가하기 버튼을 눌러주세요.",
         });
       } else {
-        setIsRegistMode(!isRegistMode);
+        setIsRegistMode(true);
         addRow();
       }
     }
@@ -289,7 +314,7 @@ const RegistFormat = (props) => {
   }, [listHandler]);
 
   return (
-    <div className="regist-event">
+    <div className="regist-event" id={`${props.englishTitle}-regist-event`}>
       <h2 className="regist-event-title">
         {isRegistMode
           ? `${props.koreanTitle} 신청`
@@ -313,7 +338,6 @@ const RegistFormat = (props) => {
           />
           <div className="regist-btn-submit">
             <Button type="button" onClick={switchModeHandler}>
-              {/* {isFirst ? "신청하기" : "수정완료"} */}
               신청하기
             </Button>
           </div>

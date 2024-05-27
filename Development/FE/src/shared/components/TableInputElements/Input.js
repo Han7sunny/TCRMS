@@ -38,11 +38,13 @@ const Input = (props) => {
   }, [id, value, isValid, onInput, teamId]);
 
   useEffect(() => {
-    dispatch({
-      type: "CHANGE",
-      val: initialValue,
-      validators: validators,
-    });
+    if (validators.length !== 0) {
+      dispatch({
+        type: "CHANGE",
+        val: initialValue,
+        validators: validators,
+      });
+    }
   }, [initialValue, validators]);
 
   const changeHandler = (event) => {

@@ -339,6 +339,14 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
       ],
     },
   },
+  {
+    id: "phoneNumber",
+    name: "비고(전화번호,이메일)",
+    type: "input",
+    detail: {
+      validators: [],
+    },
+  },
   // { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
 ];
 
@@ -355,6 +363,7 @@ export const TABLE_COLUMNS_CHECK_INDIVIDUAL = [
   },
   { id: "event", name: "종목", type: "text", detail: { separator: ", " } },
   { id: "weight", name: "체급(겨루기만)", type: "text" },
+  { id: "phoneNumber", name: "비고", type: "text" },
 ];
 
 // team

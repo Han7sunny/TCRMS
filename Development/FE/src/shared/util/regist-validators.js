@@ -32,6 +32,21 @@ export const checkValidityIndividual = (participant) => {
         focusCol: "-col3-nationality",
       };
     }
+  } else {
+    if (!idnumber[0]) {
+      return {
+        result: false,
+        message: "주민번호를 입력해주세요.",
+        focusCol: "-col4-idnumber-input0",
+      };
+    }
+    if (!idnumber[2]) {
+      return {
+        result: false,
+        message: "주민번호를 입력해주세요.",
+        focusCol: "-col4-idnumber-input2",
+      };
+    }
   }
 
   if (idnumber[0] || idnumber[2]) {
@@ -114,6 +129,21 @@ export const checkValidityTeam = (participant, event) => {
         focusCol: "-col4-nationality",
       };
     }
+  } else {
+    if (!idnumber[0]) {
+      return {
+        result: false,
+        message: "주민번호를 입력해주세요.",
+        focusCol: "-col5-idnumber-input0",
+      };
+    }
+    if (!idnumber[2]) {
+      return {
+        result: false,
+        message: "주민번호를 입력해주세요.",
+        focusCol: "-col5-idnumber-input2",
+      };
+    }
   }
 
   if (idnumber[0] || idnumber[2]) {
@@ -194,6 +224,21 @@ export const checkValiditySecond = (participant) => {
         result: false,
         message: "외국인 선수의 국적을 선택해주세요.",
         focusCol: "-col3-nationality",
+      };
+    }
+  } else {
+    if (!idnumber[0]) {
+      return {
+        result: false,
+        message: "주민번호를 입력해주세요.",
+        focusCol: "-col4-idnumber-input0",
+      };
+    }
+    if (!idnumber[2]) {
+      return {
+        result: false,
+        message: "주민번호를 입력해주세요.",
+        focusCol: "-col4-idnumber-input2",
       };
     }
   }
