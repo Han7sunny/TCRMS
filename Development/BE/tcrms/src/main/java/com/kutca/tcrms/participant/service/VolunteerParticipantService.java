@@ -15,6 +15,7 @@ import com.kutca.tcrms.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -102,6 +103,21 @@ public class VolunteerParticipantService {
         return ResponseDto.builder()
                 .isSuccess(true)
                 .payload(VolunteerParticipantResponseDto.fromEntity(participant))
+                .build();
+    }
+
+    public ResponseDto<?> deleteVolunteer(VolunteerParticipantRequestDto.Delete volunteerParticipantRequestDto){
+
+        participantApplicationRepository.deleteById(volunteerParticipantRequestDto.getParticipantApplicationId());
+
+        //  학교별 신청 종목팀 팀 개수 감소
+
+        if(!participantApplicationRepository.existsByParticipant_ParticipantId(volunteerParticipantRequestDto.getParticipantId())){
+            participantRepository.deleteById(volunteerParticipantRequestDto.getParticipantId());
+        }
+
+        return ResponseDto.builder()
+                .isSuccess(true)
                 .build();
     }
 }

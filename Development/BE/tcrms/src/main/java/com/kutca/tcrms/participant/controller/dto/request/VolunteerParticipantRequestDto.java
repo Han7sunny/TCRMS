@@ -25,4 +25,12 @@ public class VolunteerParticipantRequestDto {
 
         private String phoneNumber;
     }
+
+    @Getter
+    public static class Delete {
+
+        private Long participantId;
+
+        private Long participantApplicationId;
+    }
 }
