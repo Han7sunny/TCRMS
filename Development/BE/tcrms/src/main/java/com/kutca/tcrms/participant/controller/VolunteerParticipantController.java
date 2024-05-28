@@ -15,6 +15,16 @@ public class VolunteerParticipantController {
 
     private final VolunteerParticipantService volunteerParticipantService;
 
+    @GetMapping("/api/user/volunteer")
+    public ResponseEntity<?> getVolunteerList(@RequestParam Long userId) {
+        try {
+            return new ResponseEntity<>(volunteerParticipantService.getVolunteerList(userId), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/api/user/volunteer")
     public ResponseEntity<?> registVolunteerList(@RequestBody RequestDto<VolunteerParticipantRequestDto.Regist> volunteerParticipantRequestDto) {
         try {
@@ -35,7 +45,7 @@ public class VolunteerParticipantController {
         }
     }
 
-    @DeleteMapping("/api/user/volunteer/{participantId}")
+    @DeleteMapping("/api/user/volunteer")
     public ResponseEntity<?> deleteVolunteer(@RequestBody VolunteerParticipantRequestDto.Delete volunteerParticipantRequestDto) {
         try {
             return new ResponseEntity<>(volunteerParticipantService.deleteVolunteer(volunteerParticipantRequestDto), HttpStatus.OK);
