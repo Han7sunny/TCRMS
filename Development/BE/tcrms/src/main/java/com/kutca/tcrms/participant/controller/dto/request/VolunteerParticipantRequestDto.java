@@ -1,10 +1,12 @@
 package com.kutca.tcrms.participant.controller.dto.request;
 
+import lombok.Builder;
 import lombok.Getter;
 
 public class VolunteerParticipantRequestDto {
 
     @Getter
+    @Builder
     public static class Regist {
 
         private String name;

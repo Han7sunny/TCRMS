@@ -32,7 +32,6 @@ public class VolunteerParticipantService {
     private final ParticipantApplicationRepository participantApplicationRepository;
     private final EventRepository eventRepository;
     private final Long VOLUNTEER_EVENT_ID = 11L;
-    private final Event VOLUNTEER_EVENT = eventRepository.findById(VOLUNTEER_EVENT_ID).get();
 
     @Transactional(readOnly = true)
     public ResponseDto<?> getVolunteerList(Long userId){
@@ -86,9 +85,10 @@ public class VolunteerParticipantService {
         }
 
         User user = findUser.get();
+        Event event = eventRepository.findById(VOLUNTEER_EVENT_ID).get();
         AtomicInteger eventTeamNumber = new AtomicInteger(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).map(pa -> pa.getEventTeamNumber() + 1).orElse(1));
 
-        volunteerParticipantRequestDto.getRequestDtoList().stream().forEach(volunteer -> {
+        volunteerParticipantRequestDto.getRequestDtoList().forEach(volunteer -> {
 
             Optional<Participant> findParticipant = participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), volunteer.getName(), volunteer.getPhoneNumber());
 
@@ -104,7 +104,7 @@ public class VolunteerParticipantService {
             participantApplicationRepository.save(
                     ParticipantApplication.builder()
                             .participant(participant)
-                            .event(VOLUNTEER_EVENT)
+                            .event(event)
                             .eventTeamNumber(eventTeamNumber.getAndIncrement())
                             .build()
             );
