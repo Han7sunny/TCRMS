@@ -132,12 +132,12 @@ public class VolunteerParticipantService {
             participant.updateGender(volunteerParticipantRequestDto.getGender());
 
             List<ParticipantApplication> participantApplicationList = participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(),1L, 4L);
-            participantApplicationList.stream().forEach(pa -> {
+            participantApplicationList.forEach(pa -> {
                 //  여 <-> 남
-                if(participant.getGender().equals("여성"))
-                    pa.updateEvent(eventRepository.findById(pa.getEvent().getEventId() + 2L).get());
-                else
+                if(participant.getGender().equals("여자"))
                     pa.updateEvent(eventRepository.findById(pa.getEvent().getEventId() - 2L).get());
+                else
+                    pa.updateEvent(eventRepository.findById(pa.getEvent().getEventId() + 2L).get());
                 participantApplicationRepository.save(pa);
             });
         }

@@ -17,6 +17,7 @@ public class VolunteerParticipantRequestDto {
     }
 
     @Getter
+    @Builder
     public static class Modify {
 
         private Long participantId;
