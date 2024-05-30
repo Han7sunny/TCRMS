@@ -34,8 +34,6 @@ public class IndividualParticipantRequestDto {
     @Builder
     public static class Modify {
 
-        private Long userId;    //  useless
-
         private Boolean isParticipantChange;
 
         private Long participantId;
@@ -54,7 +52,7 @@ public class IndividualParticipantRequestDto {
 
         private Boolean isEventChange;
 
-        private Map<Long, Long> participantApplicationInfos;
+        private Map<Long, Long> eventInfo;
 
         private Boolean isWeightClassChange;
 
