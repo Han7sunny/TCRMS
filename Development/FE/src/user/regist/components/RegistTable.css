@@ -67,3 +67,13 @@ td {
   padding: 1px;
   width: 75px; */
 }
+
+.table-comments {
+  color: rgb(212, 212, 212);
+  .info-highlight-case {
+    text-decoration: underline;
+  }
+  .info-highlight {
+    color: white;
+  }
+}

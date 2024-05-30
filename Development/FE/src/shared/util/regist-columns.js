@@ -284,7 +284,11 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
     detail: {
       items: ["외국인"],
       showLabel: true,
-      affector: { id: "-col3-nationality", type: "disabled", value: "외국인" },
+      affector: {
+        id: ["-col3-nationality", "-col7-phoneNumber"],
+        type: "disabled",
+        value: "외국인",
+      },
     },
   },
   {
@@ -318,7 +322,7 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
     detail: {
       items: ["겨루기", "품새"],
       showLabel: true,
-      affector: { id: "-col6-weight", type: "disabled", value: "겨루기" },
+      affector: { id: ["-col6-weight"], type: "disabled", value: "겨루기" },
     },
   },
   {
@@ -397,7 +401,11 @@ export const TABLE_COLUMNS_REGIST_TEAM_SPARRING = [
     detail: {
       items: ["외국인"],
       showLabel: true,
-      affector: { id: "-col4-nationality", type: "disabled", value: "외국인" },
+      affector: {
+        id: ["-col4-nationality"],
+        type: "disabled",
+        value: "외국인",
+      },
     },
   },
   {
@@ -474,7 +482,11 @@ export const TABLE_COLUMNS_REGIST_TEAM_FORM = [
     detail: {
       items: ["외국인"],
       showLabel: true,
-      affector: { id: "-col4-nationality", type: "disabled", value: "외국인" },
+      affector: {
+        id: ["-col4-nationality"],
+        type: "disabled",
+        value: "외국인",
+      },
     },
   },
   {
@@ -561,7 +573,11 @@ export const TABLE_COLUMNS_REGIST_SECOND = [
     detail: {
       items: ["외국인"],
       showLabel: true,
-      affector: { id: "-col3-nationality", type: "disabled", value: "외국인" },
+      affector: {
+        id: ["-col3-nationality"],
+        type: "disabled",
+        value: "외국인",
+      },
     },
   },
   {

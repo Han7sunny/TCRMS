@@ -15,10 +15,13 @@ const RegistIndividual = () => {
       if (mode === 1) {
         // list (GET)
         let event = new Set();
-        if (participant.eventId) {
-          participant.eventId.forEach((eventId) => {
+
+        const eventIds = Object.keys(participant.eventInfo);
+        if (eventIds.length) {
+          eventIds.forEach((eventId) => {
+            console.log(eventId);
             let eventName = Object.keys(EVENT_ID).find(
-              (key) => EVENT_ID[key] === eventId
+              (key) => EVENT_ID[key].id === Number(eventId)
             );
             event.add(eventName.split(" ")[2]);
           });
@@ -38,7 +41,7 @@ const RegistIndividual = () => {
 
         return {
           participantId: participant.participantId,
-          participantApplicationId: participant.participantApplicationId,
+          eventInfo: participant.eventInfo,
           name: participant.name,
           sex: participant.gender, // 남성,여성인지 체크
           foreigner: participant.isForeigner ? ["외국인"] : [],
@@ -60,7 +63,7 @@ const RegistIndividual = () => {
         let eventId = [];
         participant.event.forEach((eventname) => {
           let eventKey = "개인전 " + participant.sex + " " + eventname;
-          eventId.push(EVENT_ID[eventKey]);
+          eventId.push(EVENT_ID[eventKey].id);
         });
 
         let weightClassId = participant.weight
@@ -73,12 +76,13 @@ const RegistIndividual = () => {
           isForeigner: participant.foreigner.length > 0 ? true : false,
           nationality: participant.nationality,
           identityNumber: identityNumber,
-          eventId: eventId,
+          phoneNumber: participant.phoneNumber,
+          // eventIds: eventId,
           weightClassId: weightClassId,
         };
 
         if (mode === 2) {
-          return sendData;
+          return { ...sendData, eventIds: eventId };
         }
 
         if (mode === 3) {
@@ -103,11 +107,29 @@ const RegistIndividual = () => {
             isParticipantChange = true;
           }
 
+          let saveParticipantEventId = [];
+          Object.keys(saveParticipant.eventInfo).forEach((event) => {
+            saveParticipantEventId.push(Number(event));
+          });
+
           if (
-            JSON.stringify(sendData.eventId.slice().sort()) !==
-            JSON.stringify(saveParticipant.eventId.slice().sort())
+            JSON.stringify(eventId.slice().sort()) !==
+            JSON.stringify(saveParticipantEventId.slice().sort())
           ) {
             isEventChange = true;
+          }
+
+          let eventInfo = participant.eventInfo;
+          if (isEventChange) {
+            eventInfo = {};
+            //eventId 가 현재 선택한 Id
+            eventId.forEach((eId) => {
+              if (!saveParticipantEventId.includes(eId)) {
+                eventInfo[eId] = null;
+              } else {
+                eventInfo[eId] = saveParticipant.eventInfo[eId];
+              }
+            });
           }
 
           if (
@@ -117,6 +139,10 @@ const RegistIndividual = () => {
             isWeightClassChange = true;
           }
 
+          if (!isParticipantChange && !isEventChange && !isWeightClassChange) {
+            return false;
+          }
+
           return {
             ...sendData,
             participantId: participant.participantId,
@@ -124,6 +150,7 @@ const RegistIndividual = () => {
             isParticipantChange: isParticipantChange,
             isEventChange: isEventChange,
             isWeightClassChange: isWeightClassChange,
+            eventInfo: eventInfo,
           };
         }
       }

@@ -247,12 +247,24 @@ const RegistTable = (props) => {
                 <th key={col.id}>
                   {col.name}
                   <Tooltip
-                    title="외국인 선수이며 외국인등록번호가 없는 경우 개인식별을 위해 폰번호나 이메일 주소 기입"
+                    title={
+                      <div className="table-comments">
+                        외국인 선수이며{" "}
+                        <span className="info-highlight-case">
+                          외국인등록번호가 없는 경우
+                        </span>
+                        <br />
+                        개인식별을 위해{" "}
+                        <span className="info-highlight">폰번호</span>나{" "}
+                        <span className="info-highlight">이메일 주소</span> 기입
+                      </div>
+                    }
                     placement="top"
                   >
                     <img
                       src={`${process.env.PUBLIC_URL}/img/info_24dp.png`}
                       width={"14px"}
+                      alt="비고"
                     />
                   </Tooltip>{" "}
                 </th>

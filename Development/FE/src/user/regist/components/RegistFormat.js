@@ -39,8 +39,9 @@ const RegistFormat = (props) => {
         JSON.stringify({
           userId: auth.userId,
           participantId: registState.inputs[rowNum].participantId,
-          participantApplicationId:
-            registState.inputs[rowNum].participantApplicationId,
+          participantApplicationId: Object.values(
+            saveParticipant[rowNum].eventInfo
+          ),
         }),
         {
           Authorization: `Bearer ${auth.token}`,
@@ -94,8 +95,7 @@ const RegistFormat = (props) => {
               isForeigner: false,
               phoneNumber: "010-5137-8081",
               nationality: "",
-              eventId: [1, 2],
-              participantApplicationId: [5, 6],
+              eventInfo: { 1: 5, 2: 10 },
             },
             {
               participantId: 2,
@@ -105,8 +105,7 @@ const RegistFormat = (props) => {
               gender: "남성",
               isForeigner: true,
               nationality: "영국",
-              eventId: [4],
-              participantApplicationId: [8],
+              eventInfo: { 4: 8 },
             },
           ],
         },
@@ -191,49 +190,62 @@ const RegistFormat = (props) => {
         return;
       }
 
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
-        "PUT",
-        JSON.stringify({
-          // userId: auth.userId,
-          ...formatParticipant(participantData, 3, saveParticipant[rowNum]),
-        }),
-        {
-          Authorization: `Bearer ${auth.token}`,
-          "Content-Type": "application/json",
-        },
-
-        `${props.errMsgPersonName} 수정 실패`
+      const formatData = formatParticipant(
+        participantData,
+        3,
+        saveParticipant[rowNum]
       );
-      // const responseData = {
-      //   isSuccess: true,
-      //   message: "check please",
-      //   payload: {
-      //     participantId: 2,
-      //     // weightClassId: ,
-      //     name: "조땡땡",
-      //     identityNumber: "000000-0000001",
-      //     gender: "남성",
-      //     isForeigner: true,
-      //     nationality: "영국",
-      //     eventId: [4],
-      //     participantApplicationId: [8],
-      //   },
-      // };
 
-      if (responseData.isSuccess) {
-        let participantsData = registState.inputs;
-        participantsData[rowNum] = formatParticipant(responseData.payload, 1);
-        setRegistData(participantsData);
+      if (formatData) {
+        const responseData = await sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
+          "PUT",
+          JSON.stringify({
+            // userId: auth.userId,
+            ...formatParticipant(participantData, 3, saveParticipant[rowNum]),
+          }),
+          {
+            Authorization: `Bearer ${auth.token}`,
+            "Content-Type": "application/json",
+          },
 
-        let saveParticipantData = saveParticipant;
-        saveParticipantData[rowNum] = responseData.payload;
-        setSaveParticipant(saveParticipantData);
+          `${props.errMsgPersonName} 수정 실패`
+        );
+        // const responseData = {
+        //   isSuccess: true,
+        //   message: "check please",
+        //   payload: {
+        //     participantId: 2,
+        //     // weightClassId: ,
+        //     name: "조땡땡",
+        //     identityNumber: "000000-0000001",
+        //     gender: "남성",
+        //     isForeigner: true,
+        //     nationality: "영국",
+        //     eventId: [4],
+        //     participantApplicationId: [8],
+        //   },
+        // };
+
+        if (responseData.isSuccess) {
+          let participantsData = registState.inputs;
+          participantsData[rowNum] = formatParticipant(responseData.payload, 1);
+          setRegistData(participantsData);
+
+          let saveParticipantData = saveParticipant;
+          saveParticipantData[rowNum] = responseData.payload;
+          setSaveParticipant(saveParticipantData);
+        } else {
+          setError({
+            title: `${props.errMsgPersonName} 수정 실패`,
+            detail: responseData.message,
+          });
+        }
       } else {
-        setError({
-          title: `${props.errMsgPersonName} 수정 실패`,
-          detail: responseData.message,
-        });
+        let participantsData = registState.inputs;
+        participantsData[rowNum].editable = false;
+        setRegistData(participantsData);
+        return;
       }
     } catch (err) {
       // throw err;

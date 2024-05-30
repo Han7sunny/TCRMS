@@ -49,22 +49,26 @@ const CheckboxGroup = (props) => {
     // affector //
     if (props.affector && props.affector.type === "disabled" && !teamId) {
       // affector: { id: "-col3-nationality", type: "disabled", value: "외국인" },
-      const affectorId = id.split("-")[0] + props.affector.id;
-      if (values.includes(props.affector.value)) {
-        document.getElementById(affectorId).disabled = false;
-      } else {
-        document.getElementById(affectorId).disabled = true;
-      }
+      props.affector.id.forEach((affectorIdSuffix) => {
+        const affectorId = id.split("-")[0] + affectorIdSuffix;
+        if (values.includes(props.affector.value)) {
+          document.getElementById(affectorId).disabled = false;
+        } else {
+          document.getElementById(affectorId).disabled = true;
+        }
+      });
     }
     // ----------- //
     if (props.affector && props.affector.type === "disabled" && teamId) {
-      const idSplit = id.split("-");
-      const affectorId = idSplit[0] + "-" + idSplit[1] + props.affector.id;
-      if (values.includes(props.affector.value)) {
-        document.getElementById(affectorId).disabled = false;
-      } else {
-        document.getElementById(affectorId).disabled = true;
-      }
+      props.affector.id.forEach((affectorIdSuffix) => {
+        const idSplit = id.split("-");
+        const affectorId = idSplit[0] + "-" + idSplit[1] + affectorIdSuffix;
+        if (values.includes(props.affector.value)) {
+          document.getElementById(affectorId).disabled = false;
+        } else {
+          document.getElementById(affectorId).disabled = true;
+        }
+      });
     }
   }, [values, id, props.affector, teamId]);
 
