@@ -16,19 +16,19 @@ public class ParticipantApplicationService {
 
     public ResponseDto<?> deleteParticipantApplication(IndividualParticipantRequestDto.Delete individualParticipantRequestDto){
 
-        individualParticipantRequestDto.getParticipantApplicationIds().stream().forEach(participantApplicationId -> {
+        individualParticipantRequestDto.getParticipantApplicationIds().forEach(participantApplicationId -> {
             participantApplicationRepository.deleteById(participantApplicationId);
             //  학교별 신청 종목 팀 데이터 변경
                 //  2차 수정 및 취소 기간
         });
 
-//        Boolean isOtherParticipantApplicationExist = participantApplicationRepository.existsByParticipantApplicationId(individualParticipantRequestDto.getParticipantId());
+        Boolean isOtherParticipantApplicationExist = participantApplicationRepository.existsByParticipant_ParticipantId(individualParticipantRequestDto.getParticipantId());
 
-//        if(!isOtherParticipantApplicationExist){
-//            participantRepository.deleteById(individualParticipantRequestDto.getParticipantId());
-//            //  participant_file
-//            //  file
-//        }
+        if(!isOtherParticipantApplicationExist){
+            participantRepository.deleteById(individualParticipantRequestDto.getParticipantId());
+            //  participant_file
+            //  file
+        }
 
         return ResponseDto.builder()
                 .isSuccess(true)
