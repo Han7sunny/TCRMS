@@ -139,7 +139,6 @@ public class ParticipantService {
     public ResponseDto<?> modifyIndividual(IndividualParticipantRequestDto.Modify individualParticipantRequestDto) {
         //  2차 기간에 종목 변경 불가능 (event) -> 종목 disabled
             //  값 넘어올 수도 있고 (1차), 안 넘어올 수도 있음(2차)
-            //  값 넘어올 경우 ParticipantApplicationId : eventId
 
         //  체급은 둘 다 변경 가능 (weightclass)
 

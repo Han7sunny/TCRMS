@@ -34,9 +34,9 @@ public class IndividualParticipantRequestDto {
     @Builder
     public static class Modify {
 
-        private Boolean isParticipantChange;
-
         private Long participantId;
+
+        private Boolean isParticipantChange;
 
         private String name;
 

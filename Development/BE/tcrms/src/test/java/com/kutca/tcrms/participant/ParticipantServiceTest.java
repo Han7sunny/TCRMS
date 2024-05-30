@@ -350,4 +350,91 @@ public class ParticipantServiceTest {
         verify(participantApplicationRepository, times(0)).findTopByEvent_EventId(anyLong());
 
     }
+
+    @Test
+    @DisplayName("개인전 신청 개인정보(여 -> 남) & 종목 & 체급 수정 성공")
+    public void modifyIndividualGenderEventWeightClassSuccess(){
+
+        //  given
+        WeightClass weightClass1 = WeightClass.builder().weightClassId(1L).build();
+
+        Participant findParticipant = Participant.builder()
+                .participantId(1L)
+                .name("Jennifer")
+                .gender("여자")
+                .universityName(user.getUniversityName())
+                .isForeigner(true)
+                .nationality("영국")
+                .identityNumber("981004-2345678")
+                .weightClass(weightClass1)
+                .build();
+
+        ParticipantApplication findParticipantApplication1 = ParticipantApplication.builder()
+                .participantApplicationId(1L)
+                .participant(findParticipant)
+                .event(events.get(1L))
+                .build();
+
+        ParticipantApplication savedParticipantApplication1 = ParticipantApplication.builder()
+                .participantApplicationId(1L)
+                .participant(findParticipant)
+                .event(events.get(3L))
+                .eventTeamNumber(1)
+                .build();
+
+        ParticipantApplication newParticipantApplication1 = ParticipantApplication.builder()
+                .participant(findParticipant)
+                .event(events.get(4L))
+                .eventTeamNumber(1)
+                .build();
+
+        ParticipantApplication savedParticipantApplication2 = ParticipantApplication.builder()
+                .participantApplicationId(2L)
+                .participant(findParticipant)
+                .event(events.get(4L))
+                .eventTeamNumber(1)
+                .build();
+
+        Map<Long, Long> eventInfo = new HashMap<>();
+        eventInfo.put(events.get(3L).getEventId(), findParticipantApplication1.getParticipantApplicationId());
+        eventInfo.put(events.get(4L).getEventId(), null);
+
+        WeightClass weightClass2 = WeightClass.builder().weightClassId(2L).build();
+
+        IndividualParticipantRequestDto.Modify modifyRequestDto = IndividualParticipantRequestDto.Modify.builder()
+                .participantId(1L)
+                .isParticipantChange(true)
+                .gender("남성")
+                .isEventChange(true)
+                .eventInfo(eventInfo)
+                .isWeightClassChange(true)
+                .weightClassId(weightClass2.getWeightClassId())
+                .build();
+
+        given(participantRepository.findById(modifyRequestDto.getParticipantId())).willReturn(Optional.of(findParticipant));
+        given(eventRepository.findById(3L)).willReturn(Optional.of(events.get(3L)));
+        given(eventRepository.findById(4L)).willReturn(Optional.of(events.get(4L)));
+        given(participantApplicationRepository.findTopByEvent_EventId(3L)).willReturn(Optional.of(savedParticipantApplication1));
+        given(participantApplicationRepository.findTopByEvent_EventId(4L)).willReturn(Optional.empty());
+        given(participantApplicationRepository.findById(1L)).willReturn(Optional.of(findParticipantApplication1));
+        given(participantApplicationRepository.save(any(ParticipantApplication.class))).willReturn(savedParticipantApplication1, savedParticipantApplication2);
+        given(participantRepository.save(any(Participant.class))).willReturn(findParticipant);
+        given(weightClassRepository.findById(2L)).willReturn(Optional.of(weightClass2));
+
+        //  when
+        ResponseDto<?> responseDto = participantService.modifyIndividual(modifyRequestDto);
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+        IndividualParticipantResponseDto individualParticipantResponseDto = (IndividualParticipantResponseDto)responseDto.getPayload();
+        assertEquals(modifyRequestDto.getGender(), individualParticipantResponseDto.getGender());
+        assertEquals(modifyRequestDto.getEventInfo().get(3L), individualParticipantResponseDto.getEventInfo().get(3L));
+        assertNotEquals(modifyRequestDto.getEventInfo().get(4L), individualParticipantResponseDto.getEventInfo().get(4L));
+        assertEquals(individualParticipantResponseDto.getEventInfo().get(4L), savedParticipantApplication2.getParticipantApplicationId());
+
+        verify(participantApplicationRepository, times(1)).findById(findParticipantApplication1.getParticipantApplicationId());
+        verify(participantApplicationRepository, times(0)).findById(4L);
+        verify(eventRepository, times(modifyRequestDto.getEventInfo().size())).findById(anyLong());
+        verify(weightClassRepository, times(1)).findById(anyLong());
+    }
 }
