@@ -90,16 +90,16 @@ public class VolunteerParticipantService {
 
         volunteerParticipantRequestDto.getRequestDtoList().forEach(volunteer -> {
 
-            Optional<Participant> findParticipant = participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), volunteer.getName(), volunteer.getPhoneNumber());
-
-            Participant participant = findParticipant.orElseGet(() -> participantRepository.save(
+            Participant participant = participantRepository.save(
                     Participant.builder()
                             .user(user)
                             .name(volunteer.getName())
                             .gender(volunteer.getGender())
+                            .isForeigner(volunteer.getIsForeigner())
+                            .nationality(volunteer.getNationality())
                             .universityName(user.getUniversityName())
                             .phoneNumber(volunteer.getPhoneNumber())
-                            .build()));
+                            .build());
 
             participantApplicationRepository.save(
                     ParticipantApplication.builder()
@@ -126,21 +126,22 @@ public class VolunteerParticipantService {
                     .build();
         }
 
-        Participant participant = findParticipant.get().updateName(volunteerParticipantRequestDto.getName()).updatePhoneNumber(volunteerParticipantRequestDto.getPhoneNumber());
+        Participant participant = findParticipant.get();
 
         if(!participant.getGender().equals(volunteerParticipantRequestDto.getGender())){
-            participant.updateGender(volunteerParticipantRequestDto.getGender());
 
             List<ParticipantApplication> participantApplicationList = participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(),1L, 4L);
             participantApplicationList.forEach(pa -> {
                 //  여 <-> 남
-                if(participant.getGender().equals("여자"))
-                    pa.updateEvent(eventRepository.findById(pa.getEvent().getEventId() - 2L).get());
-                else
+                if(participant.getGender().equals("여성"))
                     pa.updateEvent(eventRepository.findById(pa.getEvent().getEventId() + 2L).get());
+                else
+                    pa.updateEvent(eventRepository.findById(pa.getEvent().getEventId() - 2L).get());
                 participantApplicationRepository.save(pa);
             });
         }
+
+        participant.updateVolunteer(volunteerParticipantRequestDto);
 
         return ResponseDto.builder()
                 .isSuccess(true)
