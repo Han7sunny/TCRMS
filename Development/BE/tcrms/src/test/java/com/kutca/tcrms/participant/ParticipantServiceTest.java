@@ -25,10 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.stream.DoubleStream.builder;
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class ParticipantServiceTest {
@@ -57,17 +56,15 @@ public class ParticipantServiceTest {
     @Mock
     private EventRepository eventRepository;
 
-//    @BeforeEach
-//    void setUp() {
-//    }
+    private User user;
 
-    @Test
-    @DisplayName("개인전 신청 확인 성공")
-    public void getIndividualList(){
-        //  given
-        Long userId = 1L;
-        User user = User.builder()
-                .userId(userId)
+    private Map<Long, Event> events = new HashMap<>();
+
+    @BeforeEach
+    public void setUp() {
+
+        user = User.builder()
+                .userId(1L)
                 .username("홍길동")
                 .universityName("서울대학교")
                 .password("1234")
@@ -77,6 +74,20 @@ public class ParticipantServiceTest {
                 .isEditable(true)
                 .isDepositConfirmed(false)
                 .build();
+
+        events.put(1L, Event.builder().eventId(1L).eventName("개인전 여자 겨루기").build());
+        events.put(2L, Event.builder().eventId(2L).eventName("개인전 여자 품새").build());
+        events.put(3L, Event.builder().eventId(3L).eventName("개인전 남자 겨루기").build());
+        events.put(4L, Event.builder().eventId(4L).eventName("개인전 남자 품새").build());
+
+    }
+
+    @Test
+    @DisplayName("개인전 신청 확인 성공")
+    public void getIndividualList(){
+        //  given
+        Long userId = 1L;
+
 
         WeightClass weightClass1 = WeightClass.builder()
                 .weightClassId(1L)
@@ -116,31 +127,26 @@ public class ParticipantServiceTest {
                 .weightClass(weightClass2)
                 .build();
 
-        Event event1 = Event.builder().eventId(1L).eventName("개인전 여자 겨루기").build();
-        Event event2 = Event.builder().eventId(2L).eventName("개인전 여자 품새").build();
-        Event event3 = Event.builder().eventId(3L).eventName("개인전 남자 겨루기").build();
-        Event event4 = Event.builder().eventId(4L).eventName("개인전 남자 품새").build();
-
         ParticipantApplication participantApplication1 = ParticipantApplication.builder()
                 .participant(participant1)
-                .event(event1)
+                .event(events.get(1L))
                 .build();
 
         ParticipantApplication participantApplication2 = ParticipantApplication.builder()
                 .participant(participant1)
-                .event(event2)
+                .event(events.get(2L))
                 .build();
 
         ParticipantApplication participantApplication3 = ParticipantApplication.builder()
                 .participant(participant2)
-                .event(event3)
+                .event(events.get(3L))
                 .build();
 
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(participantRepository.findAllByUser_UserId(userId)).willReturn(Arrays.asList(participant1, participant2));
-        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant1.getParticipantId(), event1.getEventId(), event4.getEventId())).willReturn(Arrays.asList(participantApplication1, participantApplication2));
-        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant2.getParticipantId(), event1.getEventId(), event4.getEventId())).willReturn(Arrays.asList(participantApplication3));
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant1.getParticipantId(), events.get(1L).getEventId(), events.get(4L).getEventId())).willReturn(Arrays.asList(participantApplication1, participantApplication2));
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant2.getParticipantId(), events.get(1L).getEventId(), events.get(4L).getEventId())).willReturn(Arrays.asList(participantApplication3));
 
         //  when
         ResponseDto<?> responseDto = participantService.getIndividualList(userId);
@@ -157,15 +163,14 @@ public class ParticipantServiceTest {
 
         assertFalse(individualParticipantResponseDto.get(0).getIsForeigner());
 //        assertNull(individualParticipantResponseDto.get(0).getNationality());  //  entity 설정에 default null로 설정해주기?
-        assertEquals(individualParticipantResponseDto.get(0).getParticipantName(), participant1.getName());
+        assertEquals(individualParticipantResponseDto.get(0).getName(), participant1.getName());
         assertEquals(individualParticipantResponseDto.get(0).getIdentityNumber(), participant1.getIdentityNumber());
-        assertEquals(individualParticipantResponseDto.get(0).getEventIds().size(), 2);
-        assertEquals(individualParticipantResponseDto.get(0).getParticipantApplicationIds().size(), individualParticipantResponseDto.get(0).getEventIds().size());
+        assertEquals(individualParticipantResponseDto.get(0).getEventInfo().size(), 2);
         assertEquals(individualParticipantResponseDto.get(0).getWeightClassId(), weightClass1.getWeightClassId());
 
         assertTrue(individualParticipantResponseDto.get(1).getIsForeigner());
         assertEquals(individualParticipantResponseDto.get(1).getNationality(), participant2.getNationality());
-        assertEquals(individualParticipantResponseDto.get(1).getEventIds().size(), 1);
+        assertEquals(individualParticipantResponseDto.get(1).getEventInfo().size(), 1);
         assertEquals(individualParticipantResponseDto.get(1).getWeightClassId(), weightClass2.getWeightClassId());
 
     }
@@ -175,17 +180,6 @@ public class ParticipantServiceTest {
     public void registIndividualList(){
 
         //  given
-        User user = User.builder()
-                .userId(1L)
-                .username("홍길동")
-                .universityName("서울대학교")
-                .password("1234")
-                .auth(Role.USER)
-                .depositorName("입금주명")
-                .isFirstLogin(true)
-                .isEditable(true)
-                .isDepositConfirmed(false)
-                .build();
 
         Event event1 = Event.builder().eventId(1L).eventName("개인전 여자 겨루기").build();
         Event event2 = Event.builder().eventId(2L).eventName("개인전 여자 품새").build();
@@ -310,5 +304,137 @@ public class ParticipantServiceTest {
         assertNotNull(findParticipant3);
         assertNull(findParticipant3.get().getWeightClass());
         assertEquals(participantApplicationRepository.findTopByEvent_EventId(participant3.getEventIds().get(0)).get().getParticipant().getParticipantId(), findParticipant3.get().getParticipantId());
+    }
+
+    @Test
+    @DisplayName("개인전 신청 개인정보(이름) 수정 성공")
+    public void modifyIndividualSuccess(){
+
+        //  given
+        IndividualParticipantRequestDto.Modify modifyRequestDto = IndividualParticipantRequestDto.Modify.builder()
+                .isParticipantChange(true)
+                .participantId(1L)
+                .name("Tom")
+                .gender("남자")
+                .isForeigner(true)
+                .nationality("영국")
+                .identityNumber("981004-1234567")
+                .isEventChange(false)
+                .isWeightClassChange(false)
+                .build();
+
+        Participant savedParticipant = Participant.builder()
+                .participantId(modifyRequestDto.getParticipantId())
+                .name("Tomy")
+                .identityNumber(modifyRequestDto.getIdentityNumber())
+                .gender(modifyRequestDto.getGender())
+                .universityName(user.getUniversityName())
+                .isForeigner(modifyRequestDto.getIsForeigner())
+                .nationality(modifyRequestDto.getNationality())
+                .build();
+
+        given(participantRepository.findById(modifyRequestDto.getParticipantId())).willReturn(Optional.of(savedParticipant));
+        given(participantRepository.save(any(Participant.class))).willReturn(savedParticipant);
+
+        //  when
+        ResponseDto<?> responseDto = participantService.modifyIndividual(modifyRequestDto);
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+        assertEquals(((IndividualParticipantResponseDto)responseDto.getPayload()).getParticipantId(), modifyRequestDto.getParticipantId());
+        assertEquals(((IndividualParticipantResponseDto) responseDto.getPayload()).getName(), modifyRequestDto.getName());
+
+        verify(participantRepository, times(1)).findById(anyLong());
+        verify(eventRepository, times(0)).findById(anyLong());
+        verify(weightClassRepository, times(0)).findById(anyLong());
+        verify(participantApplicationRepository, times(0)).findTopByEvent_EventId(anyLong());
+
+    }
+
+    @Test
+    @DisplayName("개인전 신청 개인정보(여 -> 남) & 종목 & 체급 수정 성공")
+    public void modifyIndividualGenderEventWeightClassSuccess(){
+
+        //  given
+        WeightClass weightClass1 = WeightClass.builder().weightClassId(1L).build();
+
+        Participant findParticipant = Participant.builder()
+                .participantId(1L)
+                .name("Jennifer")
+                .gender("여자")
+                .universityName(user.getUniversityName())
+                .isForeigner(true)
+                .nationality("영국")
+                .identityNumber("981004-2345678")
+                .weightClass(weightClass1)
+                .build();
+
+        ParticipantApplication findParticipantApplication1 = ParticipantApplication.builder()
+                .participantApplicationId(1L)
+                .participant(findParticipant)
+                .event(events.get(1L))
+                .build();
+
+        ParticipantApplication savedParticipantApplication1 = ParticipantApplication.builder()
+                .participantApplicationId(1L)
+                .participant(findParticipant)
+                .event(events.get(3L))
+                .eventTeamNumber(1)
+                .build();
+
+        ParticipantApplication newParticipantApplication1 = ParticipantApplication.builder()
+                .participant(findParticipant)
+                .event(events.get(4L))
+                .eventTeamNumber(1)
+                .build();
+
+        ParticipantApplication savedParticipantApplication2 = ParticipantApplication.builder()
+                .participantApplicationId(2L)
+                .participant(findParticipant)
+                .event(events.get(4L))
+                .eventTeamNumber(1)
+                .build();
+
+        Map<Long, Long> eventInfo = new HashMap<>();
+        eventInfo.put(events.get(3L).getEventId(), findParticipantApplication1.getParticipantApplicationId());
+        eventInfo.put(events.get(4L).getEventId(), null);
+
+        WeightClass weightClass2 = WeightClass.builder().weightClassId(2L).build();
+
+        IndividualParticipantRequestDto.Modify modifyRequestDto = IndividualParticipantRequestDto.Modify.builder()
+                .participantId(1L)
+                .isParticipantChange(true)
+                .gender("남성")
+                .isEventChange(true)
+                .eventInfo(eventInfo)
+                .isWeightClassChange(true)
+                .weightClassId(weightClass2.getWeightClassId())
+                .build();
+
+        given(participantRepository.findById(modifyRequestDto.getParticipantId())).willReturn(Optional.of(findParticipant));
+        given(eventRepository.findById(3L)).willReturn(Optional.of(events.get(3L)));
+        given(eventRepository.findById(4L)).willReturn(Optional.of(events.get(4L)));
+        given(participantApplicationRepository.findTopByEvent_EventId(3L)).willReturn(Optional.of(savedParticipantApplication1));
+        given(participantApplicationRepository.findTopByEvent_EventId(4L)).willReturn(Optional.empty());
+        given(participantApplicationRepository.findById(1L)).willReturn(Optional.of(findParticipantApplication1));
+        given(participantApplicationRepository.save(any(ParticipantApplication.class))).willReturn(savedParticipantApplication1, savedParticipantApplication2);
+        given(participantRepository.save(any(Participant.class))).willReturn(findParticipant);
+        given(weightClassRepository.findById(2L)).willReturn(Optional.of(weightClass2));
+
+        //  when
+        ResponseDto<?> responseDto = participantService.modifyIndividual(modifyRequestDto);
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+        IndividualParticipantResponseDto individualParticipantResponseDto = (IndividualParticipantResponseDto)responseDto.getPayload();
+        assertEquals(modifyRequestDto.getGender(), individualParticipantResponseDto.getGender());
+        assertEquals(modifyRequestDto.getEventInfo().get(3L), individualParticipantResponseDto.getEventInfo().get(3L));
+        assertNotEquals(modifyRequestDto.getEventInfo().get(4L), individualParticipantResponseDto.getEventInfo().get(4L));
+        assertEquals(individualParticipantResponseDto.getEventInfo().get(4L), savedParticipantApplication2.getParticipantApplicationId());
+
+        verify(participantApplicationRepository, times(1)).findById(findParticipantApplication1.getParticipantApplicationId());
+        verify(participantApplicationRepository, times(0)).findById(4L);
+        verify(eventRepository, times(modifyRequestDto.getEventInfo().size())).findById(anyLong());
+        verify(weightClassRepository, times(1)).findById(anyLong());
     }
 }

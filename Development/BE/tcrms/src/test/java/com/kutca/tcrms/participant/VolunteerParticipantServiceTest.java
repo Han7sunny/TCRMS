@@ -5,6 +5,8 @@ import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.VolunteerParticipantRequestDto;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.VolunteerParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
@@ -21,6 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -95,7 +98,7 @@ public class VolunteerParticipantServiceTest {
 
 
     @Test
-    @DisplayName("Participant 데이터가 기존에 없는 자원봉사자 신청 성공")
+    @DisplayName("자원봉사자 신청 성공")
     public void registVolunteerWithNewParticipantSuccess(){
 
         //  given
@@ -165,90 +168,6 @@ public class VolunteerParticipantServiceTest {
     }
 
     @Test
-    @DisplayName("Participant 데이터가 기존에 있는 자원봉사자 신청 성공")
-    public void registVolunteerWithExistParticipantSuccess(){
-
-        //  given
-        Participant existParticipant = Participant.builder()
-                .participantId(1L)
-                .name(registRequestDto.getRequestDtoList().get(0).getName())
-                .identityNumber("980316-1234567")
-                .gender(registRequestDto.getRequestDtoList().get(0).getGender())
-                .universityName(user.getUniversityName())
-                .isForeigner(true)
-                .nationality("영국")
-                .phoneNumber(registRequestDto.getRequestDtoList().get(0).getPhoneNumber())
-                .build();
-
-        Participant savedVolunteer2 = Participant.builder()
-                .participantId(2L)
-                .name(registRequestDto.getRequestDtoList().get(1).getName())
-                .gender(registRequestDto.getRequestDtoList().get(1).getGender())
-                .universityName(user.getUniversityName())
-                .phoneNumber(registRequestDto.getRequestDtoList().get(1).getPhoneNumber())
-                .build();
-
-        Participant savedVolunteer3 = Participant.builder()
-                .participantId(3L)
-                .name(registRequestDto.getRequestDtoList().get(2).getName())
-                .gender(registRequestDto.getRequestDtoList().get(2).getGender())
-                .universityName(user.getUniversityName())
-                .phoneNumber(registRequestDto.getRequestDtoList().get(2).getPhoneNumber())
-                .build();
-
-        ParticipantApplication existParticipantApplication = ParticipantApplication.builder()
-                .participantApplicationId(1L)
-                .participant(existParticipant)
-                .event(Event.builder().eventId(4L).eventName("남자 개인 품새").build())
-                .eventTeamNumber(1)
-                .build();
-
-        ParticipantApplication savedVolunteerApplication1 = ParticipantApplication.builder()
-                .participantApplicationId(2L)
-                .participant(existParticipant)
-                .event(event)
-                .eventTeamNumber(1)
-                .build();
-
-        ParticipantApplication savedVolunteerApplication2 = ParticipantApplication.builder()
-                .participantApplicationId(3L)
-                .participant(savedVolunteer2)
-                .event(event)
-                .eventTeamNumber(2)
-                .build();
-
-        ParticipantApplication savedVolunteerApplication3 = ParticipantApplication.builder()
-                .participantApplicationId(4L)
-                .participant(savedVolunteer3)
-                .event(event)
-                .eventTeamNumber(3)
-                .build();
-
-        given(userRepository.findById(user.getUserId())).willReturn(Optional.of(user));
-        given(eventRepository.findById(VOLUNTEER_EVENT_ID)).willReturn(Optional.of(event));
-        given(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID)).willReturn(Optional.of(savedVolunteerApplication3));
-        given(participantApplicationRepository.findTopByEvent_EventId(existParticipantApplication.getEvent().getEventId())).willReturn(Optional.of(existParticipantApplication));
-        given(participantRepository.findAllByUser_UserId(user.getUserId())).willReturn(Arrays.asList(existParticipant, savedVolunteer2, savedVolunteer3));
-        given(participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), existParticipant.getName(), existParticipant.getPhoneNumber())).willReturn(Optional.of(existParticipant));
-
-        //  when
-        ResponseDto<?> response = volunteerParticipantService.registVolunteer(registRequestDto);
-
-        //  then
-        verify(participantRepository, times(0)).save(existParticipant);
-        verify(participantRepository, times(2)).save(any(Participant.class));
-        verify(participantRepository, times(registRequestDto.getRequestDtoList().size())).findByUser_UserIdAndNameAndPhoneNumber(anyLong(), anyString(), anyString());
-        verify(participantApplicationRepository, times(registRequestDto.getRequestDtoList().size())).save(any(ParticipantApplication.class));
-
-        assertTrue(response.getIsSuccess());
-        List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(user.getUserId());
-        assertEquals(findParticipantList.size(), registRequestDto.getRequestDtoList().size());
-        assertTrue(findParticipantList.stream().allMatch(participant -> user.getUniversityName().equals(participant.getUniversityName())));
-        assertEquals(participantApplicationRepository.findTopByEvent_EventId(existParticipantApplication.getEvent().getEventId()).get().getEventTeamNumber(), 1);
-        assertEquals(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).get().getEventTeamNumber(), registRequestDto.getRequestDtoList().size());
-    }
-
-    @Test
     @DisplayName("자원봉사자 성별 남->여 수정 성공")
     public void modifyVolunteerSuccess(){
 
@@ -309,5 +228,51 @@ public class VolunteerParticipantServiceTest {
         assertEquals(((VolunteerParticipantResponseDto) responseDto.getPayload()).getGender(), modifyRequestDto.getGender());
 
         verify(eventRepository, times(2)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("자원봉사자 신청 확인(조회) 성공")
+    public void getVolunteerList(){
+
+        //  given
+        Participant findParticipant1 = Participant.builder()
+                .participantId(1L)
+                .name("홍길동")
+                .gender("남성")
+                .identityNumber("981004-1234567")
+                .universityName(user.getUniversityName())
+                .build();
+
+        Participant findParticipant2 = Participant.builder()
+                .participantId(2L)
+                .name(findParticipant1.getName())
+                .gender(findParticipant1.getName())
+                .universityName(user.getUniversityName())
+                .phoneNumber("010-1234-5678")
+                .build();
+
+        Participant findParticipant3 = Participant.builder()
+                .participantId(3L)
+                .name("성춘향")
+                .gender("여성")
+                .universityName(user.getUniversityName())
+                .phoneNumber("010-2345-6789")
+                .build();
+
+        given(userRepository.findById(user.getUserId())).willReturn(Optional.of(user));
+        given(participantRepository.findAllByUser_UserId(user.getUserId())).willReturn(Arrays.asList(findParticipant1, findParticipant2, findParticipant3));
+        given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(findParticipant1.getParticipantId(), VOLUNTEER_EVENT_ID)).willReturn(false);
+        given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(findParticipant2.getParticipantId(), VOLUNTEER_EVENT_ID)).willReturn(true);
+        given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(findParticipant3.getParticipantId(), VOLUNTEER_EVENT_ID)).willReturn(true);
+
+        //  when
+        ResponseDto<?> responseDto = volunteerParticipantService.getVolunteerList(user.getUserId());
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+        List<VolunteerParticipantResponseDto> volunteerResponseDtoList = ((ParticipantResponseDto)responseDto.getPayload()).getParticipants().getParticipants();
+        assertEquals(volunteerResponseDtoList.size(), 2);
+
+        verify(participantApplicationRepository, times(3)).existsByParticipant_ParticipantIdAndEvent_EventId(anyLong(), anyLong());
     }
 }

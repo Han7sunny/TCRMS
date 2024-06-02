@@ -14,6 +14,10 @@ public class VolunteerParticipantRequestDto {
         private String gender;
 
         private String phoneNumber;
+
+        private Boolean isForeigner;
+
+        private String nationality;
     }
 
     @Getter
@@ -27,9 +31,14 @@ public class VolunteerParticipantRequestDto {
         private String gender;
 
         private String phoneNumber;
+
+        private Boolean isForeigner;
+
+        private String nationality;
     }
 
     @Getter
+    @Builder
     public static class Delete {
 
         private Long participantId;

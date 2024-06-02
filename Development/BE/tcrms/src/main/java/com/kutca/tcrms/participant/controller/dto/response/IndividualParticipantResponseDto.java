@@ -8,7 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Builder
@@ -17,7 +19,7 @@ public class IndividualParticipantResponseDto {
 
     private Long participantId;
 
-    private String participantName;
+    private String name;
 
     private String gender;
 
@@ -27,9 +29,7 @@ public class IndividualParticipantResponseDto {
 
     private String identityNumber;
 
-    private List<Long> eventIds;
-
-    private List<Long> participantApplicationIds;
+    private Map<Long, Long> eventInfo;
 
     private Long weightClassId;
 
@@ -37,20 +37,19 @@ public class IndividualParticipantResponseDto {
 
         IndividualParticipantResponseDto individualParticipantResponseDto = IndividualParticipantResponseDto.builder()
                 .participantId(participant.getParticipantId())
-                .participantName(participant.getName())
+                .name(participant.getName())
                 .gender(participant.getGender())
                 .isForeigner(participant.getIsForeigner())
                 .nationality(participant.getNationality())
                 .identityNumber(participant.getIdentityNumber())
-                .eventIds(new ArrayList<>())
-                .participantApplicationIds(new ArrayList<>())
-                .weightClassId(participant.getWeightClass().getWeightClassId())
+                .eventInfo(new HashMap<>())
+                .weightClassId(participant.getWeightClass() == null ? null : participant.getWeightClass().getWeightClassId())
                 .build();
 
-        participantApplicationList.stream().forEach(participantApplication -> {
-            individualParticipantResponseDto.eventIds.add(participantApplication.getEvent().getEventId());
-            individualParticipantResponseDto.participantApplicationIds.add(participantApplication.getParticipantApplicationId());
-        });
+        participantApplicationList.forEach(participantApplication ->
+            individualParticipantResponseDto.eventInfo.put(
+                    participantApplication.getEvent().getEventId(), participantApplication.getParticipantApplicationId())
+        );
 
         return individualParticipantResponseDto;
     }
