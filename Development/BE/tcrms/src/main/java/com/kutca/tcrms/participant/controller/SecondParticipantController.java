@@ -11,16 +11,25 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 public class SecondParticipantController {
 
     private final SecondParticipantService secondParticipantService;
+
+    @Operation(summary = "세컨 신청 확인(조회)")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @GetMapping("/api/user/second")
+    public ResponseEntity<?> getSecondList(@RequestParam Long userId){
+        try {
+            return new ResponseEntity<>(secondParticipantService.getSecondList(userId), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @Operation(summary = "세컨 신청")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
