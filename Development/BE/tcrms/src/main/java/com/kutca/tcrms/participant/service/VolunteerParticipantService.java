@@ -90,16 +90,14 @@ public class VolunteerParticipantService {
 
         volunteerParticipantRequestDto.getRequestDtoList().forEach(volunteer -> {
 
-            Optional<Participant> findParticipant = participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), volunteer.getName(), volunteer.getPhoneNumber());
-
-            Participant participant = findParticipant.orElseGet(() -> participantRepository.save(
+            Participant participant = participantRepository.save(
                     Participant.builder()
                             .user(user)
                             .name(volunteer.getName())
                             .gender(volunteer.getGender())
                             .universityName(user.getUniversityName())
                             .phoneNumber(volunteer.getPhoneNumber())
-                            .build()));
+                            .build());
 
             participantApplicationRepository.save(
                     ParticipantApplication.builder()
