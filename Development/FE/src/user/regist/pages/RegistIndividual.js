@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 
 import {
   TABLE_COLUMNS_REGIST_INDIVIDUAL,
+  TABLE_COLUMNS_REGIST_PERIOD2_INDIVIDUAL,
   TABLE_COLUMNS_CHECK_INDIVIDUAL,
 } from "../../../shared/util/regist-columns";
 import { EVENT_ID, WEIGHT_ID } from "../../../shared/util/const-event";
@@ -19,7 +20,6 @@ const RegistIndividual = () => {
         const eventIds = Object.keys(participant.eventInfo);
         if (eventIds.length) {
           eventIds.forEach((eventId) => {
-            console.log(eventId);
             let eventName = Object.keys(EVENT_ID).find(
               (key) => EVENT_ID[key].id === Number(eventId)
             );
@@ -71,12 +71,12 @@ const RegistIndividual = () => {
           : null;
 
         let sendData = {
-          name: participant.name,
+          name: participant.name.trim(),
           gender: participant.sex,
           isForeigner: participant.foreigner.length > 0 ? true : false,
           nationality: participant.nationality,
           identityNumber: identityNumber,
-          phoneNumber: participant.phoneNumber,
+          phoneNumber: participant.phoneNumber.trim(),
           // eventIds: eventId,
           weightClassId: weightClassId,
         };
@@ -178,6 +178,7 @@ const RegistIndividual = () => {
       englishTitle="individual"
       personName="선수"
       registTableColumn={TABLE_COLUMNS_REGIST_INDIVIDUAL}
+      registTableColumnSecondPeriod={TABLE_COLUMNS_REGIST_PERIOD2_INDIVIDUAL}
       checkTableColumn={TABLE_COLUMNS_CHECK_INDIVIDUAL}
       newPersonFormat={newPersonFormat}
       checkValidity={checkValidityIndividual}

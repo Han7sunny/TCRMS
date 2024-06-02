@@ -63,6 +63,7 @@ const RegistTable = (props) => {
             validators={colInfo.detail.validators}
             placeholder={colInfo.detail.placeholder}
             initialValue={initVal}
+            disabled={colInfo.detail.disabled}
           />
         );
       case "radio-group":
@@ -76,6 +77,7 @@ const RegistTable = (props) => {
             teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
+            disabled={colInfo.detail.disabled}
           />
         );
       case "checkbox-group":
@@ -89,6 +91,7 @@ const RegistTable = (props) => {
             teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
+            disabled={colInfo.detail.disabled}
           />
         );
       case "dropdown":
@@ -100,6 +103,7 @@ const RegistTable = (props) => {
             onInput={props.inputHandler}
             teamId={teamId}
             initialValue={initVal}
+            disabled={colInfo.detail.disabled}
           />
         );
       case "button":

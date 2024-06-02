@@ -17,6 +17,8 @@ const RegistFormat = (props) => {
   const [apiFail, setApiFail] = useState(false);
 
   const [saveParticipant, setSaveParticipant] = useState([]);
+  const [envPeriod, setEnvPeriod] = useState("none");
+  const [enableDropdownRow, setEnableDropdownRow] = useState(null);
 
   const [registState, inputHandler, addRow, deleteRow, setRegistData] =
     useRegist([], props.newPersonFormat);
@@ -27,6 +29,38 @@ const RegistFormat = (props) => {
   };
 
   const { formatParticipant, englishTitle, errMsgPersonName } = props;
+
+  const periodGetHandler = useCallback(async () => {
+    try {
+      // const responseData = await sendRequest(
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/env/period`,
+      //   "GET",
+      //   null,
+      //   {
+      //     Authorization: `Bearer ${auth.token}`,
+      //     "Content-Type": "application/json",
+      //   },
+      //   `기간 호출 실패`
+      // );
+
+      // TODO: Remove Dummy data
+      const responseData = {
+        isSuccess: true,
+        payload: { period: "second" },
+      };
+
+      if (!responseData.isSuccess) {
+        setError({
+          title: `기간 호출 실패`,
+          detail: responseData.message,
+        });
+      } else {
+        setEnvPeriod(responseData.payload.period);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }, [envPeriod]);
 
   const deleteDataHandler = async (event) => {
     event.preventDefault();
@@ -71,7 +105,7 @@ const RegistFormat = (props) => {
   const listHandler = useCallback(async () => {
     try {
       // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}`,
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
       //   "GET",
       //   null,
       //   {
@@ -258,7 +292,26 @@ const RegistFormat = (props) => {
     let participantsData = registState.inputs;
     participantsData[rowNum].editable = true;
     setRegistData(participantsData);
+
+    //개인전 2차등록일 때 종목 2개이면 종목은 active 처리
+    if (
+      props.englishTitle === "individual" &&
+      envPeriod === "second" &&
+      participantsData[rowNum].event.length > 1
+    ) {
+      setEnableDropdownRow(rowNum); // Set the row number to enable the dropdown
+    }
   };
+
+  useEffect(() => {
+    if (enableDropdownRow !== null) {
+      const elementName = `row${enableDropdownRow}-col5-event`;
+      document.getElementsByName(elementName).forEach((ele) => {
+        ele.disabled = false;
+      });
+      setEnableDropdownRow(null); // Reset the state after enabling the dropdown
+    }
+  }, [enableDropdownRow]);
 
   const switchModeHandler = (event) => {
     event.preventDefault();
@@ -322,8 +375,15 @@ const RegistFormat = (props) => {
 
   // 컴포넌트 열자마자 리스트 불러오기
   useEffect(() => {
-    listHandler();
-  }, [listHandler]);
+    periodGetHandler()
+      .then(() => {
+        // list get
+        if (["first", "second"].includes(envPeriod)) {
+          listHandler();
+        }
+      })
+      .catch(() => {});
+  }, [periodGetHandler, listHandler]);
 
   return (
     <div className="regist-event" id={`${props.englishTitle}-regist-event`}>
@@ -359,7 +419,11 @@ const RegistFormat = (props) => {
           <RegistTable
             version="check"
             columns={props.checkTableColumn}
-            modifyColumns={props.registTableColumn}
+            modifyColumns={
+              envPeriod === "first"
+                ? props.registTableColumn
+                : props.registTableColumnSecondPeriod
+            }
             data={registState.inputs}
             inputHandler={inputHandler}
             switchRowHanlder={switchRowHanlder}
@@ -367,11 +431,13 @@ const RegistFormat = (props) => {
             deleteHandler={deleteDataHandler}
             showNumber
           />
-          <div className="check-btn-submit">
-            <Button onClick={switchModeHandler} disabled={apiFail}>
-              추가하기
-            </Button>
-          </div>
+          {envPeriod === "first" && (
+            <div className="check-btn-submit">
+              <Button onClick={switchModeHandler} disabled={apiFail}>
+                추가하기
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
