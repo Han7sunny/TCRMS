@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +28,18 @@ public class SecondParticipantController {
     public ResponseEntity<?> registSecondList(@RequestBody RequestDto<SecondParticipantRequestDto.Regist> secondParticipantRequestDto){
         try {
             return new ResponseEntity<>(secondParticipantService.registSecondList(secondParticipantRequestDto), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "세컨 신청 수정")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @PutMapping("/api/user/second")
+    public ResponseEntity<?> modifySecond(@RequestBody SecondParticipantRequestDto.Modify secondParticipantRequestDto){
+        try {
+            return new ResponseEntity<>(secondParticipantService.modifySecond(secondParticipantRequestDto), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

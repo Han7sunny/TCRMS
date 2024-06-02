@@ -5,6 +5,7 @@ import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.SecondParticipantRequestDto;
+import com.kutca.tcrms.participant.controller.dto.response.SecondParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
 import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
@@ -30,10 +31,10 @@ public class SecondParticipantService {
     private final EventRepository eventRepository;
 
     @Transactional
-    public ResponseDto<?> registSecondList(RequestDto<SecondParticipantRequestDto.Regist> secondParticipantRequestDto){
+    public ResponseDto<?> registSecondList(RequestDto<SecondParticipantRequestDto.Regist> secondParticipantRequestDto) {
 
         Optional<User> findUser = userRepository.findById(secondParticipantRequestDto.getUserId());
-        if(findUser.isEmpty()) {
+        if (findUser.isEmpty()) {
             return ResponseDto.builder()
                     .isSuccess(false)
                     .message("대표자 정보를 찾을 수 없습니다.")
@@ -73,6 +74,26 @@ public class SecondParticipantService {
 
         return ResponseDto.builder()
                 .isSuccess(true)
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> modifySecond(SecondParticipantRequestDto.Modify secondParticipantRequestDto) {
+
+        Optional<Participant> findParticipant = participantRepository.findById(secondParticipantRequestDto.getParticipantId());
+        if (findParticipant.isEmpty()) {
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("참가자 정보를 찾을 수 없습니다.")
+                    .build();
+        }
+
+        Participant modifiedSecondParticipant = participantRepository.save(findParticipant.get().updateSecond(secondParticipantRequestDto));
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .message("세컨 정보가 성공적으로 수정되었습니다.")
+                .payload(SecondParticipantResponseDto.fromEntity(modifiedSecondParticipant))
                 .build();
     }
 }

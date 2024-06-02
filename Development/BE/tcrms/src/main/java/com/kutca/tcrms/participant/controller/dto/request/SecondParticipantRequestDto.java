@@ -22,4 +22,23 @@ public class SecondParticipantRequestDto {
         private String phoneNumber;
 
     }
+
+    @Getter
+    @Builder
+    public static class Modify {
+
+        private Long participantId;
+
+        private String name;
+
+        private String gender;
+
+        private Boolean isForeigner;
+
+        private String nationality;
+
+        private String identityNumber;
+
+        private String phoneNumber;
+    }
 }
