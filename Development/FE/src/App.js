@@ -17,6 +17,9 @@ import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import Login from "./auth/pages/Login";
 import RegistMain from "./user/regist/pages/RegistMain";
 import RegistIndividual from "./user/regist/pages/RegistIndividual";
+import RegistTeam from "./user/regist/pages/RegistTeam";
+import RegistSecond from "./user/regist/pages/RegistSecond";
+import RegistVolunteer from "./user/regist/pages/RegistVolunteer";
 
 const App = () => {
   const {
@@ -56,6 +59,9 @@ const App = () => {
           </Route>
           <Route path="/regist" exact component={RegistMain} />
           <Route path="/regist/individual" exact component={RegistIndividual} />
+          <Route path="/regist/team" exact component={RegistTeam} />
+          <Route path="/regist/second" exact component={RegistSecond} />
+          <Route path="/regist/volunteer" exact component={RegistVolunteer} />
 
           <Route path="/docu" exact>
             {/* <NewPlace /> */}

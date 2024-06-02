@@ -30,19 +30,21 @@ const Input = (props) => {
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput, initialValue, validators } = props;
+  const { id, onInput, initialValue, validators, teamId } = props;
   const { value, isValid } = inputState;
 
   useEffect(() => {
-    onInput(id, value, isValid);
-  }, [id, value, isValid, onInput]);
+    onInput(id, value, isValid, teamId);
+  }, [id, value, isValid, onInput, teamId]);
 
   useEffect(() => {
-    dispatch({
-      type: "CHANGE",
-      val: initialValue,
-      validators: validators,
-    });
+    if (validators.length !== 0) {
+      dispatch({
+        type: "CHANGE",
+        val: initialValue,
+        validators: validators,
+      });
+    }
   }, [initialValue, validators]);
 
   const changeHandler = (event) => {
@@ -70,6 +72,8 @@ const Input = (props) => {
         onChange={changeHandler}
         onBlur={touchHandler}
         value={inputState.value}
+        readOnly={props.readonly}
+        disabled={props.disabled}
       />
     ) : (
       <textarea
@@ -78,6 +82,8 @@ const Input = (props) => {
         onChange={changeHandler}
         onBlur={touchHandler}
         value={inputState.value}
+        readOnly={props.readonly}
+        disabled={props.disabled}
       />
     );
 

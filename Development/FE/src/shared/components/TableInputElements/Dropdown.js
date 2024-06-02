@@ -22,12 +22,12 @@ const Dropdown = (props) => {
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput, initialValue, validators } = props;
+  const { id, onInput, initialValue, validators, teamId } = props;
   const { value, isValid } = inputState;
 
   useEffect(() => {
-    onInput(id, value, isValid);
-  }, [id, value, isValid, onInput]);
+    onInput(id, value, isValid, teamId);
+  }, [id, value, isValid, onInput, teamId]);
 
   useEffect(() => {
     dispatch({
@@ -38,6 +38,9 @@ const Dropdown = (props) => {
   }, [initialValue, validators]);
 
   const changeHandler = (event) => {
+    if (props.readOnly) {
+      return; // If readOnly is true, do nothing on change
+    }
     dispatch({
       type: "CHANGE",
       val: event.target.value,

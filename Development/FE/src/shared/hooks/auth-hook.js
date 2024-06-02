@@ -45,7 +45,7 @@ export const useAuth = () => {
         tokenExpirationDate.getTime() - new Date().getTime();
       logoutTimer = setTimeout(() => {
         logout();
-        alert("토큰 시간이 만료되어 로그인되었습니다. 재로그인해주세요.");
+        alert("토큰 시간이 만료되어 로그아웃 되었습니다. 재로그인해주세요.");
       }, remainingTime);
     } else {
       clearTimeout(logoutTimer);

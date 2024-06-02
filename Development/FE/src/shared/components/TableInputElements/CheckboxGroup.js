@@ -38,26 +38,39 @@ const CheckboxGroup = (props) => {
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput, initialValue, validators } = props;
+  const { id, onInput, initialValue, validators, teamId } = props;
   const { values, isValid } = inputState;
 
   useEffect(() => {
-    onInput(id, values, isValid);
-  }, [id, values, isValid, onInput]);
+    onInput(id, values, isValid, teamId);
+  }, [id, values, isValid, onInput, teamId]);
 
   useEffect(() => {
     // affector //
-    if (props.affector && props.affector.type === "disabled") {
+    if (props.affector && props.affector.type === "disabled" && !teamId) {
       // affector: { id: "-col3-nationality", type: "disabled", value: "외국인" },
-      const affectorId = id.split("-")[0] + props.affector.id;
-      if (values.includes(props.affector.value)) {
-        document.getElementById(affectorId).disabled = false;
-      } else {
-        document.getElementById(affectorId).disabled = true;
-      }
+      props.affector.id.forEach((affectorIdSuffix) => {
+        const affectorId = id.split("-")[0] + affectorIdSuffix;
+        if (values.includes(props.affector.value)) {
+          document.getElementById(affectorId).disabled = false;
+        } else {
+          document.getElementById(affectorId).disabled = true;
+        }
+      });
     }
     // ----------- //
-  }, [values, id, props.affector]);
+    if (props.affector && props.affector.type === "disabled" && teamId) {
+      props.affector.id.forEach((affectorIdSuffix) => {
+        const idSplit = id.split("-");
+        const affectorId = idSplit[0] + "-" + idSplit[1] + affectorIdSuffix;
+        if (values.includes(props.affector.value)) {
+          document.getElementById(affectorId).disabled = false;
+        } else {
+          document.getElementById(affectorId).disabled = true;
+        }
+      });
+    }
+  }, [values, id, props.affector, teamId]);
 
   useEffect(() => {
     dispatch({
@@ -85,6 +98,8 @@ const CheckboxGroup = (props) => {
             value={item}
             checked={inputState.values.includes(item)}
             onChange={changeHandler}
+            readOnly={props.readonly}
+            disabled={props.disabled}
           />
           {props.showLabel && item}
         </label>

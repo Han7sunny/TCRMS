@@ -41,3 +41,8 @@
   border-color: red;
   background: #ffd1d1;
 }
+
+.table-input input[type="text"]:disabled {
+  border: 1px solid rgba(213, 213, 213, 0.7);
+  background: rgb(245, 245, 245);
+}

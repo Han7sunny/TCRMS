@@ -7,12 +7,12 @@ const registReducer = (state, action) => {
       let row = Number(idArr[0].replace("row", ""));
 
       let data = state.inputs;
-
       if (idArr.length === 3) {
         data[row][idArr[2]] = action.value;
       }
       if (idArr.length === 4) {
         let subidx = Number(idArr[3].replace("input", ""));
+
         data[row][idArr[2]][subidx] = action.value;
       }
 
@@ -20,10 +20,30 @@ const registReducer = (state, action) => {
         ...state,
         inputs: data,
       };
+    
+    case "INPUT_CHANGE_TEAM":
+      let idArrTeam = action.inputId.split("-");
+      let teamIdx = Number(idArrTeam[0].replace("team", ""));
+      let memberIdx = Number(idArrTeam[1].replace("row", ""));
+
+      let dataTeam = state.inputs;
+      if (idArrTeam.length === 4) {
+        dataTeam[teamIdx].teamMembers[memberIdx][idArrTeam[3]] = action.value;
+      }
+      if (idArrTeam.length === 5) {
+        let subidx = Number(idArrTeam[4].replace("input", ""));
+        dataTeam[teamIdx].teamMembers[memberIdx][idArrTeam[3]][subidx] = action.value;
+      }
+
+      return {
+        ...state,
+        inputs: dataTeam,
+      };
 
     case "ADD_ROW":
       let addRow = state.inputs;
-      addRow.push(action.value);
+      const newRow = JSON.parse(JSON.stringify(action.value));
+      addRow.push(newRow);
 
       return {
         ...state,
@@ -54,19 +74,28 @@ export const useRegist = (initialInputs, defaultInputs) => {
     inputs: initialInputs,
   });
 
-  const inputHandler = useCallback((id, value, isValid) => {
-    dispatch({
-      type: "INPUT_CHANGE",
-      value: value,
-      isValid: isValid,
-      inputId: id,
-    });
+  const inputHandler = useCallback((id, value, isValid, teamId) => {
+    if (teamId) {
+      dispatch({
+        type: "INPUT_CHANGE_TEAM",
+        value: value,
+        isValid: isValid,
+        inputId: id,
+      })
+    } else {
+      dispatch({
+        type: "INPUT_CHANGE",
+        value: value,
+        isValid: isValid,
+        inputId: id,
+      });
+    }
   }, []);
 
-  const addRow = useCallback(() => {
+  const addRow = useCallback((input) => {
     dispatch({
       type: "ADD_ROW",
-      value: defaultInputs,
+      value: input ? input : defaultInputs,
     });
   }, [defaultInputs]);
 

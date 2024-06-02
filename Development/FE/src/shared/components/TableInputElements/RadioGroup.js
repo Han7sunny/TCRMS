@@ -22,16 +22,21 @@ const RadioGroup = (props) => {
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput, initialValue, validators } = props;
+  const { id, onInput, initialValue, validators, teamId } = props;
   const { value, isValid } = inputState;
 
   useEffect(() => {
-    onInput(id, value, isValid);
-  }, [id, value, isValid, onInput]);
+    onInput(id, value, isValid, teamId);
+  }, [id, value, isValid, onInput, teamId]);
 
   useEffect(() => {
     // affector //
-    if (props.affector && props.affector.type === "setting" && value) {
+    if (
+      props.affector &&
+      props.affector.type === "setting" &&
+      value &&
+      !teamId
+    ) {
       // affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
       const affectorId = id.split("-")[0] + props.affector.id;
       const element = document.getElementById(affectorId);
@@ -49,7 +54,29 @@ const RadioGroup = (props) => {
       });
     }
     // ----------- //
-  }, [value, id, props.affector]);
+    if (
+      props.affector &&
+      props.affector.type === "setting" &&
+      value &&
+      teamId
+    ) {
+      const idSplit = id.split("-");
+      const affectorId = idSplit[0] + "-" + idSplit[1] + props.affector.id;
+      const element = document.getElementById(affectorId);
+
+      const elementLength = element.length;
+      for (let i = 1; i < elementLength; i++) {
+        element.remove(1);
+      }
+
+      Object.keys(props.affector.value[value]).forEach((eventName) => {
+        let selectOption = document.createElement("option");
+        selectOption.text = eventName;
+        selectOption.value = eventName;
+        element.add(selectOption);
+      });
+    }
+  }, [value, id, props.affector, teamId]);
 
   useEffect(() => {
     dispatch({
@@ -77,6 +104,8 @@ const RadioGroup = (props) => {
             value={item}
             checked={inputState.value === item}
             onChange={changeHandler}
+            readOnly={props.readonly}
+            disabled={props.disabled}
           />
           {props.showLabel && item}
         </label>

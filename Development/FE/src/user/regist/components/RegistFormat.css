@@ -1,0 +1,210 @@
+.regist-event {
+  margin: 24px auto;
+  width: fit-content;
+}
+
+.regist-event-title {
+  margin-left: 10px;
+  margin-top: 5px;
+  margin-bottom: 16px;
+}
+
+.regist-form {
+  position: relative;
+}
+
+.regist-form .regist-btn-add-row {
+  position: absolute;
+  right: 0;
+  top: -40px;
+  font-size: 14px;
+}
+
+.regist-form .regist-btn-add-row button {
+  padding: 4px 12px;
+}
+
+.regist-form .regist-btn-submit,
+.check-btn-submit {
+  padding: 16px 0;
+  text-align: right;
+}
+
+.regist-form .regist-btn-submit button {
+  width: 100px;
+  height: 40px;
+  font-weight: 400;
+}
+
+.regist-form .check-btn-submit button {
+  width: 140px;
+  height: 40px;
+  font-weight: 400;
+}
+
+.regist-form .regist-team {
+  background-color: #fafafa;
+  border-radius: 4px;
+  padding: 8px 18px 18px 18px;
+  margin-bottom: 16px;
+  border: 1px solid #969696;
+}
+
+.regist-form .regist-team .regist-team-subtitle {
+  padding: 5px;
+  font-size: 17px;
+  font-weight: 400;
+  display: flex;
+}
+
+.regist-form .regist-team .regist-team-subtitle .table-button {
+  margin-left: 8px;
+  width: 60px;
+  font-size: 12px;
+}
+
+.regist-event .table-dropdown {
+  max-width: 100px;
+}
+
+/* 개인전/세컨/자원봉사자별 컬럼 너비 */
+#individual-regist-event .table-col-0 {
+  /* 인덱스 */
+  width: 30px;
+}
+
+#individual-regist-event .table-col-1 {
+  /* 성명 */
+  width: 140px;
+}
+
+#individual-regist-event .table-col-2 {
+  /* 성별 */
+  width: 116px;
+}
+
+#individual-regist-event .table-col-3 {
+  /* 외국인 */
+  width: 80px;
+}
+
+#individual-regist-event .table-col-4 {
+  /* 국적 */
+  width: 122px;
+}
+#individual-regist-event .table-col-5 {
+  /* 주민등록번호 */
+  width: 160px;
+}
+
+#individual-regist-event .table-col-6 {
+  /* 종목 */
+  width: 122px;
+}
+
+#individual-regist-event .table-col-7 {
+  /* 체급 */
+  width: 120px;
+}
+
+#individual-regist-event .table-col-8 {
+  /* 비고 */
+  width: 150px;
+}
+
+#individual-regist-event .table-col-btn {
+  width: 108px;
+}
+
+#team-regist-event .table-col-0 {
+  /* 인덱스 */
+  width: 80px;
+}
+
+#team-regist-event .table-col-1 {
+  /* 성명 */
+  width: 140px;
+}
+
+#team-regist-event .table-col-2 {
+  /* 성별 */
+  width: 116px;
+}
+
+#team-regist-event .table-col-3 {
+  /* 외국인 */
+  width: 80px;
+}
+
+#team-regist-event .table-col-4 {
+  /* 국적 */
+  width: 122px;
+}
+
+#team-regist-event .table-col-5 {
+  /* 주민등록번호 */
+  width: 160px;
+}
+
+#team-regist-event .table-col-6 {
+  /* 체급 */
+  width: 120px;
+}
+
+#second-regist-event .table-col-0 {
+  /* 인덱스 */
+  width: 30px;
+}
+
+#second-regist-event .table-col-1 {
+  /* 성명 */
+  width: 140px;
+}
+
+#second-regist-event .table-col-2 {
+  /* 성별 */
+  width: 116px;
+}
+
+#second-regist-event .table-col-3 {
+  /* 외국인 */
+  width: 80px;
+}
+
+#second-regist-event .table-col-4 {
+  /* 국적 */
+  width: 122px;
+}
+
+#second-regist-event .table-col-5 {
+  /* 주민등록번호 */
+  width: 160px;
+}
+
+#second-regist-event .table-col-btn {
+  width: 108px;
+}
+
+#volunteer-regist-event .table-col-0 {
+  /* 인덱스 */
+  width: 30px;
+}
+
+#volunteer-regist-event .table-col-1 {
+  /* 성명 */
+  width: 140px;
+}
+
+#volunteer-regist-event .table-col-2 {
+  /* 성별 */
+  width: 116px;
+}
+
+#volunteer-regist-event .table-col-3 {
+  /* 성별 */
+  width: 160px;
+}
+
+#volunteer-regist-event .table-col-btn {
+  width: 108px;
+}

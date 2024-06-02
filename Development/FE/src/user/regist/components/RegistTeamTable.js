@@ -5,11 +5,10 @@ import RadioGroup from "../../../shared/components/TableInputElements/RadioGroup
 import CheckboxGroup from "../../../shared/components/TableInputElements/CheckboxGroup";
 import Dropdown from "../../../shared/components/TableInputElements/Dropdown";
 import Button from "../../../shared/components/TableInputElements/Button";
-import Tooltip from "@material-ui/core/Tooltip";
 
 import "./RegistTable.css";
 
-const RegistTable = (props) => {
+const RegistTeamTable = (props) => {
   const teamId = props.teamId || "";
 
   const inputField = (colInfo, initVal, rowidx, colidx, key) => {
@@ -63,7 +62,6 @@ const RegistTable = (props) => {
             validators={colInfo.detail.validators}
             placeholder={colInfo.detail.placeholder}
             initialValue={initVal}
-            disabled={colInfo.detail.disabled}
           />
         );
       case "radio-group":
@@ -91,7 +89,6 @@ const RegistTable = (props) => {
             teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
-            disabled={colInfo.detail.disabled}
           />
         );
       case "dropdown":
@@ -135,87 +132,22 @@ const RegistTable = (props) => {
 
   const [hideText, setHideText] = useState(true);
 
-  let bodyElement;
-  if (props.version === "check") {
-    bodyElement = props.data.map((row, i) => (
-      <tr key={i}>
-        {props.showNumber && <td>{i + 1}</td>}
-        {row.editable
-          ? props.modifyColumns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))
-          : props.columns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))}
-        {row.editable ? (
-          <React.Fragment>
-            <td>
-              <div className="td-flex">
-                <Button
-                  id={teamId + "row" + i + "-btn-modifyRow"}
-                  type="button"
-                  className="btn-modify"
-                  onClick={props.modifyHandler}
-                >
-                  수정완료
-                </Button>
-                <Button
-                  id={teamId + "row" + i + "-btn-delete"}
-                  type="button"
-                  className="btn-delete"
-                  onClick={props.deleteHandler}
-                >
-                  삭제
-                </Button>
-              </div>
+  let bodyElement = props.data.map((row, i) => (
+    <tr key={i}>
+      {props.showNumber && <td>{i + 1}</td>}
+      {props.editMode
+        ? props.modifyColumns.map((col, j) => (
+            <td key={"row" + i + "col" + j}>
+              {inputField(col, row[col.id], i, j)}
             </td>
-          </React.Fragment>
-        ) : (
-          <td>
-            <Button
-              id={teamId + "row" + i + "-btn-switchRow"}
-              type="button"
-              onClick={props.switchRowHanlder}
-            >
-              수정
-            </Button>
-          </td>
-        )}
-      </tr>
-    ));
-  } else if (props.version === "regist") {
-    bodyElement = props.data.map((row, i) => (
-      <tr key={i}>
-        {props.showNumber && <td>{i + 1}</td>}
-        {row.isNew
-          ? props.columns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))
-          : props.checkColumns.map((col, j) => (
-              <td key={"row" + i + "col" + j}>
-                {inputField(col, row[col.id], i, j)}
-              </td>
-            ))}
-        <td>
-          {row.isNew && (
-            <Button
-              id={teamId + "row" + i + "-btn-deleteRow"}
-              type="button"
-              onClick={props.deleteHandler}
-            >
-              삭제
-            </Button>
-          )}
-        </td>
-      </tr>
-    ));
-  }
+          ))
+        : props.columns.map((col, j) => (
+            <td key={"row" + i + "col" + j}>
+              {inputField(col, row[col.id], i, j)}
+            </td>
+          ))}
+    </tr>
+  ));
 
   return (
     <table id={props.tableId} className="regist-table">
@@ -226,7 +158,6 @@ const RegistTable = (props) => {
         {props.showNumber && (
           <col className={"table-col-" + props.columns.length} />
         )}
-        <col className="table-col-btn" />
       </colgroup>
       <thead>
         <tr>
@@ -246,38 +177,10 @@ const RegistTable = (props) => {
                   </button>
                 </th>
               );
-            } else if (col.name === "비고") {
-              return (
-                <th key={col.id}>
-                  {col.name}
-                  <Tooltip
-                    title={
-                      <div className="table-comments">
-                        외국인 선수이며{" "}
-                        <span className="info-highlight-case">
-                          외국인등록번호가 없는 경우
-                        </span>
-                        <br />
-                        개인식별을 위해{" "}
-                        <span className="info-highlight">폰번호</span>나{" "}
-                        <span className="info-highlight">이메일 주소</span> 기입
-                      </div>
-                    }
-                    placement="top"
-                  >
-                    <img
-                      src={`${process.env.PUBLIC_URL}/img/info_24dp.png`}
-                      width={"14px"}
-                      alt="비고"
-                    />
-                  </Tooltip>{" "}
-                </th>
-              );
             } else {
               return <th key={col.id}>{col.name}</th>;
             }
           })}
-          <th></th>
         </tr>
       </thead>
       <tbody>{bodyElement}</tbody>
@@ -285,4 +188,4 @@ const RegistTable = (props) => {
   );
 };
 
-export default RegistTable;
+export default RegistTeamTable;
