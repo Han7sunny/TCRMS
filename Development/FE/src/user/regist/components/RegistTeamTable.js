@@ -62,6 +62,7 @@ const RegistTeamTable = (props) => {
             validators={colInfo.detail.validators}
             placeholder={colInfo.detail.placeholder}
             initialValue={initVal}
+            disabled={colInfo.detail.disabled}
           />
         );
       case "radio-group":
@@ -89,6 +90,7 @@ const RegistTeamTable = (props) => {
             teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
+            disabled={colInfo.detail.disabled}
           />
         );
       case "dropdown":

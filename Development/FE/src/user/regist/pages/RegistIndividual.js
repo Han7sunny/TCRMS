@@ -49,6 +49,7 @@ const RegistIndividual = () => {
           idnumber: participant.identityNumber
             ? [idnumber[0], "-", idnumber[1]]
             : [],
+          phoneNumber: participant.phoneNumber,
           event: event,
           weight: weight,
           editable: false,
@@ -102,7 +103,9 @@ const RegistIndividual = () => {
             isNullData(sendData.nationality) !==
               isNullData(saveParticipant.nationality) ||
             isNullData(sendData.identityNumber) !==
-              isNullData(saveParticipant.identityNumber)
+              isNullData(saveParticipant.identityNumber) ||
+            isNullData(sendData.phoneNumber) !==
+              isNullData(saveParticipant.phoneNumber)
           ) {
             isParticipantChange = true;
           }
@@ -146,7 +149,6 @@ const RegistIndividual = () => {
           return {
             ...sendData,
             participantId: participant.participantId,
-            participantApplicationId: participant.participantApplicationId,
             isParticipantChange: isParticipantChange,
             isEventChange: isEventChange,
             isWeightClassChange: isWeightClassChange,
@@ -167,6 +169,7 @@ const RegistIndividual = () => {
       idnumber: ["", "-", ""],
       event: [],
       weight: "",
+      phoneNumber: "",
       isNew: true,
     },
     []

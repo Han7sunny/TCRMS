@@ -46,7 +46,7 @@ const RegistFormat = (props) => {
       // TODO: Remove Dummy data
       const responseData = {
         isSuccess: true,
-        payload: { period: "second" },
+        payload: { period: "first" },
       };
 
       if (!responseData.isSuccess) {
@@ -60,7 +60,7 @@ const RegistFormat = (props) => {
     } catch (err) {
       throw err;
     }
-  }, [envPeriod]);
+  }, [setError]);
 
   const deleteDataHandler = async (event) => {
     event.preventDefault();
@@ -73,9 +73,10 @@ const RegistFormat = (props) => {
         JSON.stringify({
           userId: auth.userId,
           participantId: registState.inputs[rowNum].participantId,
-          participantApplicationId: Object.values(
-            saveParticipant[rowNum].eventInfo
-          ),
+          participantApplicationId:
+            props.englishTitle === "individual"
+              ? Object.values(saveParticipant[rowNum].eventInfo)
+              : Object.values(saveParticipant[rowNum].eventInfo)[0],
         }),
         {
           Authorization: `Bearer ${auth.token}`,
@@ -168,6 +169,7 @@ const RegistFormat = (props) => {
     }
   }, [
     auth.token,
+    auth.userId,
     sendRequest,
     setRegistData,
     addRow,
@@ -236,7 +238,7 @@ const RegistFormat = (props) => {
           "PUT",
           JSON.stringify({
             // userId: auth.userId,
-            ...formatParticipant(participantData, 3, saveParticipant[rowNum]),
+            ...formatData,
           }),
           {
             Authorization: `Bearer ${auth.token}`,
@@ -264,6 +266,10 @@ const RegistFormat = (props) => {
         if (responseData.isSuccess) {
           let participantsData = registState.inputs;
           participantsData[rowNum] = formatParticipant(responseData.payload, 1);
+          if (props.englishTitle !== "individual") {
+            participantsData[rowNum].eventInfo =
+              registState.inputs[rowNum].eventInfo;
+          }
           setRegistData(participantsData);
 
           let saveParticipantData = saveParticipant;
@@ -343,6 +349,14 @@ const RegistFormat = (props) => {
         errMsg = `${props.personName} 한 명 이상 신청해주세요.`;
       }
 
+      if (
+        props.englishTitle === "second" &&
+        participantNumber > process.env.REACT_APP_SECOND_NUM_LIMIT
+      ) {
+        isValidity = false;
+        errMsg = `${props.personName}은 ${process.env.REACT_APP_SECOND_NUM_LIMIT}명 이하로 신청해주세요.`;
+      }
+
       if (!isValidity) {
         setError({ title: "입력정보 확인", detail: errMsg });
         return;
@@ -383,7 +397,7 @@ const RegistFormat = (props) => {
         }
       })
       .catch(() => {});
-  }, [periodGetHandler, listHandler]);
+  }, [periodGetHandler, listHandler, envPeriod]);
 
   return (
     <div className="regist-event" id={`${props.englishTitle}-regist-event`}>

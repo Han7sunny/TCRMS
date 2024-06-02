@@ -345,7 +345,7 @@ export const TABLE_COLUMNS_REGIST_INDIVIDUAL = [
   },
   {
     id: "phoneNumber",
-    name: "비고(전화번호,이메일)",
+    name: "비고",
     type: "input",
     detail: {
       validators: [],
@@ -445,7 +445,7 @@ export const TABLE_COLUMNS_REGIST_PERIOD2_INDIVIDUAL = [
   },
   {
     id: "phoneNumber",
-    name: "비고(전화번호,이메일)",
+    name: "비고",
     type: "input",
     detail: {
       validators: [],
@@ -473,7 +473,7 @@ export const TABLE_COLUMNS_CHECK_INDIVIDUAL = [
 // team
 export const TABLE_COLUMNS_REGIST_TEAM_SPARRING = [
   {
-    id: "index",
+    id: "indexInTeam",
     name: "",
     type: "text",
   },
@@ -502,7 +502,7 @@ export const TABLE_COLUMNS_REGIST_TEAM_SPARRING = [
       items: ["외국인"],
       showLabel: true,
       affector: {
-        id: ["-col4-nationality"],
+        id: ["-col4-nationality", "-col7-phoneNumber"],
         type: "disabled",
         value: "외국인",
       },
@@ -548,13 +548,21 @@ export const TABLE_COLUMNS_REGIST_TEAM_SPARRING = [
         "미들",
         "헤비",
       ],
+    },
+  },
+  {
+    id: "phoneNumber",
+    name: "비고",
+    type: "input",
+    detail: {
+      validators: [],
     },
   },
 ];
 
 export const TABLE_COLUMNS_REGIST_TEAM_FORM = [
   {
-    id: "index",
+    id: "indexInTeam",
     name: "",
     type: "text",
   },
@@ -583,7 +591,7 @@ export const TABLE_COLUMNS_REGIST_TEAM_FORM = [
       items: ["외국인"],
       showLabel: true,
       affector: {
-        id: ["-col4-nationality"],
+        id: ["-col4-nationality", "-col7-phoneNumber"],
         type: "disabled",
         value: "외국인",
       },
@@ -632,10 +640,213 @@ export const TABLE_COLUMNS_REGIST_TEAM_FORM = [
       disabled: true,
     },
   },
+  {
+    id: "phoneNumber",
+    name: "비고",
+    type: "input",
+    detail: {
+      validators: [],
+    },
+  },
+];
+
+export const TABLE_COLUMNS_REGIST_PERIOD2_TEAM_SPARRING = [
+  {
+    id: "indexInTeam",
+    name: "",
+    type: "text",
+  },
+  {
+    id: "name",
+    name: "성명",
+    type: "input",
+    detail: {
+      validators: [VALIDATOR_REQUIRE()],
+      placeholder: "성명",
+      disabled: true,
+    },
+  },
+  {
+    id: "sex",
+    name: "성별",
+    type: "radio-group",
+    detail: {
+      items: ["남성", "여성"],
+      disabled: true,
+      showLabel: true,
+      disabled: true,
+      affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
+    },
+  },
+  {
+    id: "foreigner",
+    name: "외국인",
+    type: "checkbox-group",
+    detail: {
+      items: ["외국인"],
+      showLabel: true,
+      disabled: true,
+      affector: {
+        id: ["-col4-nationality"],
+        type: "disabled",
+        value: "외국인",
+      },
+    },
+  },
+  {
+    id: "nationality",
+    name: "국적",
+    type: "dropdown",
+    detail: { items: nationalityCandidate, disabled: true },
+  },
+  {
+    id: "idnumber",
+    name: "주민등록번호",
+    type: "multi-input",
+    detail: [
+      {
+        id: "idnumber-input0",
+        type: "input",
+        disabled: true,
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(6)] },
+      },
+      { id: "idnum-hypen", type: "text" },
+      {
+        id: "idnumber-input2",
+        type: "input",
+        disabled: true,
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(7)] },
+      },
+    ],
+  },
+  {
+    id: "weight",
+    name: "체급(겨루기만)",
+    type: "dropdown",
+    detail: {
+      items: [
+        "체급선택",
+        "핀",
+        "플라이",
+        "밴텀",
+        "페더",
+        "라이트",
+        "웰터",
+        "미들",
+        "헤비",
+      ],
+    },
+  },
+  {
+    id: "phoneNumber",
+    name: "비고",
+    type: "input",
+    detail: {
+      validators: [],
+      disabled: true,
+    },
+  },
+];
+
+export const TABLE_COLUMNS_REGIST_PERIOD2_TEAM_FORM = [
+  {
+    id: "indexInTeam",
+    name: "",
+    type: "text",
+  },
+  {
+    id: "name",
+    name: "성명",
+    type: "input",
+    detail: {
+      validators: [VALIDATOR_REQUIRE()],
+      placeholder: "성명",
+      disabled: true,
+    },
+  },
+  {
+    id: "sex",
+    name: "성별",
+    type: "radio-group",
+    detail: {
+      items: ["남성", "여성"],
+      disabled: true,
+      showLabel: true,
+      disabled: true,
+      affector: { id: "-col6-weight", type: "setting", value: WEIGHT_ID },
+    },
+  },
+  {
+    id: "foreigner",
+    name: "외국인",
+    type: "checkbox-group",
+    detail: {
+      items: ["외국인"],
+      showLabel: true,
+      disabled: true,
+      affector: {
+        id: ["-col4-nationality", "-col7-phoneNumber"],
+        type: "disabled",
+        value: "외국인",
+      },
+    },
+  },
+  {
+    id: "nationality",
+    name: "국적",
+    type: "dropdown",
+    detail: { items: nationalityCandidate, disabled: true },
+  },
+  {
+    id: "idnumber",
+    name: "주민등록번호",
+    type: "multi-input",
+    detail: [
+      {
+        id: "idnumber-input0",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(6)], disabled: true },
+      },
+      { id: "idnum-hypen", type: "text" },
+      {
+        id: "idnumber-input2",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(7)], disabled: true },
+      },
+    ],
+  },
+  {
+    id: "weight",
+    name: "체급(겨루기만)",
+    type: "dropdown",
+    detail: {
+      items: [
+        "체급선택",
+        "핀",
+        "플라이",
+        "밴텀",
+        "페더",
+        "라이트",
+        "웰터",
+        "미들",
+        "헤비",
+      ],
+      disabled: true,
+    },
+  },
+  {
+    id: "phoneNumber",
+    name: "비고",
+    type: "input",
+    detail: {
+      validators: [],
+      disabled: true,
+    },
+  },
 ];
 
 export const TABLE_COLUMNS_CHECK_TEAM = [
-  { id: "index", name: "", type: "text" },
+  { id: "indexInTeam", name: "", type: "text" },
   { id: "name", name: "성명", type: "text" },
   { id: "sex", name: "성별", type: "text" },
   { id: "foreigner", name: "외국인", type: "text" },
@@ -647,6 +858,7 @@ export const TABLE_COLUMNS_CHECK_TEAM = [
     detail: { showCharNum: 7 },
   },
   { id: "weight", name: "체급(겨루기만)", type: "text" },
+  { id: "phoneNumber", name: "비고", type: "text" },
 ];
 
 // second
@@ -674,7 +886,7 @@ export const TABLE_COLUMNS_REGIST_SECOND = [
       items: ["외국인"],
       showLabel: true,
       affector: {
-        id: ["-col3-nationality"],
+        id: ["-col3-nationality", "-col5-phoneNumber"],
         type: "disabled",
         value: "외국인",
       },
@@ -704,7 +916,85 @@ export const TABLE_COLUMNS_REGIST_SECOND = [
       },
     ],
   },
-  // { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
+  {
+    id: "phoneNumber",
+    name: "비고",
+    type: "input",
+    detail: {
+      validators: [],
+    },
+  },
+];
+
+export const TABLE_COLUMNS_REGIST_PERIOD2_SECOND = [
+  {
+    id: "name",
+    name: "성명",
+    type: "input",
+    detail: {
+      validators: [VALIDATOR_REQUIRE()],
+      placeholder: "성명",
+      disabled: true,
+    },
+  },
+  {
+    id: "sex",
+    name: "성별",
+    type: "radio-group",
+    detail: {
+      items: ["남성", "여성"],
+      showLabel: true,
+      disabled: true,
+    },
+  },
+  {
+    id: "foreigner",
+    name: "외국인",
+    type: "checkbox-group",
+    detail: {
+      items: ["외국인"],
+      showLabel: true,
+      disabled: true,
+      affector: {
+        id: ["-col3-nationality"],
+        type: "disabled",
+        value: "외국인",
+      },
+    },
+  },
+  {
+    id: "nationality",
+    name: "국적",
+    type: "dropdown",
+    detail: { items: nationalityCandidate, disabled: true },
+  },
+  {
+    id: "idnumber",
+    name: "주민등록번호",
+    type: "multi-input",
+    detail: [
+      {
+        id: "idnumber-input0",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(6)], disabled: true },
+      },
+      { id: "idnum-hypen", type: "text" },
+      {
+        id: "idnumber-input2",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(7)], disabled: true },
+      },
+    ],
+  },
+  {
+    id: "phoneNumber",
+    name: "비고",
+    type: "input",
+    detail: {
+      validators: [],
+      disabled: true,
+    },
+  },
 ];
 
 export const TABLE_COLUMNS_CHECK_SECOND = [
@@ -718,6 +1008,7 @@ export const TABLE_COLUMNS_CHECK_SECOND = [
     type: "text-hidden",
     detail: { showCharNum: 7 },
   },
+  { id: "phoneNumber", name: "비고", type: "text" },
 ];
 
 // volunteer
@@ -761,7 +1052,53 @@ export const TABLE_COLUMNS_REGIST_VOLUNTEER = [
       },
     ],
   },
-  // { id: "delete-btn", name: "", type: "button", detail: { content: "삭제" } },
+];
+
+export const TABLE_COLUMNS_REGIST_PERIOD2_VOLUNTEER = [
+  {
+    id: "name",
+    name: "성명",
+    type: "input",
+    detail: {
+      validators: [VALIDATOR_REQUIRE()],
+      placeholder: "성명",
+      disabled: true,
+    },
+  },
+  {
+    id: "sex",
+    name: "성별",
+    type: "radio-group",
+    detail: {
+      items: ["남성", "여성"],
+      showLabel: true,
+      disabled: true,
+    },
+  },
+  {
+    id: "phoneNumber",
+    name: "전화번호",
+    type: "multi-input",
+    detail: [
+      {
+        id: "phoneNumber-input0",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(3)], disabled: true },
+      },
+      { id: "phoneNumber-hypen1", type: "text" },
+      {
+        id: "phoneNumber-input2",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(4)], disabled: true },
+      },
+      { id: "phoneNumber-hypen3", type: "text" },
+      {
+        id: "phoneNumber-input4",
+        type: "input",
+        detail: { validators: [VALIDATOR_REQUIRE_LENGTH(4)], disabled: true },
+      },
+    ],
+  },
 ];
 
 export const TABLE_COLUMNS_CHECK_VOLUNTEER = [

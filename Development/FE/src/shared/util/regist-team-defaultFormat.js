@@ -1,13 +1,14 @@
 import { EVENT_ID } from "./const-event";
 
 const participantFormat = (index, sex) => ({
-  index: index,
+  indexInTeam: index,
   name: "",
   sex: sex || "",
   foreigner: [],
   nationality: "",
   idnumber: ["", "-", ""],
   weight: "",
+  editable: index === "후보 선수" ? false : true,
 });
 
 export const teamInitialFormat = (eventName) => {

@@ -10,6 +10,10 @@
   width: 64px !important;
 }
 
+.regist-team-event {
+  min-width: 1000px;
+}
+
 .regist-team-event .check-btn-submit {
   padding: 0px;
 }
