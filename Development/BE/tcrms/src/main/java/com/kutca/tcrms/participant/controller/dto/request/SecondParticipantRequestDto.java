@@ -41,4 +41,14 @@ public class SecondParticipantRequestDto {
 
         private String phoneNumber;
     }
+
+    @Getter
+    @Builder
+    public static class Delete {
+
+        private Long participantId;
+
+        private Long participantApplicationId;
+
+    }
 }

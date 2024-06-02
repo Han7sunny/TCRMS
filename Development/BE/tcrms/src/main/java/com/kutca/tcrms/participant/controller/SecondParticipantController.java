@@ -54,4 +54,16 @@ public class SecondParticipantController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Operation(summary = "세컨 신청 삭제")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @DeleteMapping("/api/user/second")
+    public ResponseEntity<?> deleteSecond(@RequestBody SecondParticipantRequestDto.Delete secondParticipantRequestDto){
+        try {
+            return new ResponseEntity<>(secondParticipantService.deleteSecond(secondParticipantRequestDto), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

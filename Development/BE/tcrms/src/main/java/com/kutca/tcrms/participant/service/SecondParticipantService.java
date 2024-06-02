@@ -139,4 +139,23 @@ public class SecondParticipantService {
                 .payload(SecondParticipantResponseDto.fromEntity(modifiedSecondParticipant))
                 .build();
     }
+
+    @Transactional
+    public ResponseDto<?> deleteSecond(SecondParticipantRequestDto.Delete secondParticipantRequestDto){
+        participantApplicationRepository.deleteById(secondParticipantRequestDto.getParticipantApplicationId());
+
+        //  학교별 신청 종목 팀 데이터 변경
+
+        Boolean isOtherParticipantApplicationExist = participantApplicationRepository.existsByParticipant_ParticipantId(secondParticipantRequestDto.getParticipantId());
+
+        if(!isOtherParticipantApplicationExist){
+            participantRepository.deleteById(secondParticipantRequestDto.getParticipantId());
+            //  participant_file
+            //  file
+        }
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .build();
+    }
 }
