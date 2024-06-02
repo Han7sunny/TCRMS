@@ -29,6 +29,8 @@ public class SecondParticipantRequestDto {
 
         private Long participantId;
 
+        private Long participantApplicationId;
+
         private String name;
 
         private String gender;

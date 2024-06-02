@@ -10,6 +10,8 @@ public class SecondParticipantResponseDto {
 
     private Long participantId;
 
+    private Long participantApplicationId;
+
     private String name;
 
     private String gender;
@@ -22,9 +24,10 @@ public class SecondParticipantResponseDto {
 
     private String phoneNumber;
 
-    public static SecondParticipantResponseDto fromEntity(Participant participant) {
+    public static SecondParticipantResponseDto fromEntity(Participant participant, Long participantApplicationId) {
         return SecondParticipantResponseDto.builder()
                 .participantId(participant.getParticipantId())
+                .participantApplicationId(participantApplicationId)
                 .name(participant.getName())
                 .gender(participant.getGender())
                 .identityNumber(participant.getIdentityNumber() == null ? null : participant.getIdentityNumber())

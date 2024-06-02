@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -67,8 +68,13 @@ public class SecondParticipantService {
                         .isParticipantExists(true)
                         .isEditable(user.getIsEditable())
                         .isDepositConfirmed(user.getIsDepositConfirmed())
-                        .participants(new ParticipantsResponseDto<>(findParticipantList.stream().filter(
-                                participant -> participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), SECOND_EVENT_ID)).collect(Collectors.toList())))
+                        .participants(new ParticipantsResponseDto<>(findParticipantList.stream()
+                                .map(participant -> {
+                                    Optional<ParticipantApplication> findParticipantApplication = participantApplicationRepository.findByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), SECOND_EVENT_ID);
+                                    return findParticipantApplication.map(participantApplication -> SecondParticipantResponseDto.fromEntity(participant, participantApplication.getParticipantApplicationId())).orElse(null);
+                                })
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList())))
                         .build())
                 .build();
     }
@@ -136,7 +142,7 @@ public class SecondParticipantService {
         return ResponseDto.builder()
                 .isSuccess(true)
                 .message("세컨 정보가 성공적으로 수정되었습니다.")
-                .payload(SecondParticipantResponseDto.fromEntity(modifiedSecondParticipant))
+                .payload(SecondParticipantResponseDto.fromEntity(modifiedSecondParticipant, secondParticipantRequestDto.getParticipantApplicationId()))
                 .build();
     }
 
