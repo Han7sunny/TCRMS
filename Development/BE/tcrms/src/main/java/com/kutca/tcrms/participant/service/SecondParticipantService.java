@@ -137,7 +137,22 @@ public class SecondParticipantService {
                     .build();
         }
 
-        Participant modifiedSecondParticipant = participantRepository.save(findParticipant.get().updateSecond(secondParticipantRequestDto));
+        Participant participant = findParticipant.get();
+
+        if(!participant.getGender().equals(secondParticipantRequestDto.getGender())){
+
+            List<ParticipantApplication> participantApplicationList = participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(),1L, 4L);
+            participantApplicationList.forEach(pa -> {
+                //  여 <-> 남
+                if(participant.getGender().equals("여성"))
+                    pa.updateEvent(eventRepository.findById(pa.getEvent().getEventId() + 2L).get());
+                else
+                    pa.updateEvent(eventRepository.findById(pa.getEvent().getEventId() - 2L).get());
+                participantApplicationRepository.save(pa);
+            });
+        }
+
+        Participant modifiedSecondParticipant = participantRepository.save(participant.updateSecond(secondParticipantRequestDto));
 
         return ResponseDto.builder()
                 .isSuccess(true)

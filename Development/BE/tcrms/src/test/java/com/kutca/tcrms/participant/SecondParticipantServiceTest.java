@@ -225,4 +225,53 @@ public class SecondParticipantServiceTest {
 
     }
 
+    @Test
+    @DisplayName("세컨 신청 수정 성공")
+    void modifySecond(){
+
+        //  given
+        SecondParticipantRequestDto.Modify modifyRequestDto = SecondParticipantRequestDto.Modify.builder()
+                .participantId(1L)
+                .participantApplicationId(1L)
+                .name("이몽룡")
+                .gender("남성")
+                .isForeigner(false)
+                .identityNumber("981007-1234567")
+                .build();
+
+        Participant findParticipant1 = Participant.builder()
+                .participantId(modifyRequestDto.getParticipantId())
+                .name("이동룡")
+                .gender(modifyRequestDto.getGender())
+                .isForeigner(modifyRequestDto.getIsForeigner())
+                .nationality(modifyRequestDto.getNationality())
+                .identityNumber("980706-5432198")
+                .phoneNumber(modifyRequestDto.getPhoneNumber())
+                .build();
+
+        Participant savedParticipant1 = Participant.builder()
+                .participantId(modifyRequestDto.getParticipantId())
+                .name(modifyRequestDto.getName())
+                .gender(modifyRequestDto.getGender())
+                .isForeigner(modifyRequestDto.getIsForeigner())
+                .nationality(modifyRequestDto.getNationality())
+                .identityNumber(modifyRequestDto.getIdentityNumber())
+                .phoneNumber(modifyRequestDto.getPhoneNumber())
+                .build();
+
+        given(participantRepository.findById(modifyRequestDto.getParticipantId())).willReturn(Optional.of(findParticipant1));
+        given(participantRepository.save(any(Participant.class))).willReturn(savedParticipant1);
+
+        //  when
+        ResponseDto<?> requestDto = secondParticipantService.modifySecond(modifyRequestDto);
+
+        //  then
+        assertTrue(requestDto.getIsSuccess());
+        assertEquals(((SecondParticipantResponseDto)requestDto.getPayload()).getName(), modifyRequestDto.getName());
+        assertEquals(((SecondParticipantResponseDto)requestDto.getPayload()).getIdentityNumber(), modifyRequestDto.getIdentityNumber());
+
+        verify(eventRepository, times(0)).findById(anyLong());
+        verify(participantRepository, times(1)).save(any(Participant.class));
+    }
+
 }
