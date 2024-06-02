@@ -215,6 +215,7 @@ public class VolunteerParticipantServiceTest {
                 .build();
 
         given(participantRepository.findById(modifyRequestDto.getParticipantId())).willReturn(Optional.of(savedVolunteer));
+        given(participantRepository.save(any(Participant.class))).willReturn(savedVolunteer);
         given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(modifyRequestDto.getParticipantId(), 1L, 4L))
                 .willReturn(Arrays.asList(savedParticipantApplication1, savedParticipantApplication2));
         given(eventRepository.findById(event1.getEventId())).willReturn(Optional.of(event1));

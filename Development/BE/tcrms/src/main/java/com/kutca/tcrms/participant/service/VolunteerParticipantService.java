@@ -141,11 +141,11 @@ public class VolunteerParticipantService {
             });
         }
 
-        participant.updateVolunteer(volunteerParticipantRequestDto);
+        Participant modifiedVolunteerParticipant = participantRepository.save(participant.updateVolunteer(volunteerParticipantRequestDto));
 
         return ResponseDto.builder()
                 .isSuccess(true)
-                .payload(VolunteerParticipantResponseDto.fromEntity(participant))
+                .payload(VolunteerParticipantResponseDto.fromEntity(modifiedVolunteerParticipant))
                 .build();
     }
 
