@@ -1,9 +1,12 @@
 package com.kutca.tcrms.participant;
 
+import com.kutca.tcrms.common.dto.request.RequestDto;
 import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
+import com.kutca.tcrms.participant.controller.dto.request.SecondParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.SecondParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
@@ -27,8 +30,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -59,7 +61,7 @@ public class SecondParticipantServiceTest {
     private final Long SECOND_EVENT_ID = 10L;
 
     @BeforeEach
-    public void setUp(){
+    void setUp(){
         user = User.builder()
                 .userId(1L)
                 .universityName("서울대학교")
@@ -130,6 +132,96 @@ public class SecondParticipantServiceTest {
         assertEquals(secondResponseDtoList.size(), 2);
 
         verify(participantApplicationRepository, times((3))).findByParticipant_ParticipantIdAndEvent_EventId(anyLong(), anyLong());
+
+    }
+
+    @Test
+    @DisplayName("기존에 참가자 정보 존재하는 세컨 신청 성공")
+    void registSecondListWithExistParticipant(){
+
+        //  given
+        SecondParticipantRequestDto.Regist second1 = SecondParticipantRequestDto.Regist.builder()
+                .name("이몽룡")
+                .gender("남성")
+                .isForeigner(false)
+                .identityNumber("981007-1234567")
+                .build();
+
+        SecondParticipantRequestDto.Regist second2 = SecondParticipantRequestDto.Regist.builder()
+                .name("Sara")
+                .gender("여성")
+                .isForeigner(true)
+                .nationality("미국")
+                .identityNumber("981007-1234567")
+                .build();
+
+        SecondParticipantRequestDto.Regist second3 = SecondParticipantRequestDto.Regist.builder()
+                .name("Tom")
+                .gender("남성")
+                .isForeigner(true)
+                .nationality("영국")
+                .phoneNumber("luckyTomy@gmail.com")
+                .build();
+
+        RequestDto<SecondParticipantRequestDto.Regist> registRequestDto = RequestDto.<SecondParticipantRequestDto.Regist>builder()
+                .userId(user.getUserId())
+                .requestDtoList(Arrays.asList(second1, second2, second3))
+                .build();
+
+        Participant findParticipant1 = Participant.builder()
+                .participantId(1L)
+                .name(second1.getName())
+                .gender(second1.getGender())
+                .isForeigner(second1.getIsForeigner())
+                .nationality(second1.getNationality())
+                .identityNumber(second1.getIdentityNumber())
+                .phoneNumber(second1.getPhoneNumber())
+                .build();
+
+        Participant findParticipant2 = Participant.builder()
+                .participantId(2L)
+                .name(second2.getName())
+                .gender(second2.getGender())
+                .isForeigner(second2.getIsForeigner())
+                .nationality(second2.getNationality())
+                .identityNumber(second2.getIdentityNumber())
+                .phoneNumber(second2.getPhoneNumber())
+                .build();
+
+        Participant savedParticipant1 = Participant.builder()
+                .participantId(3L)
+                .name(second3.getName())
+                .gender(second3.getGender())
+                .isForeigner(second3.getIsForeigner())
+                .nationality(second3.getNationality())
+                .identityNumber(second3.getIdentityNumber())
+                .phoneNumber(second3.getPhoneNumber())
+                .build();
+
+        ParticipantApplication findParticipantApplication1 = ParticipantApplication.builder()
+                .participantApplicationId(2L)
+                .participant(findParticipant1)
+                .eventTeamNumber(2)
+                .build();
+
+        given(userRepository.findById(user.getUserId())).willReturn(Optional.of(user));
+        given(eventRepository.findById(SECOND_EVENT_ID)).willReturn(Optional.of(event));
+        given(participantApplicationRepository.findTopByEvent_EventId(SECOND_EVENT_ID)).willReturn(Optional.of(findParticipantApplication1));
+        given(participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), second1.getName(), second1.getIdentityNumber())).willReturn(Optional.of(findParticipant1));
+        given(participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), second2.getName(), second2.getIdentityNumber())).willReturn(Optional.of(findParticipant2)); // 외국인인데 identityNumber있을 수 있음
+        given(participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), second3.getName(), second3.getPhoneNumber())).willReturn(Optional.empty());
+        given(participantRepository.save(any(Participant.class))).willReturn(savedParticipant1);
+
+        //  when
+        ResponseDto<?> responseDto = secondParticipantService.registSecondList(registRequestDto);
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+
+        verify(participantRepository, times(2)).findByUser_UserIdAndNameAndIdentityNumber(anyLong(), anyString(), anyString());
+        verify(participantRepository, times(1)).findByUser_UserIdAndNameAndPhoneNumber(anyLong(), anyString(), anyString());
+        verify(participantRepository, times(1)).save(any(Participant.class));
+        verify(participantApplicationRepository, times(registRequestDto.getRequestDtoList().size())).save(any(ParticipantApplication.class));
 
     }
 
