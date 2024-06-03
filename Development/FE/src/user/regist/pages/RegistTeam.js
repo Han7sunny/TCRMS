@@ -41,18 +41,20 @@ const RegistTeam = () => {
     // each teamMember validity check
     const teamMemberNumber = teamData.teamMembers.length;
     for (let i = 0; i < teamMemberNumber; i++) {
-      const { result, message, focusCol } = checkValidityTeam(
-        teamData.teamMembers[i],
-        teamData.event
-      );
-      if (!result) {
-        // 포커스 틀린 컬럼으로
-        document.getElementById(`team${teamNum}-row${i}${focusCol}`).focus();
-        return {
-          isValidity: false,
-          message: message,
-          teamMemberIndex: teamData.teamMembers[i].index,
-        };
+      if (teamData.teamMembers[i].editable) {
+        const { result, message, focusCol } = checkValidityTeam(
+          teamData.teamMembers[i],
+          teamData.event
+        );
+        if (!result) {
+          // 포커스 틀린 컬럼으로
+          document.getElementById(`team${teamNum}-row${i}${focusCol}`).focus();
+          return {
+            isValidity: false,
+            message: message,
+            teamMemberIndex: teamData.teamMembers[i].indexInTeam,
+          };
+        }
       }
     }
 
@@ -82,31 +84,34 @@ const RegistTeam = () => {
       };
 
       const getIdNumber = (identityNumber) => {
-        if (!identityNumber) return "";
+        if (!identityNumber) return [];
 
         let idnumber = identityNumber.split("-");
         return [idnumber[0], "-", idnumber[1]];
       };
+
+      let teamMembers = team.teamMembers.map((member) => {
+        return {
+          participantId: member.participantId,
+          participantApplicationId: member.participantApplicationId,
+          indexInTeam: member.indexInTeam,
+          name: member.name,
+          sex: member.gender,
+          foreigner: member.isForeigner ? ["외국인"] : [],
+          nationality: member.nationality,
+          idnumber: getIdNumber(member.identityNumber),
+          weight: getWeight(member.weightClassId, member.gender),
+          phoneNumber: member.phoneNumber,
+          editable: true,
+        };
+      });
 
       return {
         eventTeamNumber: team.eventTeamNumber,
         event: EVENT_ID[eventName].name,
         eventId: team.eventId,
         editable: false,
-        teamMembers: team.teamMembers.map((member) => {
-          return {
-            participantId: member.participantId,
-            participantApplicationId: member.participantApplicationId,
-            indexInTeam: member.indexInTeam,
-            name: member.name,
-            sex: member.gender,
-            foreigner: member.isForeigner ? ["외국인"] : [],
-            nationality: member.nationality,
-            idnumber: getIdNumber(member.identityNumber),
-            weight: getWeight(member.weightClassId, member.gender),
-            phoneNumber: member.phoneNumber,
-          };
-        }),
+        teamMembers: teamMembers,
       };
     }
 
@@ -128,16 +133,18 @@ const RegistTeam = () => {
         // eventTeamNumber: team.eventTeamNumber,
         eventId: EVENT_ID[eventName].id,
 
-        teamMembers: team.teamMembers.map((member) => ({
-          indexInTeam: member.indexInTeam,
-          name: member.name,
-          gender: member.sex,
-          isForeigner: member.foreigner.length > 0 ? true : false,
-          nationality: member.nationality,
-          identityNumber: getIdNumber(member.idnumber),
-          phoneNumber: member.phoneNumber,
-          weightClassId: WEIGHT_ID[member.sex][member.weight],
-        })),
+        teamMembers: team.teamMembers
+          .filter((member) => member.editable)
+          .map((member) => ({
+            indexInTeam: member.indexInTeam,
+            name: member.name,
+            gender: member.sex,
+            isForeigner: member.foreigner.length > 0 ? true : false,
+            nationality: member.nationality,
+            identityNumber: getIdNumber(member.idnumber),
+            phoneNumber: member.phoneNumber,
+            weightClassId: WEIGHT_ID[member.sex][member.weight],
+          })),
       };
 
       if (mode === 2) {
@@ -257,15 +264,6 @@ const RegistTeam = () => {
     setTeamSelectModalShow(false);
   };
 
-  // const candidateHandler = (event) => {
-    // inputHandler로 처리되나?
-  //   event.preventDefault();
-  //   const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
-  //   let teamsData = registState.inputs;
-  //   teamsData[teamNum].editable = true;
-  //   setRegistData(teamsData);
-  // };
-
   const deleteTeamHandler = (event) => {
     event.preventDefault();
     const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
@@ -283,12 +281,12 @@ const RegistTeam = () => {
         JSON.stringify({
           userId: auth.userId,
           // eventTeamNumber: registState.inputs[teamNum].eventTeamNumber,
-          participantIds: registState.inputs[teamNum].teamMembers.filter(
+          participantIds: registState.inputs[teamNum].teamMembers.map(
             (member) => member.participantId
           ),
           participantApplicationIds: registState.inputs[
             teamNum
-          ].teamMembers.filter((member) => member.participantApplicationId),
+          ].teamMembers.map((member) => member.participantApplicationId),
         }),
         {
           Authorization: `Bearer ${auth.token}`,
@@ -329,91 +327,138 @@ const RegistTeam = () => {
       const responseData = {
         isSuccess: true,
         payload: {
-          isTeamExists: false,
+          isTeamExists: true,
           teams: [
             {
               eventTeamNumber: 2,
-              event: 5,
+              eventId: 5,
               teamMembers: [
                 {
-                  index: "1번 선수",
-                  name: "",
-                  // sex: "", 혼성도 적지 말아? 아니면 자동체크
-                  foreigner: [],
+                  participantId: 1,
+                  participantApplicationId: 100,
+                  indexInTeam: "1번 선수",
+                  name: "조서영",
+                  gender: "여성",
+                  isForeigner: false,
                   nationality: "",
-                  idnumber: ["", "-", ""],
-                  weight: "",
+                  identityNumber: "961201-0000000",
+                  weightClassId: 2,
                   phoneNumber: "010-0000-0000",
                 },
                 {
-                  index: "2번 선수",
-                  name: "",
-                  // sex: "", 혼성도 적지 말아? 아니면 자동체크
-                  foreigner: [],
+                  participantId: 2,
+                  participantApplicationId: 101,
+                  indexInTeam: "2번 선수",
+                  name: "조투투",
+                  gender: "여성",
+                  isForeigner: false,
                   nationality: "",
-                  idnumber: ["", "-", ""],
-                  weight: "",
+                  identityNumber: "961202-0000000",
+                  weightClassId: 3,
                   phoneNumber: "",
                 },
                 {
-                  index: "3번 선수",
-                  name: "",
-                  // sex: "", 혼성도 적지 말아? 아니면 자동체크
-                  foreigner: [],
+                  participantId: 3,
+                  participantApplicationId: 103,
+                  indexInTeam: "3번 선수",
+                  name: "조삼삼",
+                  gender: "여성",
+                  isForeigner: false,
                   nationality: "",
-                  idnumber: ["", "-", ""],
-                  weight: "",
+                  identityNumber: "961203-0000000",
+                  weightClassId: 4,
                   phoneNumber: "",
                 },
                 {
-                  index: "후보 선수",
-                  name: "",
-                  // sex: "", 혼성도 적지 말아? 아니면 자동체크
-                  foreigner: [],
+                  participantId: 4,
+                  participantApplicationId: 104,
+                  indexInTeam: "후보 선수",
+                  name: "조후보",
+                  gender: "여성",
+                  isForeigner: false,
                   nationality: "",
-                  idnumber: ["", "-", ""],
-                  weight: "",
+                  identityNumber: "961204-0000000",
+                  weightClassId: 2,
                   phoneNumber: "",
                 },
               ],
             },
             {
-              eventTeamNumber: 3,
-              eventId: 8,
-
+              eventTeamNumber: 4,
+              eventId: 7,
               teamMembers: [
                 {
                   participantId: 1,
-                  index: "1번 선수",
+                  indexInTeam: "1번 선수",
                   name: "조서영",
                   gender: "남성",
                   isForeigner: false,
                   nationality: "",
                   identityNumber: "961201-0000000",
-                  weightClassId: 7,
+                  weightClassId: 2,
+                  phoneNumber: "010-0000-0000",
                 },
                 {
                   participantId: 2,
-                  index: "2번 선수",
+                  indexInTeam: "2번 선수",
                   name: "조투투",
                   gender: "남성",
                   isForeigner: false,
                   nationality: "",
                   identityNumber: "961202-0000000",
-                  weightClassId: 8,
+                  weightClassId: 3,
+                  phoneNumber: "",
                 },
                 {
                   participantId: 3,
-                  index: "3번 선수",
+                  indexInTeam: "3번 선수",
                   name: "조삼삼",
                   gender: "남성",
                   isForeigner: false,
                   nationality: "",
                   identityNumber: "961203-0000000",
-                  weightClassId: 6,
+                  weightClassId: 4,
+                  phoneNumber: "",
                 },
               ],
             },
+            // {
+            //   eventTeamNumber: 3,
+            //   eventId: 8,
+
+            //   teamMembers: [
+            //     {
+            //       participantId: 1,
+            //       indexInTeam: "1번 선수",
+            //       name: "조서영",
+            //       gender: "남성",
+            //       isForeigner: false,
+            //       nationality: "",
+            //       identityNumber: "961201-0000000",
+            //       weightClassId: 7,
+            //     },
+            //     {
+            //       participantId: 2,
+            //       indexInTeam: "2번 선수",
+            //       name: "조투투",
+            //       gender: "남성",
+            //       isForeigner: false,
+            //       nationality: "",
+            //       identityNumber: "961202-0000000",
+            //       weightClassId: 8,
+            //     },
+            //     {
+            //       participantId: 3,
+            //       indexInTeam: "3번 선수",
+            //       name: "조삼삼",
+            //       gender: "남성",
+            //       isForeigner: false,
+            //       nationality: "",
+            //       identityNumber: "961203-0000000",
+            //       weightClassId: 6,
+            //     },
+            //   ],
+            // },
           ],
         },
       };
@@ -423,6 +468,25 @@ const RegistTeam = () => {
       // };
 
       if (responseData.payload.isTeamExists) {
+        // 겨루기 단체전이고 후보선수 없을 경우 후보선수 만들어줘야함
+        // if (
+        //   eventName.includes("겨루기") &&
+        //   team.teamMembers.filter((member) => member.indexInTeam === "후보 선수")
+        //     .length === 0
+        // ) {
+        //   teamMembers.push({
+        //     indexInTeam: "후보 선수",
+        //     name: "",
+        //     sex: eventName.includes("남성") ? "남성" : "여성",
+        //     foreigner: [],
+        //     nationality: "",
+        //     idnumber: ["", "-", ""],
+        //     phoneNumber: "",
+        //     weight: "",
+        //     editable: false,
+        //   });
+        // }
+
         setIsRegistMode(false);
         setRegistData(
           responseData.payload.teams.map((team) => formatTeam(team, 1))

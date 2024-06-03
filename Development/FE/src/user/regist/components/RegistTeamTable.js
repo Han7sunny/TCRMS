@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Input from "../../../shared/components/TableInputElements/Input";
 import RadioGroup from "../../../shared/components/TableInputElements/RadioGroup";
 import CheckboxGroup from "../../../shared/components/TableInputElements/CheckboxGroup";
+import CheckboxBool from "../../../shared/components/TableInputElements/CheckboxBool";
 import Dropdown from "../../../shared/components/TableInputElements/Dropdown";
 import Button from "../../../shared/components/TableInputElements/Button";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -33,17 +34,16 @@ const RegistTeamTable = (props) => {
               key={key}
             >
               &nbsp;{initVal}&nbsp;
-              {/* <CheckboxGroup
-                id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
-                key={key}
-                items={colInfo.detail.items}
-                initialValue={initVal} //row.editable 가져와야하는디
-                onInput={props.inputHandler}
-                teamId={teamId}
-                // showLabel={colInfo.detail.showLabel}
-                // affector={colInfo.detail.affector}
-                disabled={disabled || colInfo.detail.disabled}
-              /> */}
+              {props.editMode && (
+                <CheckboxBool
+                  id={teamId + "row" + rowidx + "-col" + colidx + "-editable"}
+                  key={key}
+                  item={true}
+                  initialValue={!disabled} //!row.editable = disabled
+                  onInput={props.inputHandler}
+                  teamId={teamId}
+                />
+              )}
             </div>
           );
         } else {
@@ -57,7 +57,8 @@ const RegistTeamTable = (props) => {
           );
         }
       case "text-hidden":
-        const val = initVal.join("");
+        let val = initVal.join("");
+        if (val === "-") val = "";
         return (
           <div
             id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
@@ -145,7 +146,14 @@ const RegistTeamTable = (props) => {
             key={key}
           >
             {colInfo.detail.map((item, i) =>
-              inputField(item, initVal[i], rowidx, colidx, colInfo.id + i, disabled)
+              inputField(
+                item,
+                initVal[i],
+                rowidx,
+                colidx,
+                colInfo.id + i,
+                disabled
+              )
             )}
           </div>
         );
@@ -163,7 +171,7 @@ const RegistTeamTable = (props) => {
             <td key={"row" + i + "col" + j}>
               {inputField(col, row[col.id], i, j, null, !row.editable)}
             </td>
-          )) // editable 
+          )) // editable
         : props.columns.map((col, j) => (
             <td key={"row" + i + "col" + j}>
               {inputField(col, row[col.id], i, j, null, false)}
@@ -171,6 +179,29 @@ const RegistTeamTable = (props) => {
           ))}
     </tr>
   ));
+
+  const infoToolTip = (
+    <Tooltip
+      title={
+        <div className="table-comments">
+          외국인 선수이며{" "}
+          <span className="info-highlight-case">
+            외국인등록번호가 없는 경우
+          </span>
+          <br />
+          개인식별을 위해 <span className="info-highlight">폰번호</span>나{" "}
+          <span className="info-highlight">이메일 주소</span> 기입
+        </div>
+      }
+      placement="top"
+    >
+      <img
+        src={`${process.env.PUBLIC_URL}/img/info_24dp.png`}
+        width={"14px"}
+        alt="비고"
+      />
+    </Tooltip>
+  );
 
   return (
     <table id={props.tableId} className="regist-table">
@@ -185,52 +216,45 @@ const RegistTeamTable = (props) => {
       <thead>
         <tr>
           {props.showNumber && <th></th>}
-          {props.columns.map((col) => {
-            if (col.type === "text-hidden") {
-              return (
-                <th key={col.id}>
-                  {col.name}{" "}
-                  <button
-                    className="table-column__hide-btn"
-                    onClick={() => {
-                      setHideText(!hideText);
-                    }}
-                  >
-                    {hideText ? "보이기" : "숨기기"}
-                  </button>
-                </th>
-              );
-            } else if (col.name === "비고") {
-              return (
-                <th key={col.id}>
-                  {col.name}
-                  <Tooltip
-                    title={
-                      <div className="table-comments">
-                        외국인 선수이며{" "}
-                        <span className="info-highlight-case">
-                          외국인등록번호가 없는 경우
-                        </span>
-                        <br />
-                        개인식별을 위해{" "}
-                        <span className="info-highlight">폰번호</span>나{" "}
-                        <span className="info-highlight">이메일 주소</span> 기입
-                      </div>
-                    }
-                    placement="top"
-                  >
-                    <img
-                      src={`${process.env.PUBLIC_URL}/img/info_24dp.png`}
-                      width={"14px"}
-                      alt="비고"
-                    />
-                  </Tooltip>{" "}
-                </th>
-              );
-            } else {
-              return <th key={col.id}>{col.name}</th>;
-            }
-          })}
+          {props.editMode
+            ? props.modifyColumns.map((col) => {
+                if (col.name === "비고") {
+                  return (
+                    <th key={col.id}>
+                      {col.name}
+                      {infoToolTip}{" "}
+                    </th>
+                  );
+                } else {
+                  return <th key={col.id}>{col.name}</th>;
+                }
+              })
+            : props.columns.map((col) => {
+                if (col.type === "text-hidden") {
+                  return (
+                    <th key={col.id}>
+                      {col.name}{" "}
+                      <button
+                        className="table-column__hide-btn"
+                        onClick={() => {
+                          setHideText(!hideText);
+                        }}
+                      >
+                        {hideText ? "보이기" : "숨기기"}
+                      </button>
+                    </th>
+                  );
+                } else if (col.name === "비고") {
+                  return (
+                    <th key={col.id}>
+                      {col.name}
+                      {infoToolTip}{" "}
+                    </th>
+                  );
+                } else {
+                  return <th key={col.id}>{col.name}</th>;
+                }
+              })}
         </tr>
       </thead>
       <tbody>{bodyElement}</tbody>
