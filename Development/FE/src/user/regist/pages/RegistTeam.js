@@ -257,6 +257,15 @@ const RegistTeam = () => {
     setTeamSelectModalShow(false);
   };
 
+  // const candidateHandler = (event) => {
+    // inputHandler로 처리되나?
+  //   event.preventDefault();
+  //   const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
+  //   let teamsData = registState.inputs;
+  //   teamsData[teamNum].editable = true;
+  //   setRegistData(teamsData);
+  // };
+
   const deleteTeamHandler = (event) => {
     event.preventDefault();
     const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
@@ -505,7 +514,7 @@ const RegistTeam = () => {
 
         if (responseData.isSuccess) {
           let teamsData = registState.inputs;
-          teamsData[teamNum] = formatParticipant(responseData.payload, 1);
+          teamsData[teamNum] = formatTeam(responseData.payload, 1);
           setRegistData(teamsData);
 
           let saveTeamData = saveTeam;
