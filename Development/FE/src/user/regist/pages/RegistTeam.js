@@ -59,6 +59,7 @@ const RegistTeam = () => {
     }
 
     // 겨루기인 경우 단체전 체급 합산 체크
+    // team.event.includes("겨루기")
 
     return { isValidity: true };
   };
@@ -77,7 +78,7 @@ const RegistTeam = () => {
         let weight = "";
         if (weightId) {
           weight = Object.keys(WEIGHT_ID[sex]).find(
-            (key) => WEIGHT_ID[sex][key] === weightId
+            (key) => WEIGHT_ID[sex][key].id === weightId
           );
         }
         return weight;
@@ -143,7 +144,7 @@ const RegistTeam = () => {
             nationality: member.nationality,
             identityNumber: getIdNumber(member.idnumber),
             phoneNumber: member.phoneNumber,
-            weightClassId: WEIGHT_ID[member.sex][member.weight],
+            weightClassId: WEIGHT_ID[member.sex][member.weight].id,
           })),
       };
 
@@ -738,7 +739,7 @@ const RegistTeam = () => {
             return (
               <div className="regist-team" key={`team${i}`}>
                 <div className="regist-team-subtitle">
-                  <div>{team.event}</div>
+                  <div><span className="regist-team-teamNumber">{i+1}팀</span>{team.event}</div>
                   {team.editable ? (
                     <React.Fragment>
                       <Button

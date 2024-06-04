@@ -32,7 +32,7 @@ const RegistIndividual = () => {
         if (participant.weightClassId) {
           weight = Object.keys(WEIGHT_ID[participant.gender]).find(
             (key) =>
-              WEIGHT_ID[participant.gender][key] === participant.weightClassId
+              WEIGHT_ID[participant.gender][key].id === participant.weightClassId
           );
         }
 
@@ -68,7 +68,7 @@ const RegistIndividual = () => {
         });
 
         let weightClassId = participant.weight
-          ? WEIGHT_ID[participant.sex][participant.weight]
+          ? WEIGHT_ID[participant.sex][participant.weight].id
           : null;
 
         let sendData = {
