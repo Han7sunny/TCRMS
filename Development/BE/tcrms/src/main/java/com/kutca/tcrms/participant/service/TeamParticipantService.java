@@ -6,6 +6,7 @@ import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.TeamParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.TeamMemberParticipantResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.TeamParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
@@ -67,32 +68,35 @@ public class TeamParticipantService {
             findParticipantApplicationList.forEach(pa -> participantApplicationByEventTeamNumber.computeIfAbsent(pa.getEventTeamNumber(), k -> new ArrayList<>()).add(pa));
         });
 
-        List<TeamParticipantResponseDto> teams = new ArrayList<>();
+        List<TeamParticipantResponseDto> teams = participantApplicationByEventTeamNumber.entrySet().stream()
+                .map(entry -> {
+                    Integer eventTeamNumber = entry.getKey();
+                    List<ParticipantApplication> participantApplicationList = entry.getValue();
+                    Long eventId = participantApplicationList.get(0).getEvent().getEventId();
 
-        participantApplicationByEventTeamNumber.forEach((eventTeamNumber, participantApplicationList) -> {
-            teams.add(TeamParticipantResponseDto.builder()
-                    .eventTeamNumber(eventTeamNumber)
-                    .eventId(participantApplicationList.get(0).getEvent().getEventId())
-                    .teamMembers(participantApplicationList.stream().map(pa -> {
-                        WeightClass weightClass = pa.getParticipant().getWeightClass();
-                        return TeamMemberParticipantResponseDto.builder()
-                                .participantApplicationId(pa.getParticipantApplicationId())
-                                .participantId(pa.getParticipant().getParticipantId())
-                                .weightClassId(weightClass == null ? null : weightClass.getWeightClassId())
-                                .name(pa.getParticipant().getName())
-                                .identityNumber(pa.getParticipant().getIdentityNumber())
-                                .gender(pa.getParticipant().getGender())
-                                .isForeigner(pa.getParticipant().getIsForeigner())
-                                .nationality(pa.getParticipant().getNationality())
-                                .phoneNumber(pa.getParticipant().getPhoneNumber())
-                                .indexInTeam(pa.getIndexInTeam())
-                                .build();
-                    })
-                            .collect(Collectors.toList()))
-                    .build()
-            );
+                    List<TeamMemberParticipantResponseDto> teamMembers = participantApplicationList.stream()
+                            .map(pa -> {
+                                WeightClass weightClass = pa.getParticipant().getWeightClass();
+                                return TeamMemberParticipantResponseDto.builder()
+                                        .participantApplicationId(pa.getParticipantApplicationId())
+                                        .participantId(pa.getParticipant().getParticipantId())
+                                        .weightClassId(weightClass == null ? null : weightClass.getWeightClassId())
+                                        .name(pa.getParticipant().getName())
+                                        .identityNumber(pa.getParticipant().getIdentityNumber())
+                                        .gender(pa.getParticipant().getGender())
+                                        .isForeigner(pa.getParticipant().getIsForeigner())
+                                        .nationality(pa.getParticipant().getNationality())
+                                        .phoneNumber(pa.getParticipant().getPhoneNumber())
+                                        .indexInTeam(pa.getIndexInTeam())
+                                        .build();
+                            }).collect(Collectors.toList());
 
-        });
+                    return TeamParticipantResponseDto.builder()
+                            .eventTeamNumber(eventTeamNumber)
+                            .eventId(eventId)
+                            .teamMembers(teamMembers)
+                            .build();
+                }).collect(Collectors.toList());
 
         return ResponseDto.builder()
                 .isSuccess(true)
@@ -101,7 +105,7 @@ public class TeamParticipantService {
                                 .isEditable(user.getIsEditable())
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
-//                                .participants(new ParticipantsResponseDto<>(teams))
+                                .participants(new ParticipantsResponseDto<>(new ArrayList<>(teams)))
                                 .build()
                 )
                 .build();
