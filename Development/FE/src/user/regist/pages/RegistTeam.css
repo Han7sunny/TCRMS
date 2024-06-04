@@ -44,3 +44,7 @@
 .regist-team-event .regist-btn-submit {
   padding: 0px;
 }
+
+.regist-team .display-flex {
+  display: inline-flex;
+}

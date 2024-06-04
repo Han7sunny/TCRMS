@@ -27,6 +27,7 @@ const RegistTable = (props) => {
             </div>
           );
         } else {
+          console.log(initVal);
           return (
             <div
               id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
@@ -137,6 +138,8 @@ const RegistTable = (props) => {
 
   let bodyElement;
   if (props.version === "check") {
+    console.log("CHECKRECDER");
+    console.log(props.data);
     bodyElement = props.data.map((row, i) => (
       <tr key={i}>
         {props.showNumber && <td>{i + 1}</td>}
@@ -151,40 +154,41 @@ const RegistTable = (props) => {
                 {inputField(col, row[col.id], i, j)}
               </td>
             ))}
-        {row.editable ? (
-          <React.Fragment>
+        {props.isEditable &&
+          (row.editable ? (
+            <React.Fragment>
+              <td>
+                <div className="td-flex">
+                  <Button
+                    id={teamId + "row" + i + "-btn-modifyRow"}
+                    type="button"
+                    className="btn-modify"
+                    onClick={props.modifyHandler}
+                  >
+                    수정완료
+                  </Button>
+                  <Button
+                    id={teamId + "row" + i + "-btn-delete"}
+                    type="button"
+                    className="btn-delete"
+                    onClick={props.deleteHandler}
+                  >
+                    삭제
+                  </Button>
+                </div>
+              </td>
+            </React.Fragment>
+          ) : (
             <td>
-              <div className="td-flex">
-                <Button
-                  id={teamId + "row" + i + "-btn-modifyRow"}
-                  type="button"
-                  className="btn-modify"
-                  onClick={props.modifyHandler}
-                >
-                  수정완료
-                </Button>
-                <Button
-                  id={teamId + "row" + i + "-btn-delete"}
-                  type="button"
-                  className="btn-delete"
-                  onClick={props.deleteHandler}
-                >
-                  삭제
-                </Button>
-              </div>
+              <Button
+                id={teamId + "row" + i + "-btn-switchRow"}
+                type="button"
+                onClick={props.switchRowHanlder}
+              >
+                수정
+              </Button>
             </td>
-          </React.Fragment>
-        ) : (
-          <td>
-            <Button
-              id={teamId + "row" + i + "-btn-switchRow"}
-              type="button"
-              onClick={props.switchRowHanlder}
-            >
-              수정
-            </Button>
-          </td>
-        )}
+          ))}
       </tr>
     ));
   } else if (props.version === "regist") {
@@ -217,6 +221,8 @@ const RegistTable = (props) => {
     ));
   }
 
+  console.log("RT");
+
   return (
     <table id={props.tableId} className="regist-table">
       <colgroup>
@@ -226,7 +232,7 @@ const RegistTable = (props) => {
         {props.showNumber && (
           <col className={"table-col-" + props.columns.length} />
         )}
-        <col className="table-col-btn" />
+        {props.isEditable && <col className="table-col-btn" />}
       </colgroup>
       <thead>
         <tr>
@@ -277,7 +283,7 @@ const RegistTable = (props) => {
               return <th key={col.id}>{col.name}</th>;
             }
           })}
-          <th></th>
+          {props.isEditable && <th></th>}
         </tr>
       </thead>
       <tbody>{bodyElement}</tbody>

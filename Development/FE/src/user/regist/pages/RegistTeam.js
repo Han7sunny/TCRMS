@@ -32,6 +32,7 @@ const RegistTeam = () => {
 
   const [saveTeam, setSaveTeam] = useState([]);
   const [envPeriod, setEnvPeriod] = useState("none");
+  const [isEditable, setIsEditable] = useState(false);
 
   const errMsgPersonName = "팀";
   const englishTitle = "team";
@@ -59,7 +60,57 @@ const RegistTeam = () => {
     }
 
     // 겨루기인 경우 단체전 체급 합산 체크
-    // team.event.includes("겨루기")
+    if (teamData.event.includes("겨루기")) {
+      const weights = teamData.teamMembers
+        .filter((member) => member.editable)
+        .map((member) => WEIGHT_ID[member.sex][member.weight].maxWeight);
+
+      let sumWeightOK = true;
+      if (weights.length > 3) {
+        const sum = weights.reduce((a, b) => a + b, 0);
+        const min = Math.min.apply(null, weights);
+        if (teamData.event.includes("남성")) {
+          if (
+            sum > process.env.REACT_APP_TEAM_SPARRING_WEIGHT_MALE_MEM4_LIMIT ||
+            sum - min >
+              process.env.REACT_APP_TEAM_SPARRING_WEIGHT_MALE_MEM3_LIMIT
+          ) {
+            sumWeightOK = false;
+          }
+        } else {
+          if (
+            sum >
+              process.env.REACT_APP_TEAM_SPARRING_WEIGHT_FEMALE_MEM4_LIMIT ||
+            sum - min >
+              process.env.REACT_APP_TEAM_SPARRING_WEIGHT_FEMALE_MEM3_LIMIT
+          ) {
+            sumWeightOK = false;
+          }
+        }
+      } else {
+        const sum = weights.reduce((a, b) => a + b, 0);
+        if (teamData.event.includes("남성")) {
+          if (
+            sum > process.env.REACT_APP_TEAM_SPARRING_WEIGHT_MALE_MEM3_LIMIT
+          ) {
+            sumWeightOK = false;
+          }
+        } else {
+          if (
+            sum > process.env.REACT_APP_TEAM_SPARRING_WEIGHT_FEMALE_MEM3_LIMIT
+          ) {
+            sumWeightOK = false;
+          }
+        }
+      }
+
+      if (!sumWeightOK) {
+        return {
+          isValidity: false,
+          message: "체중 조건을 맞춰주세요",
+        };
+      }
+    }
 
     return { isValidity: true };
   };
@@ -85,7 +136,7 @@ const RegistTeam = () => {
       };
 
       const getIdNumber = (identityNumber) => {
-        if (!identityNumber) return [];
+        if (!identityNumber) return ["", "-", ""];
 
         let idnumber = identityNumber.split("-");
         return [idnumber[0], "-", idnumber[1]];
@@ -103,7 +154,7 @@ const RegistTeam = () => {
           idnumber: getIdNumber(member.identityNumber),
           weight: getWeight(member.weightClassId, member.gender),
           phoneNumber: member.phoneNumber,
-          editable: true,
+          editable: member.editable === false ? false : true,
         };
       });
 
@@ -314,7 +365,7 @@ const RegistTeam = () => {
   // 단체전 페이지 들어오면 먼저 단체전 저장된 데이터 있는지 체크
   const teamListHandler = useCallback(async () => {
     try {
-      // const responseData = await sendRequest(
+      // let responseData = await sendRequest(
       //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
       //   "GET",
       //   null,
@@ -325,10 +376,11 @@ const RegistTeam = () => {
       // );
 
       // // TODO : change Dummy DATA
-      const responseData = {
+      let responseData = {
         isSuccess: true,
         payload: {
           isTeamExists: true,
+          isEditable: true,
           teams: [
             {
               eventTeamNumber: 2,
@@ -470,30 +522,40 @@ const RegistTeam = () => {
 
       if (responseData.payload.isTeamExists) {
         // 겨루기 단체전이고 후보선수 없을 경우 후보선수 만들어줘야함
-        // if (
-        //   eventName.includes("겨루기") &&
-        //   team.teamMembers.filter((member) => member.indexInTeam === "후보 선수")
-        //     .length === 0
-        // ) {
-        //   teamMembers.push({
-        //     indexInTeam: "후보 선수",
-        //     name: "",
-        //     sex: eventName.includes("남성") ? "남성" : "여성",
-        //     foreigner: [],
-        //     nationality: "",
-        //     idnumber: ["", "-", ""],
-        //     phoneNumber: "",
-        //     weight: "",
-        //     editable: false,
-        //   });
-        // }
+        responseData.payload.teams = responseData.payload.teams.map((team) => {
+          const eventName = Object.values(EVENT_ID).find(
+            (event) => event.id === team.eventId
+          ).name;
+          if (
+            eventName.includes("겨루기") &&
+            team.teamMembers.filter(
+              (member) => member.indexInTeam === "후보 선수"
+            ).length === 0
+          ) {
+            team.teamMembers.push({
+              indexInTeam: "후보 선수",
+              name: "",
+              // gender: eventName.includes("남성") ? "남성" : "여성",
+              gender: "",
+              isForeigner: false,
+              nationality: "",
+              identityNumber: "",
+              phoneNumber: "",
+              //weight: "",
+              editable: false,
+            });
+          }
 
+          return team;
+        });
+
+        setIsEditable(responseData.payload.isEditable);
         setIsRegistMode(false);
         setRegistData(
           responseData.payload.teams.map((team) => formatTeam(team, 1))
         );
         setSaveTeam(responseData.payload.teams);
-      } else {
+      } else if (responseData.payload.isEditable) {
         setIsRegistMode(true);
         setTeamSelectModalShow(true);
       }
@@ -536,7 +598,15 @@ const RegistTeam = () => {
     event.preventDefault();
     const teamNum = Number(event.target.id.split("-")[1].replace("team", ""));
     let teamsData = registState.inputs;
-    teamsData[teamNum].editable = true;
+    let teamData = teamsData[teamNum];
+    teamData.editable = true;
+    teamData.teaMembers = teamData.teamMembers.map((member) => {
+      if (member.indexInTeam === "후보 선수" && member.sex === "") {
+        member.sex = teamData.event.includes("남성") ? "남성" : "여성";
+      }
+      return member;
+    });
+
     setRegistData(teamsData);
   };
 
@@ -549,7 +619,9 @@ const RegistTeam = () => {
     if (!isValidity) {
       setError({
         title: "입력정보 확인",
-        detail: `${teamMemberIndex} : ${message}`,
+        detail: teamMemberIndex
+          ? `${teamMemberIndex} : ${message}`
+          : `${message}`,
       });
       return;
     }
@@ -595,9 +667,10 @@ const RegistTeam = () => {
         // throw err;
       }
     } else {
-      let teamsData = registState.inputs;
-      teamsData[teamNum].editable = false;
-      setRegistData(teamsData);
+      // let teamsData = registState.inputs;
+      // teamsData[teamNum].editable = false;
+      // setRegistData(teamsData);
+      setRegistData(saveTeam.map((team) => formatTeam(team, 1)));
       return;
     }
   };
@@ -622,7 +695,9 @@ const RegistTeam = () => {
           } = checkValidity(i);
           isValidity = isValidity & isTeamValid;
           if (!isTeamValid) {
-            errMsg = `${i + 1}번째 팀의 ${teamMemberIndex} : ` + message;
+            errMsg = teamMemberIndex
+              ? `${i + 1}번째 팀의 ${teamMemberIndex} : ` + message
+              : `${i + 1}번째 팀 : ` + message;
             break;
           }
         }
@@ -700,7 +775,10 @@ const RegistTeam = () => {
           {registState.inputs.map((team, i) => (
             <div className="regist-team" key={`team${i}`}>
               <div className="regist-team-subtitle">
-                <div>{team.event}</div>
+                <div>
+                  <span className="regist-team-teamNumber">{i + 1}팀</span>
+                  {team.event}
+                </div>
                 {team.editable && (
                   <Button
                     id={`btn-team${i}-delete`}
@@ -739,36 +817,41 @@ const RegistTeam = () => {
             return (
               <div className="regist-team" key={`team${i}`}>
                 <div className="regist-team-subtitle">
-                  <div><span className="regist-team-teamNumber">{i+1}팀</span>{team.event}</div>
-                  {team.editable ? (
-                    <React.Fragment>
+                  <div>
+                    <span className="regist-team-teamNumber">{i + 1}팀</span>
+                    {team.event}
+                  </div>
+
+                  {isEditable &&
+                    (team.editable ? (
+                      <React.Fragment>
+                        <Button
+                          id={`btn-team${i}-modify`}
+                          className="btn-team-modify"
+                          onClick={modifyTeamHandler}
+                          type="button"
+                        >
+                          수정완료
+                        </Button>
+                        <Button
+                          id={`btn-team${i}-delete`}
+                          className="btn-team-delete"
+                          onClick={deleteDataHandler}
+                          type="button"
+                        >
+                          삭제하기
+                        </Button>
+                      </React.Fragment>
+                    ) : (
                       <Button
-                        id={`btn-team${i}-modify`}
-                        className="btn-team-modify"
-                        onClick={modifyTeamHandler}
+                        id={`btn-team${i}-modechange`}
+                        className="btn-team-modechange"
+                        onClick={modifyModeHandler}
                         type="button"
                       >
-                        수정완료
+                        수정하기
                       </Button>
-                      <Button
-                        id={`btn-team${i}-delete`}
-                        className="btn-team-delete"
-                        onClick={deleteDataHandler}
-                        type="button"
-                      >
-                        삭제하기
-                      </Button>
-                    </React.Fragment>
-                  ) : (
-                    <Button
-                      id={`btn-team${i}-modechange`}
-                      className="btn-team-modechange"
-                      onClick={modifyModeHandler}
-                      type="button"
-                    >
-                      수정하기
-                    </Button>
-                  )}
+                    ))}
                 </div>
                 <RegistTeamTable
                   columns={TABLE_COLUMNS_CHECK_TEAM}
@@ -790,7 +873,7 @@ const RegistTeam = () => {
               </div>
             );
           })}
-          {envPeriod === "first" && (
+          {envPeriod === "first" && isEditable && (
             <div className="check-btn-submit">
               <Button onClick={switchModeHandler} disabled={apiFail}>
                 추가하기

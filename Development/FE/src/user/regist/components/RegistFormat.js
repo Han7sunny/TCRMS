@@ -18,6 +18,7 @@ const RegistFormat = (props) => {
 
   const [saveParticipant, setSaveParticipant] = useState([]);
   const [envPeriod, setEnvPeriod] = useState("none");
+  const [isEditable, setIsEditable] = useState(false);
   const [enableDropdownRow, setEnableDropdownRow] = useState(null);
 
   const [registState, inputHandler, addRow, deleteRow, setRegistData] =
@@ -105,6 +106,7 @@ const RegistFormat = (props) => {
   // 개인전 페이지 들어오면 먼저 개인전 저장된 데이터 있는지 체크
   const listHandler = useCallback(async () => {
     try {
+      console.log("LIST");
       // const responseData = await sendRequest(
       //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
       //   "GET",
@@ -119,6 +121,7 @@ const RegistFormat = (props) => {
       const responseData = {
         isSuccess: true,
         payload: {
+          isEditable: true,
           isParticipantExists: true,
           participants: [
             {
@@ -151,6 +154,7 @@ const RegistFormat = (props) => {
       // };
 
       if (responseData.payload.isParticipantExists) {
+        setIsEditable(responseData.payload.isEditable);
         setIsRegistMode(false);
         setRegistData(
           responseData.payload.participants.map((participant) =>
@@ -158,7 +162,7 @@ const RegistFormat = (props) => {
           )
         );
         setSaveParticipant(responseData.payload.participants);
-      } else {
+      } else if (responseData.payload.isEditable) {
         setIsRegistMode(true); //useRegist 초기값 정하기
         addRow();
       }
@@ -389,11 +393,16 @@ const RegistFormat = (props) => {
 
   // 컴포넌트 열자마자 리스트 불러오기
   useEffect(() => {
+    console.log(periodGetHandler);
+    console.log(listHandler);
+    console.log(envPeriod);
     periodGetHandler()
       .then(() => {
         // list get
         if (["first", "second"].includes(envPeriod)) {
+          console.log("ME");
           listHandler();
+          console.log("ME2");
         }
       })
       .catch(() => {});
@@ -406,6 +415,7 @@ const RegistFormat = (props) => {
           ? `${props.koreanTitle} 신청`
           : `${props.koreanTitle} 신청확인`}
       </h2>
+      {console.log(`!!!${isRegistMode}`)}
       {isRegistMode ? (
         <form className="regist-form">
           <div className="regist-btn-add-row">
@@ -416,6 +426,7 @@ const RegistFormat = (props) => {
           <RegistTable
             version="regist"
             columns={props.registTableColumn}
+            isEditable={isEditable}
             checkColumns={props.checkTableColumn}
             data={registState.inputs}
             inputHandler={inputHandler}
@@ -433,6 +444,7 @@ const RegistFormat = (props) => {
           <RegistTable
             version="check"
             columns={props.checkTableColumn}
+            isEditable={isEditable}
             modifyColumns={
               envPeriod === "first"
                 ? props.registTableColumn
@@ -445,7 +457,7 @@ const RegistFormat = (props) => {
             deleteHandler={deleteDataHandler}
             showNumber
           />
-          {envPeriod === "first" && (
+          {envPeriod === "first" && isEditable && (
             <div className="check-btn-submit">
               <Button onClick={switchModeHandler} disabled={apiFail}>
                 추가하기

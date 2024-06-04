@@ -32,6 +32,7 @@ const RegistTeamTable = (props) => {
             <div
               id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
               key={key}
+              className="display-flex"
             >
               &nbsp;{initVal}&nbsp;
               {props.editMode && (

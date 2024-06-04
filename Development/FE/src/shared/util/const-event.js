@@ -36,7 +36,7 @@ export const WEIGHT_ID = {
     라이트: { id: 5, maxWeight: 74 },
     웰터: { id: 6, maxWeight: 80 },
     미들: { id: 7, maxWeight: 87 },
-    헤비: { id: 8, maxWeight: 50 },
+    헤비: { id: 8, maxWeight: 91 },
   },
   여성: {
     핀: { id: 1, maxWeight: 46 },
@@ -45,6 +45,6 @@ export const WEIGHT_ID = {
     페더: { id: 4, maxWeight: 57 },
     라이트: { id: 5, maxWeight: 62 },
     웰터: { id: 6, maxWeight: 67 },
-    미들헤비: { id: 9, maxWeight: 50 },
+    미들헤비: { id: 9, maxWeight: 81 },
   },
 };
