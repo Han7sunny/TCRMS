@@ -4,10 +4,10 @@ import com.kutca.tcrms.common.dto.request.RequestDto;
 import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
-import com.kutca.tcrms.participant.controller.dto.request.VolunteerParticipantRequestDto;
+import com.kutca.tcrms.participant.controller.dto.request.SecondParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
-import com.kutca.tcrms.participant.controller.dto.response.VolunteerParticipantResponseDto;
+import com.kutca.tcrms.participant.controller.dto.response.SecondParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
 import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
@@ -19,22 +19,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class VolunteerParticipantService {
+public class SecondParticipantService {
 
-    private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
     private final ParticipantApplicationRepository participantApplicationRepository;
+    private final UserRepository userRepository;
+
+    private static final Long SECOND_EVENT_ID = 10L;
     private final EventRepository eventRepository;
-    private final Long VOLUNTEER_EVENT_ID = 11L;
 
     @Transactional(readOnly = true)
-    public ResponseDto<?> getVolunteerList(Long userId){
+    public ResponseDto<?> getSecondList(Long userId){
 
         Optional<User> findUser = userRepository.findById(userId);
         if(findUser.isEmpty()){
@@ -49,6 +51,7 @@ public class VolunteerParticipantService {
         if(findParticipantList.isEmpty()){
             return ResponseDto.builder()
                     .isSuccess(true)
+                    .message("세컨 신청 내역이 없습니다.")
                     .payload(
                             ParticipantResponseDto.builder()
                                     .isEditable(user.getIsEditable())
@@ -61,23 +64,26 @@ public class VolunteerParticipantService {
 
         return ResponseDto.builder()
                 .isSuccess(true)
-                .payload(
-                        ParticipantResponseDto.builder()
-                                .isEditable(user.getIsEditable())
-                                .isDepositConfirmed(user.getIsDepositConfirmed())
-                                .isParticipantExists(true)
-                                .participants(
-                                        new ParticipantsResponseDto<>(findParticipantList.stream().filter(participant -> participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), VOLUNTEER_EVENT_ID)).collect(Collectors.toList()))
-                                )
+                .payload(ParticipantResponseDto.builder()
+                        .isParticipantExists(true)
+                        .isEditable(user.getIsEditable())
+                        .isDepositConfirmed(user.getIsDepositConfirmed())
+                        .participants(new ParticipantsResponseDto<>(findParticipantList.stream()
+                                .map(participant -> {
+                                    Optional<ParticipantApplication> findParticipantApplication = participantApplicationRepository.findByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), SECOND_EVENT_ID);
+                                    return findParticipantApplication.map(participantApplication -> SecondParticipantResponseDto.fromEntity(participant, participantApplication.getParticipantApplicationId())).orElse(null);
+                                })
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList())))
                         .build())
                 .build();
     }
 
     @Transactional
-    public ResponseDto<?> registVolunteer(RequestDto<VolunteerParticipantRequestDto.Regist> volunteerParticipantRequestDto) {
+    public ResponseDto<?> registSecondList(RequestDto<SecondParticipantRequestDto.Regist> secondParticipantRequestDto) {
 
-        Optional<User> findUser = userRepository.findById(volunteerParticipantRequestDto.getUserId());
-        if(findUser.isEmpty()) {
+        Optional<User> findUser = userRepository.findById(secondParticipantRequestDto.getUserId());
+        if (findUser.isEmpty()) {
             return ResponseDto.builder()
                     .isSuccess(false)
                     .message("대표자 정보를 찾을 수 없습니다.")
@@ -85,21 +91,25 @@ public class VolunteerParticipantService {
         }
 
         User user = findUser.get();
-        Event event = eventRepository.findById(VOLUNTEER_EVENT_ID).get();
-        AtomicInteger eventTeamNumber = new AtomicInteger(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).map(pa -> pa.getEventTeamNumber() + 1).orElse(1));
+        Event event = eventRepository.findById(SECOND_EVENT_ID).get();
+        AtomicInteger eventTeamNumber = new AtomicInteger(participantApplicationRepository.findTopByEvent_EventId(SECOND_EVENT_ID).map(pa -> pa.getEventTeamNumber() + 1).orElse(1));
 
-        volunteerParticipantRequestDto.getRequestDtoList().forEach(volunteer -> {
+        secondParticipantRequestDto.getRequestDtoList().forEach(second -> {
 
-            Participant participant = participantRepository.save(
+            Optional<Participant> findParticipant = (second.getIsForeigner() && second.getIdentityNumber() == null)
+                    ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), second.getName(), second.getPhoneNumber())
+                    : participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), second.getName(), second.getIdentityNumber());
+
+            Participant participant = findParticipant.orElseGet(() -> participantRepository.save(
                     Participant.builder()
                             .user(user)
-                            .name(volunteer.getName())
-                            .gender(volunteer.getGender())
-                            .isForeigner(volunteer.getIsForeigner())
-                            .nationality(volunteer.getNationality())
+                            .name(second.getName())
+                            .gender(second.getGender())
+                            .isForeigner(second.getIsForeigner())
+                            .nationality(second.getNationality())
                             .universityName(user.getUniversityName())
-                            .phoneNumber(volunteer.getPhoneNumber())
-                            .build());
+                            .phoneNumber(second.getPhoneNumber())
+                            .build()));
 
             participantApplicationRepository.save(
                     ParticipantApplication.builder()
@@ -108,6 +118,7 @@ public class VolunteerParticipantService {
                             .eventTeamNumber(eventTeamNumber.getAndIncrement())
                             .build()
             );
+
         });
 
         return ResponseDto.builder()
@@ -116,10 +127,10 @@ public class VolunteerParticipantService {
     }
 
     @Transactional
-    public ResponseDto<?> modifyVolunteer(VolunteerParticipantRequestDto.Modify volunteerParticipantRequestDto){
+    public ResponseDto<?> modifySecond(SecondParticipantRequestDto.Modify secondParticipantRequestDto) {
 
-        Optional<Participant> findParticipant = participantRepository.findById(volunteerParticipantRequestDto.getParticipantId());
-        if(findParticipant.isEmpty()){
+        Optional<Participant> findParticipant = participantRepository.findById(secondParticipantRequestDto.getParticipantId());
+        if (findParticipant.isEmpty()) {
             return ResponseDto.builder()
                     .isSuccess(false)
                     .message("참가자 정보를 찾을 수 없습니다.")
@@ -128,7 +139,7 @@ public class VolunteerParticipantService {
 
         Participant participant = findParticipant.get();
 
-        if(!participant.getGender().equals(volunteerParticipantRequestDto.getGender())){
+        if(!participant.getGender().equals(secondParticipantRequestDto.getGender())){
 
             List<ParticipantApplication> participantApplicationList = participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(),1L, 4L);
             participantApplicationList.forEach(pa -> {
@@ -141,23 +152,27 @@ public class VolunteerParticipantService {
             });
         }
 
-        Participant modifiedVolunteerParticipant = participantRepository.save(participant.updateVolunteer(volunteerParticipantRequestDto));
+        Participant modifiedSecondParticipant = participantRepository.save(participant.updateSecond(secondParticipantRequestDto));
 
         return ResponseDto.builder()
                 .isSuccess(true)
-                .payload(VolunteerParticipantResponseDto.fromEntity(modifiedVolunteerParticipant))
+                .message("세컨 정보가 성공적으로 수정되었습니다.")
+                .payload(SecondParticipantResponseDto.fromEntity(modifiedSecondParticipant, secondParticipantRequestDto.getParticipantApplicationId()))
                 .build();
     }
 
     @Transactional
-    public ResponseDto<?> deleteVolunteer(VolunteerParticipantRequestDto.Delete volunteerParticipantRequestDto){
+    public ResponseDto<?> deleteSecond(SecondParticipantRequestDto.Delete secondParticipantRequestDto){
+        participantApplicationRepository.deleteById(secondParticipantRequestDto.getParticipantApplicationId());
 
-        participantApplicationRepository.deleteById(volunteerParticipantRequestDto.getParticipantApplicationId());
+        //  학교별 신청 종목 팀 데이터 변경
 
-        //  학교별 신청 종목팀 팀 개수 감소
+        Boolean isOtherParticipantApplicationExist = participantApplicationRepository.existsByParticipant_ParticipantId(secondParticipantRequestDto.getParticipantId());
 
-        if(!participantApplicationRepository.existsByParticipant_ParticipantId(volunteerParticipantRequestDto.getParticipantId())){
-            participantRepository.deleteById(volunteerParticipantRequestDto.getParticipantId());
+        if(!isOtherParticipantApplicationExist){
+            participantRepository.deleteById(secondParticipantRequestDto.getParticipantId());
+            //  participant_file
+            //  file
         }
 
         return ResponseDto.builder()

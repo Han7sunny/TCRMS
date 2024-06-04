@@ -22,6 +22,8 @@ public class ParticipantApplication {
 
     private Boolean is2ndChange;
 
+    private String indexInTeam;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant_id")
     private Participant participant;
