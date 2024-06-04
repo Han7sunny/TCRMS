@@ -2,13 +2,15 @@ package com.kutca.tcrms.weightclass.entity;
 
 import com.kutca.tcrms.participant.entity.Participant;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WeightClass {
 
