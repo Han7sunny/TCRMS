@@ -68,35 +68,32 @@ public class TeamParticipantService {
             findParticipantApplicationList.forEach(pa -> participantApplicationByEventTeamNumber.computeIfAbsent(pa.getEventTeamNumber(), k -> new ArrayList<>()).add(pa));
         });
 
-        List<TeamParticipantResponseDto> teams = participantApplicationByEventTeamNumber.entrySet().stream()
-                .map(entry -> {
-                    Integer eventTeamNumber = entry.getKey();
-                    List<ParticipantApplication> participantApplicationList = entry.getValue();
-                    Long eventId = participantApplicationList.get(0).getEvent().getEventId();
+        List<TeamParticipantResponseDto> teams = new ArrayList<>();
 
-                    List<TeamMemberParticipantResponseDto> teamMembers = participantApplicationList.stream()
-                            .map(pa -> {
-                                WeightClass weightClass = pa.getParticipant().getWeightClass();
-                                return TeamMemberParticipantResponseDto.builder()
-                                        .participantApplicationId(pa.getParticipantApplicationId())
-                                        .participantId(pa.getParticipant().getParticipantId())
-                                        .weightClassId(weightClass == null ? null : weightClass.getWeightClassId())
-                                        .name(pa.getParticipant().getName())
-                                        .identityNumber(pa.getParticipant().getIdentityNumber())
-                                        .gender(pa.getParticipant().getGender())
-                                        .isForeigner(pa.getParticipant().getIsForeigner())
-                                        .nationality(pa.getParticipant().getNationality())
-                                        .phoneNumber(pa.getParticipant().getPhoneNumber())
-                                        .indexInTeam(pa.getIndexInTeam())
-                                        .build();
-                            }).collect(Collectors.toList());
+        participantApplicationByEventTeamNumber.forEach((eventTeamNumber, participantApplicationList) -> {
+            teams.add(TeamParticipantResponseDto.builder()
+                    .eventTeamNumber(eventTeamNumber)
+                    .eventId(participantApplicationList.get(0).getEvent().getEventId())
+                    .teamMembers(participantApplicationList.stream().map(pa -> {
+                        WeightClass weightClass = pa.getParticipant().getWeightClass();
+                        return TeamMemberParticipantResponseDto.builder()
+                                .participantApplicationId(pa.getParticipantApplicationId())
+                                .participantId(pa.getParticipant().getParticipantId())
+                                .weightClassId(weightClass == null ? null : weightClass.getWeightClassId())
+                                .name(pa.getParticipant().getName())
+                                .identityNumber(pa.getParticipant().getIdentityNumber())
+                                .gender(pa.getParticipant().getGender())
+                                .isForeigner(pa.getParticipant().getIsForeigner())
+                                .nationality(pa.getParticipant().getNationality())
+                                .phoneNumber(pa.getParticipant().getPhoneNumber())
+                                .indexInTeam(pa.getIndexInTeam())
+                                .build();
+                    })
+                            .collect(Collectors.toList()))
+                    .build()
+            );
 
-                    return TeamParticipantResponseDto.builder()
-                            .eventTeamNumber(eventTeamNumber)
-                            .eventId(eventId)
-                            .teamMembers(teamMembers)
-                            .build();
-                }).collect(Collectors.toList());
+        });
 
         return ResponseDto.builder()
                 .isSuccess(true)
@@ -129,9 +126,9 @@ public class TeamParticipantService {
             int eventTeamNumber = participantApplicationRepository.findTopByEvent_EventId(event.getEventId()).map(pa -> pa.getEventTeamNumber() + 1).orElse(1);
             team.getTeamMembers().forEach(teamMember -> {
 
-                Optional<Participant> findParticipant = (teamMember.getIsForeigner() && teamMember.getIdentityName() == null)
+                Optional<Participant> findParticipant = (teamMember.getIsForeigner() && teamMember.getIdentityNumber() == null)
                         ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), teamMember.getName(), teamMember.getPhoneNumber())
-                        : participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), teamMember.getName(), teamMember.getIdentityName());
+                        : participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), teamMember.getName(), teamMember.getIdentityNumber());
 
                 Participant participant = findParticipant.orElseGet(() -> participantRepository.save(
                         Participant.builder()
@@ -159,6 +156,67 @@ public class TeamParticipantService {
 
         return ResponseDto.builder()
                 .isSuccess(true)
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> modifyTeam(TeamParticipantRequestDto.Modify teamParticipantRequestDto){
+
+        User user = userRepository.findById(teamParticipantRequestDto.getUserId()).get();
+        Event event = eventRepository.findById(teamParticipantRequestDto.getEventId()).get();
+        int eventTeamNumber = teamParticipantRequestDto.getEventTeamNumber();
+
+        teamParticipantRequestDto.getTeamMembers().forEach(teamMember -> {
+
+            WeightClass weightClass = weightClassRepository.findById(teamMember.getWeightClassId()).get();
+
+            Optional<Participant> findParticipant = (teamMember.getIsForeigner() && teamMember.getIdentityNumber() == null)
+                    ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), teamMember.getName(), teamMember.getPhoneNumber())
+                    : participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), teamMember.getName(), teamMember.getIdentityNumber());
+
+            Participant participant = findParticipant.orElseGet(() -> participantRepository.save(
+                    Participant.builder()
+                            .name(teamMember.getName())
+                            .identityNumber(teamMember.getIdentityNumber())
+                            .gender(teamMember.getGender())
+                            .universityName(user.getUniversityName())
+                            .isForeigner(teamMember.getIsForeigner())
+                            .nationality(teamMember.getNationality())
+                            .user(user)
+                            .weightClass(weightClass)
+                            .build()
+            ));
+
+            if(teamMember.getIsParticipantChange()){
+//                participant.updateParticipant();
+            }
+
+            if(teamMember.getIsWeightClassChange()) {
+                participant.updateWeightClass(weightClass);
+            }
+
+            if(!participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(eventTeamNumber, teamMember.getIndexInTeam())){
+                participantApplicationRepository.save(
+                        ParticipantApplication.builder()
+                                .participant(participant)
+                                .event(event)
+                                .eventTeamNumber(eventTeamNumber)
+                                .is2ndCancel(false)
+                                .is2ndChange(true)
+                                .indexInTeam(teamMember.getIndexInTeam())
+                        .build());
+            }
+        });
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(
+                        TeamParticipantResponseDto.builder()
+                                .eventTeamNumber(eventTeamNumber)
+                                .eventId(event.getEventId())
+//                                .teamMembers()
+                                .build()
+                )
                 .build();
     }
 }
