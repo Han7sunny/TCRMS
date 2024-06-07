@@ -29,4 +29,17 @@ public class TeamParticipantRequestDto {
         private List<TeamMemberParticipantRequestDto.Modify> teamMembers;
     }
 
+    @Getter
+    @Builder
+    public static class Delete {
+
+        private Long userId;
+
+        private Long eventId;
+
+        private List<Long> participantIds;
+
+        private List<Long> participantApplicationIds;
+    }
+
 }

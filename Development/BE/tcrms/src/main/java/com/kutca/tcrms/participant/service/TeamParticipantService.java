@@ -236,4 +236,26 @@ public class TeamParticipantService {
                 )
                 .build();
     }
+
+    @Transactional
+    public ResponseDto<?> deleteTeam(TeamParticipantRequestDto.Delete teamParticipantRequestDto){
+
+        Long eventId = teamParticipantRequestDto.getEventId();
+
+        teamParticipantRequestDto.getParticipantApplicationIds().forEach(participantApplicationRepository::deleteById);
+
+        teamParticipantRequestDto.getParticipantIds().forEach(participantId -> {
+            if(!participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participantId, eventId)){
+                participantRepository.deleteById(participantId);
+                //  participant_file
+                //  file
+            }
+        });
+
+        //  학교별 신청 종목 팀 데이터 변경
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .build();
+    }
 }
