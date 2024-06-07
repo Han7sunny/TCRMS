@@ -166,8 +166,9 @@ public class TeamParticipantService {
         Event event = eventRepository.findById(teamParticipantRequestDto.getEventId()).get();
         int eventTeamNumber = teamParticipantRequestDto.getEventTeamNumber();
 
-        teamParticipantRequestDto.getTeamMembers().forEach(teamMember -> {
+        List<TeamMemberParticipantResponseDto> teamMembers = teamParticipantRequestDto.getTeamMembers().stream().map(teamMember -> {
 
+            Long participantApplicationId = teamMember.getParticipantApplicationId();
             WeightClass weightClass = weightClassRepository.findById(teamMember.getWeightClassId()).get();
 
             Optional<Participant> findParticipant = (teamMember.getIsForeigner() && teamMember.getIdentityNumber() == null)
@@ -187,16 +188,18 @@ public class TeamParticipantService {
                             .build()
             ));
 
-            if(teamMember.getIsParticipantChange()){
-//                participant.updateParticipant();
-            }
+            if(findParticipant.isPresent()){
+                if(teamMember.getIsWeightClassChange()) {
+                    participant.updateWeightClass(weightClass);
+                }
 
-            if(teamMember.getIsWeightClassChange()) {
-                participant.updateWeightClass(weightClass);
+                if(teamMember.getIsParticipantChange()){
+                    participant.updateTeamMember(teamMember);
+                }
             }
 
             if(!participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(eventTeamNumber, teamMember.getIndexInTeam())){
-                participantApplicationRepository.save(
+                participantApplicationId = participantApplicationRepository.save(
                         ParticipantApplication.builder()
                                 .participant(participant)
                                 .event(event)
@@ -204,9 +207,23 @@ public class TeamParticipantService {
                                 .is2ndCancel(false)
                                 .is2ndChange(true)
                                 .indexInTeam(teamMember.getIndexInTeam())
-                        .build());
+                        .build()).getParticipantApplicationId();
             }
-        });
+
+            return TeamMemberParticipantResponseDto.builder()
+                    .participantId(participant.getParticipantId())
+                    .participantApplicationId(participantApplicationId)
+                    .weightClassId(weightClass.getWeightClassId())
+                    .name(participant.getName())
+                    .identityNumber(participant.getIdentityNumber())
+                    .gender(participant.getGender())
+                    .isForeigner(participant.getIsForeigner())
+                    .nationality(participant.getNationality())
+                    .phoneNumber(participant.getPhoneNumber())
+                    .indexInTeam(teamMember.getIndexInTeam())
+                    .build();
+
+        }).collect(Collectors.toList());
 
         return ResponseDto.builder()
                 .isSuccess(true)
@@ -214,7 +231,7 @@ public class TeamParticipantService {
                         TeamParticipantResponseDto.builder()
                                 .eventTeamNumber(eventTeamNumber)
                                 .eventId(event.getEventId())
-//                                .teamMembers()
+                                .teamMembers(teamMembers)
                                 .build()
                 )
                 .build();
