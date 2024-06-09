@@ -169,7 +169,7 @@ public class TeamParticipantService {
         List<TeamMemberParticipantResponseDto> teamMembers = teamParticipantRequestDto.getTeamMembers().stream().map(teamMember -> {
 
             Long participantApplicationId = teamMember.getParticipantApplicationId();
-            WeightClass weightClass = weightClassRepository.findById(teamMember.getWeightClassId()).get();
+            WeightClass weightClass = teamMember.getWeightClassId() == null ? null : weightClassRepository.findById(teamMember.getWeightClassId()).get();  //  품새의 경우 체급 정보 없음
 
             Optional<Participant> findParticipant = (teamMember.getIsForeigner() && teamMember.getIdentityNumber() == null)
                     ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), teamMember.getName(), teamMember.getPhoneNumber())
@@ -213,7 +213,7 @@ public class TeamParticipantService {
             return TeamMemberParticipantResponseDto.builder()
                     .participantId(participant.getParticipantId())
                     .participantApplicationId(participantApplicationId)
-                    .weightClassId(weightClass.getWeightClassId())
+                    .weightClassId(weightClass == null ? null : weightClass.getWeightClassId())
                     .name(participant.getName())
                     .identityNumber(participant.getIdentityNumber())
                     .gender(participant.getGender())

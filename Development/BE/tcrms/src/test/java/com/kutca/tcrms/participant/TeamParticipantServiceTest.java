@@ -6,6 +6,7 @@ import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.TeamMemberParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.request.TeamParticipantRequestDto;
+import com.kutca.tcrms.participant.controller.dto.response.TeamMemberParticipantResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.TeamParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -60,6 +62,8 @@ public class TeamParticipantServiceTest {
 
     private Map<Long, WeightClass> weightClassMap = new HashMap<>();
 
+    private Participant findParticipant1, findParticipant2, findParticipant3;
+
     @BeforeEach
     void setUp(){
         user = User.builder()
@@ -73,15 +77,7 @@ public class TeamParticipantServiceTest {
         weightClassMap.put(4L, WeightClass.builder().weightClassId(4L).build());
         weightClassMap.put(5L, WeightClass.builder().weightClassId(5L).build());
 
-    }
-
-    @Test
-    @DisplayName("팀 신청 (기존 참가자 정보 존재) 성공")
-    void registTeamListWithExistParticipantSuccess(){
-
-        //  given
-
-        Participant findParticipant1 = Participant.builder()
+        findParticipant1 = Participant.builder()
                 .participantId(1L)
                 .name("성춘향")
                 .gender("여성")
@@ -90,7 +86,7 @@ public class TeamParticipantServiceTest {
                 .weightClass(weightClassMap.get(1L))
                 .build();
 
-        Participant findParticipant2 = Participant.builder()
+        findParticipant2 = Participant.builder()
                 .participantId(2L)
                 .name("Jennifer")
                 .gender("여성")
@@ -100,6 +96,23 @@ public class TeamParticipantServiceTest {
                 .weightClass(weightClassMap.get(2L))
                 .build();
 
+        findParticipant3 = Participant.builder()
+                .participantId(3L)
+                .name("Ken")
+                .gender("남성")
+                .isForeigner(true)
+                .nationality("미국")
+                .phoneNumber("kenny@gmail.com")
+                .weightClass(weightClassMap.get(3L))
+                .build();
+
+    }
+
+    @Test
+    @DisplayName("팀 신청 (기존 참가자 정보 존재) 성공")
+    void registTeamListWithExistParticipantSuccess(){
+
+        //  given
         TeamParticipantRequestDto.Regist team1 = TeamParticipantRequestDto.Regist.builder()
                 .eventId(5L)
                 .teamMembers(Arrays.asList(
@@ -225,4 +238,231 @@ public class TeamParticipantServiceTest {
         verify(participantRepository, times(3)).save(any(Participant.class));
 
     }
+
+    @Test
+    @DisplayName("팀 신청 (개인정보) 수정")
+    void modifyTeamWithIsParticipantChangeSuccess(){
+
+        //  given
+        Event event = Event.builder().eventId(9L).eventName("단체전 혼성 품새").build();
+
+        ParticipantApplication findParticipantApplication1 = ParticipantApplication.builder()
+                .participantApplicationId(1L)
+                .participant(findParticipant1)
+                .event(event)
+                .eventTeamNumber(1)
+                .indexInTeam("1번 선수")
+                .build();
+
+        ParticipantApplication findParticipantApplication2 = ParticipantApplication.builder()
+                .participantApplicationId(2L)
+                .participant(findParticipant3)
+                .event(event)
+                .eventTeamNumber(1)
+                .indexInTeam("2번 선수")
+                .build();
+
+        TeamMemberParticipantRequestDto.Modify teamMember1 = TeamMemberParticipantRequestDto.Modify.builder()
+                .isParticipantChange(true)
+                .participantId(findParticipant1.getParticipantId())
+                .name("전춘향")
+                .identityNumber(findParticipant1.getIdentityNumber())
+                .gender(findParticipant1.getGender())
+                .isForeigner(findParticipant1.getIsForeigner())
+                .nationality(findParticipant1.getNationality())
+                .phoneNumber(findParticipant1.getPhoneNumber())
+                .isWeightClassChange(false)
+                .weightClassId(findParticipant1.getWeightClass().getWeightClassId())
+                .participantApplicationId(findParticipantApplication1.getParticipantApplicationId())
+                .indexInTeam(findParticipantApplication1.getIndexInTeam())
+                .build();
+
+        TeamMemberParticipantRequestDto.Modify teamMember2 = TeamMemberParticipantRequestDto.Modify.builder()
+                .isParticipantChange(false)
+                .participantId(findParticipant3.getParticipantId())
+                .weightClassId(findParticipant3.getWeightClass().getWeightClassId())
+                .name(findParticipant3.getName())
+                .identityNumber(findParticipant3.getIdentityNumber())
+                .gender(findParticipant3.getGender())
+                .isForeigner(findParticipant3.getIsForeigner())
+                .nationality(findParticipant3.getNationality())
+                .phoneNumber(findParticipant3.getPhoneNumber())
+                .isWeightClassChange(false)
+                .weightClassId(1L)
+                .participantApplicationId(findParticipantApplication2.getParticipantApplicationId())
+                .indexInTeam(findParticipantApplication2.getIndexInTeam())
+                .build();
+
+        TeamParticipantRequestDto.Modify modifyRequestDto = TeamParticipantRequestDto.Modify.builder()
+                .userId(user.getUserId())
+                .eventTeamNumber(1)
+                .eventId(event.getEventId())
+                .teamMembers(Arrays.asList(teamMember1, teamMember2))
+                .build();
+
+        given(userRepository.findById(user.getUserId())).willReturn(Optional.of(user));
+        given(eventRepository.findById(modifyRequestDto.getEventId())).willReturn(Optional.of(Event.builder().eventId(modifyRequestDto.getEventId()).build()));
+        given(weightClassRepository.findById(1L)).willReturn(Optional.of(weightClassMap.get(1L)));
+        given(participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), modifyRequestDto.getTeamMembers().get(0).getName(), modifyRequestDto.getTeamMembers().get(0).getIdentityNumber())).willReturn(Optional.empty());
+        given(participantRepository.save(any(Participant.class))).willReturn(findParticipant1.updateTeamMember(teamMember1));
+        given(participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), modifyRequestDto.getTeamMembers().get(1).getName(), modifyRequestDto.getTeamMembers().get(1).getPhoneNumber())).willReturn(Optional.of(findParticipant3));
+        given(participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(findParticipantApplication1.getEventTeamNumber(), findParticipantApplication1.getIndexInTeam())).willReturn(true);
+        given(participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(findParticipantApplication2.getEventTeamNumber(), findParticipantApplication2.getIndexInTeam())).willReturn(true);
+
+        //  when
+        ResponseDto<?> responseDto = teamParticipantService.modifyTeam(modifyRequestDto);
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+
+        TeamParticipantResponseDto teamParticipantResponseDto = (TeamParticipantResponseDto)responseDto.getPayload();
+        assertEquals(teamParticipantResponseDto.getTeamMembers().get(0).getName(), modifyRequestDto.getTeamMembers().get(0).getName());
+        assertEquals(teamParticipantResponseDto.getTeamMembers().get(1).getWeightClassId(), modifyRequestDto.getTeamMembers().get(1).getWeightClassId());
+    }
+
+    @Test
+    @DisplayName("단체전 신청 수정 (ex. 후보 선수 추가된 경우) 성공")
+    void modifyTeamWithNewIndexInTeamSuccess(){
+
+        //  given
+        Event event = Event.builder().eventId(5L).eventName("단체전 여자 겨루기").build();
+
+        ParticipantApplication findParticipantApplication1 = ParticipantApplication.builder()
+                .participantApplicationId(1L)
+                .participant(findParticipant1)
+                .event(event)
+                .eventTeamNumber(1)
+                .indexInTeam("1번 선수")
+                .build();
+
+        ParticipantApplication findParticipantApplication2 = ParticipantApplication.builder()
+                .participantApplicationId(2L)
+                .participant(findParticipant2)
+                .event(event)
+                .eventTeamNumber(1)
+                .indexInTeam("2번 선수")
+                .build();
+
+        ParticipantApplication findParticipantApplication3 = ParticipantApplication.builder()
+                .participantApplicationId(3L)
+                .participant(findParticipant3)
+                .event(event)
+                .eventTeamNumber(1)
+                .indexInTeam("3번 선수")
+                .build();
+
+        TeamMemberParticipantRequestDto.Modify teamMember1 = TeamMemberParticipantRequestDto.Modify.builder()
+                .isParticipantChange(false)
+                .participantId(findParticipant1.getParticipantId())
+                .name(findParticipant1.getName())
+                .identityNumber(findParticipant1.getIdentityNumber())
+                .gender(findParticipant1.getGender())
+                .isForeigner(findParticipant1.getIsForeigner())
+                .nationality(findParticipant1.getNationality())
+                .phoneNumber(findParticipant1.getPhoneNumber())
+                .isWeightClassChange(false)
+                .weightClassId(5L)
+                .participantApplicationId(findParticipantApplication1.getParticipantApplicationId())
+                .indexInTeam(findParticipantApplication1.getIndexInTeam())
+                .build();
+
+        TeamMemberParticipantRequestDto.Modify teamMember2 = TeamMemberParticipantRequestDto.Modify.builder()
+                .isParticipantChange(false)
+                .participantId(findParticipant2.getParticipantId())
+                .weightClassId(findParticipant2.getWeightClass().getWeightClassId())
+                .name(findParticipant2.getName())
+                .identityNumber(findParticipant2.getIdentityNumber())
+                .gender(findParticipant2.getGender())
+                .isForeigner(findParticipant2.getIsForeigner())
+                .nationality(findParticipant2.getNationality())
+                .phoneNumber(findParticipant2.getPhoneNumber())
+                .isWeightClassChange(false)
+                .weightClassId(5L)
+                .participantApplicationId(findParticipantApplication2.getParticipantApplicationId())
+                .indexInTeam(findParticipantApplication2.getIndexInTeam())
+                .build();
+
+        TeamMemberParticipantRequestDto.Modify teamMember3 = TeamMemberParticipantRequestDto.Modify.builder()
+                .isParticipantChange(false)
+                .participantId(findParticipant3.getParticipantId())
+                .weightClassId(findParticipant3.getWeightClass().getWeightClassId())
+                .name(findParticipant3.getName())
+                .identityNumber(findParticipant3.getIdentityNumber())
+                .gender("여성")
+                .isForeigner(findParticipant3.getIsForeigner())
+                .nationality(findParticipant3.getNationality())
+                .phoneNumber(findParticipant3.getPhoneNumber())
+                .isWeightClassChange(false)
+                .weightClassId(5L)
+                .participantApplicationId(findParticipantApplication3.getParticipantApplicationId())
+                .indexInTeam(findParticipantApplication3.getIndexInTeam())
+                .build();
+
+        TeamMemberParticipantRequestDto.Modify teamMember4 = TeamMemberParticipantRequestDto.Modify.builder()
+                .isParticipantChange(false)
+//                .participantId()
+                .weightClassId(1L)
+                .name("김후보")
+                .identityNumber("001001-4567891")
+                .gender("여성")
+                .isForeigner(false)
+                .isWeightClassChange(false)
+                .weightClassId(5L)
+//                .participantApplicationId()
+                .indexInTeam("후보 선수")
+                .build();
+
+        TeamParticipantRequestDto.Modify modifyRequestDto = TeamParticipantRequestDto.Modify.builder()
+                .userId(user.getUserId())
+                .eventTeamNumber(1)
+                .eventId(6L)
+                .teamMembers(Arrays.asList(teamMember1, teamMember2, teamMember3, teamMember4))
+                .build();
+
+        Participant savedParticipant1 = Participant.builder()
+                .participantId(4L)
+                .name(teamMember4.getName())
+                .identityNumber(teamMember4.getIdentityNumber())
+                .gender(teamMember4.getGender())
+                .universityName(user.getUniversityName())
+                .isForeigner(teamMember4.getIsForeigner())
+                .nationality(teamMember4.getNationality())
+                .user(user)
+                .build();
+
+        ParticipantApplication savedParticipantApplication1 = ParticipantApplication.builder()
+                .participant(savedParticipant1)
+                .event(event)
+                .eventTeamNumber(modifyRequestDto.getEventTeamNumber())
+                .is2ndCancel(false)
+                .is2ndChange(true)
+                .build();
+
+        given(userRepository.findById(user.getUserId())).willReturn(Optional.of(user));
+        given(eventRepository.findById(modifyRequestDto.getEventId())).willReturn(Optional.of(Event.builder().eventId(modifyRequestDto.getEventId()).build()));
+        given(weightClassRepository.findById(5L)).willReturn(Optional.of(weightClassMap.get(5L)));
+        given(participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), modifyRequestDto.getTeamMembers().get(0).getName(), modifyRequestDto.getTeamMembers().get(0).getIdentityNumber())).willReturn(Optional.of(findParticipant1));
+        given(participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), modifyRequestDto.getTeamMembers().get(1).getName(), modifyRequestDto.getTeamMembers().get(1).getPhoneNumber())).willReturn(Optional.of(findParticipant2));
+        given(participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), modifyRequestDto.getTeamMembers().get(2).getName(), modifyRequestDto.getTeamMembers().get(2).getPhoneNumber())).willReturn(Optional.of(findParticipant3));
+        given(participantRepository.save(any(Participant.class))).willReturn(savedParticipant1);
+
+        given(participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(findParticipantApplication1.getEventTeamNumber(), findParticipantApplication1.getIndexInTeam())).willReturn(true);
+        given(participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(findParticipantApplication2.getEventTeamNumber(), findParticipantApplication2.getIndexInTeam())).willReturn(true);
+        given(participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(findParticipantApplication3.getEventTeamNumber(), findParticipantApplication3.getIndexInTeam())).willReturn(true);
+        given(participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(modifyRequestDto.getEventTeamNumber(), modifyRequestDto.getTeamMembers().get(3).getIndexInTeam())).willReturn(false);
+        given(participantApplicationRepository.save(any(ParticipantApplication.class))).willReturn(savedParticipantApplication1);
+
+
+        //  when
+        ResponseDto<?> responseDto = teamParticipantService.modifyTeam(modifyRequestDto);
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+        TeamParticipantResponseDto teamParticipantResponseDto = (TeamParticipantResponseDto)responseDto.getPayload();
+        assertEquals(teamParticipantResponseDto.getTeamMembers().get(3).getIndexInTeam(), modifyRequestDto.getTeamMembers().get(3).getIndexInTeam());
+
+        verify(participantRepository, times(1)).save(any(Participant.class));
+        verify(participantApplicationRepository, times(1)).save(any(ParticipantApplication.class));
+    }
+
 }
