@@ -1,8 +1,5 @@
-import {
-  VALIDATOR_REQUIRE,
-  VALIDATOR_REQUIRE_LENGTH,
-} from "../../shared/util/validators";
-import { WEIGHT_ID } from "./const-event";
+import { VALIDATOR_REQUIRE, VALIDATOR_REQUIRE_LENGTH } from "../validators";
+import { WEIGHT_ID } from "../const-event";
 
 const nationalityCandidate = [
   "국적선택",

@@ -4,9 +4,9 @@ import {
   TABLE_COLUMNS_REGIST_SECOND,
   TABLE_COLUMNS_REGIST_PERIOD2_SECOND,
   TABLE_COLUMNS_CHECK_SECOND,
-} from "../../../shared/util/regist-columns";
+} from "../../../shared/util/regist/regist-columns";
 // import { EVENT_ID } from "../../../shared/util/const-event";
-import { checkValiditySecond } from "../../../shared/util/regist-validators";
+import { checkValiditySecond } from "../../../shared/util/regist/regist-validators";
 
 import RegistFormat from "../components/RegistFormat";
 

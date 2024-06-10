@@ -1,0 +1,16 @@
+.docu-submit {
+  margin: 24px;
+  /* margin: 24px auto; */
+  /* width: fit-content; */
+
+  .docu-submit-title {
+    /* margin-left: 10px; */
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+
+  .docu-submit-noti {
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+}

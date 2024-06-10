@@ -4,9 +4,9 @@ import {
   TABLE_COLUMNS_REGIST_VOLUNTEER,
   TABLE_COLUMNS_REGIST_PERIOD2_VOLUNTEER,
   TABLE_COLUMNS_CHECK_VOLUNTEER,
-} from "../../../shared/util/regist-columns";
+} from "../../../shared/util/regist/regist-columns";
 // import { EVENT_ID } from "../../../shared/util/const-event";
-import { checkValidityVolunteer } from "../../../shared/util/regist-validators";
+import { checkValidityVolunteer } from "../../../shared/util/regist/regist-validators";
 
 import RegistFormat from "../components/RegistFormat";
 

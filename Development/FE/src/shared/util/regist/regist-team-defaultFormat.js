@@ -1,4 +1,4 @@
-import { EVENT_ID } from "./const-event";
+import { EVENT_ID } from "../const-event";
 
 const participantFormat = (index, sex) => ({
   indexInTeam: index,

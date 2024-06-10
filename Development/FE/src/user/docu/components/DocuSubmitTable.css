@@ -1,0 +1,60 @@
+table.docu-table {
+  border-spacing: 0px;
+  border-style: none;
+  border-collapse: collapse;
+  width: fit-content;
+  /* width: 100%; */
+  box-shadow: 1px 1px 2px #9f9e9e;
+}
+
+.docu-table th,
+td {
+  border: 1px solid rgba(224, 224, 224, 1);
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 200;
+}
+
+.docu-table th {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 400;
+  background-color: white;
+}
+
+.docu-table tbody td:first-child {
+  text-align: center;
+}
+
+.docu-table tbody tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+
+.docu-table tbody tr:nth-child(even) {
+  background-color: white;
+}
+
+.docu-table .div-flex {
+  display: flex;
+}
+
+.docu-table .table-column__hide-btn {
+  background-color: transparent;
+  border: 1px solid dimgray;
+  border-radius: 3px;
+  font-size: 12px;
+  color: dimgray;
+  cursor: pointer;
+}
+
+.docu-table .table-column__hide-btn:hover {
+  color: black;
+}
+
+.docu-table .file-status {
+  text-align: center;
+}
+
+.docu-table .file-emphasize {
+  font-weight: 500;
+}

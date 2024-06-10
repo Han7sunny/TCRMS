@@ -6,9 +6,9 @@ import {
   TABLE_COLUMNS_REGIST_TEAM_FORM,
   TABLE_COLUMNS_REGIST_PERIOD2_TEAM_FORM,
   TABLE_COLUMNS_REGIST_PERIOD2_TEAM_SPARRING,
-} from "../../../shared/util/regist-columns";
+} from "../../../shared/util/regist/regist-columns";
 import { EVENT_ID, WEIGHT_ID } from "../../../shared/util/const-event";
-import { checkValidityTeam } from "../../../shared/util/regist-validators";
+import { checkValidityTeam } from "../../../shared/util/regist/regist-validators";
 import { useRegist } from "../../../shared/hooks/regist-hook";
 import { HttpContext } from "../../../shared/context/http-context";
 import { AuthContext } from "../../../shared/context/auth-context";
