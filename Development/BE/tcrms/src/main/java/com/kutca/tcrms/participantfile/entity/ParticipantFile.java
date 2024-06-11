@@ -2,13 +2,11 @@ package com.kutca.tcrms.participantfile.entity;
 
 import com.kutca.tcrms.participant.entity.Participant;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

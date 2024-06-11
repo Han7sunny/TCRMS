@@ -1,21 +1,29 @@
 package com.kutca.tcrms.file.service;
 
 import com.kutca.tcrms.common.dto.response.ResponseDto;
+import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.file.controller.dto.request.FilesRequestDto;
 import com.kutca.tcrms.file.controller.dto.response.FileResponseDto;
 import com.kutca.tcrms.file.controller.dto.response.FilesResponseDto;
 import com.kutca.tcrms.file.entity.File;
 import com.kutca.tcrms.file.repository.FileRepository;
 import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantFileResponseDto;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
 import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import com.kutca.tcrms.participantfile.entity.ParticipantFile;
 import com.kutca.tcrms.participantfile.entity.ParticipantFileRepository;
+import com.kutca.tcrms.user.entity.User;
+import com.kutca.tcrms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +37,61 @@ public class FileService {
     private final ParticipantApplicationRepository participantApplicationRepository;
     private final FileRepository fileRepository;
     private final ParticipantFileRepository participantFileRepository;
+
+    public ResponseDto<?> getFileInfoList (Long userId){
+
+        List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(userId);
+        if(findParticipantList.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(true)
+                    .message("신청 내역이 존재하지 않습니다.")
+                    .build();
+        }
+
+        List<ParticipantFileResponseDto> participants = findParticipantList.stream().map(participant -> {
+
+            ParticipantFile participantFile = participantFileRepository.findByParticipant_ParticipantId(participant.getParticipantId()).get();
+            List<File> files = fileRepository.findAllByParticipant_ParticipantId(participant.getParticipantId());
+
+            ParticipantFileResponseDto participantFileResponseDto = ParticipantFileResponseDto.builder()
+                    .participantId(participant.getParticipantId())
+                    .name(participant.getName())
+                    .isForeigner(participant.getIsForeigner())
+                    .identityNumber(participant.getIdentityNumber())
+                    .fileInfos(files.stream().map(FileResponseDto::fromEntity).collect(Collectors.toList()))
+                    .isAllFileConfirmed(participantFile.getIsAllFileCompleted())
+                    .build();
+
+            if (participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), 11L)) {
+                participantFileResponseDto.setTypes(List.of("자원봉사자"));
+                return participantFileResponseDto;
+            }
+
+            List<String> events = participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(), 1L, 9L).stream().map(participantApplication -> participantApplication.getEvent().getEventName()).collect(Collectors.toList());
+            List<String> types = new ArrayList<>();
+
+            if (!events.isEmpty()) {
+                types.add("선수");
+            }
+
+            if (participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), 10L)) {
+                types.add("세컨");
+            }
+
+            participantFileResponseDto.setTypes(types);
+            participantFileResponseDto.setEvents(events);
+
+            return participantFileResponseDto;
+
+        }).toList();
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(ParticipantsResponseDto.builder()
+                        .participants(new ArrayList<>(participants))
+                        .build())
+                .build();
+    }
 
     public ResponseDto<?> uploadFileInfo(Long participantId, List<String> filePaths, FilesRequestDto fileInfos){
 
@@ -74,7 +137,7 @@ public class FileService {
             requiredFileCount += 4;
         }
 
-        if (requiredFileCount == submittedFileCount) {   //  이게 아니라 기존에 저장되어있고 이번에 새로 3개만 추가할 경우도 따져줘야함
+        if (requiredFileCount == submittedFileCount) {
             participantFile.updateIsAllFileCompleted(true);
         }
 

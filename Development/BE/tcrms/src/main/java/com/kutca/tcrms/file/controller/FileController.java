@@ -24,6 +24,17 @@ public class FileController {
 
     private final FileService fileService;
 
+    @Operation(summary = "참가자 정보 및 관련 서류 제출 확인 여부")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    public ResponseEntity<?> getFileInfoList(@RequestParam Long userId){
+        try {
+            return new ResponseEntity<>(fileService.getFileInfoList(userId), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Operation(summary = "선수별 서류 제출")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     @PostMapping("/api/user/file")
