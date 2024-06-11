@@ -71,14 +71,4 @@ public class IndividualParticipantRequestDto {
         private List<Long> participantApplicationIds;
     }
 
-
-    @Getter
-    @Builder
-    public static class File {
-
-        private Long participantId;
-
-        private FilesRequestDto fileInfos;
-    }
-
 }

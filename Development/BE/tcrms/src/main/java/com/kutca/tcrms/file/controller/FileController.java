@@ -1,6 +1,7 @@
 package com.kutca.tcrms.file.controller;
 
 import com.kutca.tcrms.common.dto.response.ResponseDto;
+import com.kutca.tcrms.file.controller.dto.request.FilesRequestDto;
 import com.kutca.tcrms.file.service.FileService;
 import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,11 +27,11 @@ public class FileController {
     @Operation(summary = "선수별 서류 제출")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     @PostMapping("/api/user/file")
-    public ResponseEntity<?> uploadFiles(@RequestParam MultipartFile[] files, @RequestParam Long userId, @RequestParam IndividualParticipantRequestDto.File participant){
+    public ResponseEntity<?> uploadFiles(@RequestParam MultipartFile[] files, @RequestParam Long participantId, @RequestParam FilesRequestDto fileInfos){
         try {
 //            List<String> filePath = s3Service.uploadFileToS3(files);
-            List<String> filePath = null;
-            return new ResponseEntity<>(fileService.uploadFileInfo(filePath, participant), HttpStatus.OK);
+            List<String> filePaths = null;
+            return new ResponseEntity<>(fileService.uploadFileInfo(participantId, filePaths, fileInfos), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
