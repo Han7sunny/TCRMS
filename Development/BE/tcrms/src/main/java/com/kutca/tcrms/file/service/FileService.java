@@ -38,6 +38,35 @@ public class FileService {
     private final FileRepository fileRepository;
     private final ParticipantFileRepository participantFileRepository;
 
+    public ResponseDto<?> isFileCompleted(Long userId){
+
+        List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(userId);
+        if(findParticipantList.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("신청 내역이 존재하지 않습니다.")
+                    .build();
+        }
+
+        Boolean allFilesCompleted = null;
+//                findParticipantList.stream()
+//                .map(participant -> participantFileRepository.findByParticipant_ParticipantId(participant.getParticipantId()))
+//                .allMatch(ParticipantFile::getIsAllFileCompleted);
+
+        if(!allFilesCompleted){
+            return ResponseDto.builder()
+                    .isSuccess(true)
+                    .payload(false)
+                    .build();
+        }
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(true)
+                .build();
+
+    }
+
     public ResponseDto<?> getFileInfoList (Long userId){
 
         List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(userId);

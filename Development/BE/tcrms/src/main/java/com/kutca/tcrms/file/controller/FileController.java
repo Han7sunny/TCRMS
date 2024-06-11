@@ -27,6 +27,18 @@ public class FileController {
 
     private final FileService fileService;
 
+    @Operation(summary = "입금 및 최종 제출 메뉴 접근 가능 여부", description = "모든 서류 제출이 완료되었는지 확인")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @GetMapping("/api/user/is-file-completed")
+    public ResponseEntity<?> isFileCompleted(@RequestParam Long userId){
+        try {
+            return new ResponseEntity<>(fileService.isFileCompleted(userId), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Operation(summary = "참가자 정보 및 관련 서류 제출 확인 여부")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     @GetMapping("/api/user/file")
