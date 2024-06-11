@@ -68,35 +68,32 @@ public class TeamParticipantService {
             findParticipantApplicationList.forEach(pa -> participantApplicationByEventTeamNumber.computeIfAbsent(pa.getEventTeamNumber(), k -> new ArrayList<>()).add(pa));
         });
 
-        List<TeamParticipantResponseDto> teams = participantApplicationByEventTeamNumber.entrySet().stream()
-                .map(entry -> {
-                    Integer eventTeamNumber = entry.getKey();
-                    List<ParticipantApplication> participantApplicationList = entry.getValue();
-                    Long eventId = participantApplicationList.get(0).getEvent().getEventId();
+        List<TeamParticipantResponseDto> teams = new ArrayList<>();
 
-                    List<TeamMemberParticipantResponseDto> teamMembers = participantApplicationList.stream()
-                            .map(pa -> {
-                                WeightClass weightClass = pa.getParticipant().getWeightClass();
-                                return TeamMemberParticipantResponseDto.builder()
-                                        .participantApplicationId(pa.getParticipantApplicationId())
-                                        .participantId(pa.getParticipant().getParticipantId())
-                                        .weightClassId(weightClass == null ? null : weightClass.getWeightClassId())
-                                        .name(pa.getParticipant().getName())
-                                        .identityNumber(pa.getParticipant().getIdentityNumber())
-                                        .gender(pa.getParticipant().getGender())
-                                        .isForeigner(pa.getParticipant().getIsForeigner())
-                                        .nationality(pa.getParticipant().getNationality())
-                                        .phoneNumber(pa.getParticipant().getPhoneNumber())
-                                        .indexInTeam(pa.getIndexInTeam())
-                                        .build();
-                            }).collect(Collectors.toList());
+        participantApplicationByEventTeamNumber.forEach((eventTeamNumber, participantApplicationList) -> {
+            teams.add(TeamParticipantResponseDto.builder()
+                    .eventTeamNumber(eventTeamNumber)
+                    .eventId(participantApplicationList.get(0).getEvent().getEventId())
+                    .teamMembers(participantApplicationList.stream().map(pa -> {
+                        WeightClass weightClass = pa.getParticipant().getWeightClass();
+                        return TeamMemberParticipantResponseDto.builder()
+                                .participantApplicationId(pa.getParticipantApplicationId())
+                                .participantId(pa.getParticipant().getParticipantId())
+                                .weightClassId(weightClass == null ? null : weightClass.getWeightClassId())
+                                .name(pa.getParticipant().getName())
+                                .identityNumber(pa.getParticipant().getIdentityNumber())
+                                .gender(pa.getParticipant().getGender())
+                                .isForeigner(pa.getParticipant().getIsForeigner())
+                                .nationality(pa.getParticipant().getNationality())
+                                .phoneNumber(pa.getParticipant().getPhoneNumber())
+                                .indexInTeam(pa.getIndexInTeam())
+                                .build();
+                    })
+                            .collect(Collectors.toList()))
+                    .build()
+            );
 
-                    return TeamParticipantResponseDto.builder()
-                            .eventTeamNumber(eventTeamNumber)
-                            .eventId(eventId)
-                            .teamMembers(teamMembers)
-                            .build();
-                }).collect(Collectors.toList());
+        });
 
         return ResponseDto.builder()
                 .isSuccess(true)
@@ -129,9 +126,9 @@ public class TeamParticipantService {
             int eventTeamNumber = participantApplicationRepository.findTopByEvent_EventId(event.getEventId()).map(pa -> pa.getEventTeamNumber() + 1).orElse(1);
             team.getTeamMembers().forEach(teamMember -> {
 
-                Optional<Participant> findParticipant = (teamMember.getIsForeigner() && teamMember.getIdentityName() == null)
+                Optional<Participant> findParticipant = (teamMember.getIsForeigner() && teamMember.getIdentityNumber() == null)
                         ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), teamMember.getName(), teamMember.getPhoneNumber())
-                        : participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), teamMember.getName(), teamMember.getIdentityName());
+                        : participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), teamMember.getName(), teamMember.getIdentityNumber());
 
                 Participant participant = findParticipant.orElseGet(() -> participantRepository.save(
                         Participant.builder()
@@ -156,6 +153,106 @@ public class TeamParticipantService {
                 );
             });
         });
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> modifyTeam(TeamParticipantRequestDto.Modify teamParticipantRequestDto){
+
+        User user = userRepository.findById(teamParticipantRequestDto.getUserId()).get();
+        Event event = eventRepository.findById(teamParticipantRequestDto.getEventId()).get();
+        int eventTeamNumber = teamParticipantRequestDto.getEventTeamNumber();
+
+        List<TeamMemberParticipantResponseDto> teamMembers = teamParticipantRequestDto.getTeamMembers().stream().map(teamMember -> {
+
+            Long participantApplicationId = teamMember.getParticipantApplicationId();
+            WeightClass weightClass = teamMember.getWeightClassId() == null ? null : weightClassRepository.findById(teamMember.getWeightClassId()).get();  //  품새의 경우 체급 정보 없음
+
+            Optional<Participant> findParticipant = (teamMember.getIsForeigner() && teamMember.getIdentityNumber() == null)
+                    ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), teamMember.getName(), teamMember.getPhoneNumber())
+                    : participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), teamMember.getName(), teamMember.getIdentityNumber());
+
+            Participant participant = findParticipant.orElseGet(() -> participantRepository.save(
+                    Participant.builder()
+                            .name(teamMember.getName())
+                            .identityNumber(teamMember.getIdentityNumber())
+                            .gender(teamMember.getGender())
+                            .universityName(user.getUniversityName())
+                            .isForeigner(teamMember.getIsForeigner())
+                            .nationality(teamMember.getNationality())
+                            .user(user)
+                            .weightClass(weightClass)
+                            .build()
+            ));
+
+            if(findParticipant.isPresent()){
+                if(teamMember.getIsWeightClassChange()) {
+                    participant.updateWeightClass(weightClass);
+                }
+
+                if(teamMember.getIsParticipantChange()){
+                    participant.updateTeamMember(teamMember);
+                }
+            }
+
+            if(!participantApplicationRepository.existsByEventTeamNumberAndIndexInTeam(eventTeamNumber, teamMember.getIndexInTeam())){
+                participantApplicationId = participantApplicationRepository.save(
+                        ParticipantApplication.builder()
+                                .participant(participant)
+                                .event(event)
+                                .eventTeamNumber(eventTeamNumber)
+                                .is2ndCancel(false)
+                                .is2ndChange(true)
+                                .indexInTeam(teamMember.getIndexInTeam())
+                        .build()).getParticipantApplicationId();
+            }
+
+            return TeamMemberParticipantResponseDto.builder()
+                    .participantId(participant.getParticipantId())
+                    .participantApplicationId(participantApplicationId)
+                    .weightClassId(weightClass == null ? null : weightClass.getWeightClassId())
+                    .name(participant.getName())
+                    .identityNumber(participant.getIdentityNumber())
+                    .gender(participant.getGender())
+                    .isForeigner(participant.getIsForeigner())
+                    .nationality(participant.getNationality())
+                    .phoneNumber(participant.getPhoneNumber())
+                    .indexInTeam(teamMember.getIndexInTeam())
+                    .build();
+
+        }).collect(Collectors.toList());
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(
+                        TeamParticipantResponseDto.builder()
+                                .eventTeamNumber(eventTeamNumber)
+                                .eventId(event.getEventId())
+                                .teamMembers(teamMembers)
+                                .build()
+                )
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> deleteTeam(TeamParticipantRequestDto.Delete teamParticipantRequestDto){
+
+        Long eventId = teamParticipantRequestDto.getEventId();
+
+        teamParticipantRequestDto.getParticipantApplicationIds().forEach(participantApplicationRepository::deleteById);
+
+        teamParticipantRequestDto.getParticipantIds().forEach(participantId -> {
+            if(!participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participantId, eventId)){
+                participantRepository.deleteById(participantId);
+                //  participant_file
+                //  file
+            }
+        });
+
+        //  학교별 신청 종목 팀 데이터 변경
 
         return ResponseDto.builder()
                 .isSuccess(true)

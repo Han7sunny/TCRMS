@@ -2,7 +2,9 @@ package com.kutca.tcrms.participant.entity;
 
 import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.request.SecondParticipantRequestDto;
+import com.kutca.tcrms.participant.controller.dto.request.TeamMemberParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.request.VolunteerParticipantRequestDto;
+import com.kutca.tcrms.participant.controller.dto.response.TeamMemberParticipantResponseDto;
 import com.kutca.tcrms.participantfile.entity.ParticipantFile;
 import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.weightclass.entity.WeightClass;
@@ -53,7 +55,18 @@ public class Participant {
         this.weightClass = weightClassId;
         return this;
     }
+
     public Participant updateParticipant(IndividualParticipantRequestDto.Modify participant) {
+        this.name = participant.getName();
+        this.identityNumber = participant.getIdentityNumber();
+        this.gender = participant.getGender();
+        this.isForeigner = participant.getIsForeigner();
+        this.nationality = participant.getNationality();
+        this.phoneNumber = participant.getPhoneNumber();
+        return this;
+    }
+
+    public Participant updateTeamMember(TeamMemberParticipantRequestDto.Modify participant) {
         this.name = participant.getName();
         this.identityNumber = participant.getIdentityNumber();
         this.gender = participant.getGender();

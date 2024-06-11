@@ -1,5 +1,6 @@
 package com.kutca.tcrms.participant.controller.dto.request;
 
+import com.kutca.tcrms.file.controller.dto.request.FilesRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 

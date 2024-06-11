@@ -43,4 +43,27 @@ public class TeamParticipantController {
         }
     }
 
+    @Operation(summary = "단체전 신청 수정")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @PostMapping("/api/user/team")
+    public ResponseEntity<?> modifyTeam(@RequestBody TeamParticipantRequestDto.Modify teamParticipantRequestDto){
+        try {
+            return new ResponseEntity<>(teamParticipantService.modifyTeam(teamParticipantRequestDto), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "단체전 신청 삭제")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @DeleteMapping("/api/user/team")
+    public ResponseEntity<?> deleteTeam(@RequestBody TeamParticipantRequestDto.Delete teamParticipantRequestDto){
+        try {
+            return new ResponseEntity<>(teamParticipantService.deleteTeam(teamParticipantRequestDto), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
