@@ -1,5 +1,6 @@
 package com.kutca.tcrms.participant.controller.dto.request;
 
+import com.kutca.tcrms.file.controller.dto.request.FilesRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -68,6 +69,16 @@ public class IndividualParticipantRequestDto {
         private Long participantId;
 
         private List<Long> participantApplicationIds;
+    }
+
+
+    @Getter
+    @Builder
+    public static class File {
+
+        private Long participantId;
+
+        private FilesRequestDto fileInfos;
     }
 
 }
