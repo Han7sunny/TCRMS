@@ -2,11 +2,13 @@ package com.kutca.tcrms.file.entity;
 
 import com.kutca.tcrms.participantfile.entity.ParticipantFile;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
+@Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class File {
 
@@ -26,4 +28,9 @@ public class File {
     @ManyToOne
     @JoinColumn(name = "participant_file_id")
     private ParticipantFile participantFile;
+
+    public File updateFilePath(String filePath){
+        this.filePath = filePath;
+        return this;
+    }
 }

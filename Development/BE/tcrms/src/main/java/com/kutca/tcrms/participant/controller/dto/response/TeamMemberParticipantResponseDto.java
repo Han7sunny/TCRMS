@@ -1,7 +1,9 @@
 package com.kutca.tcrms.participant.controller.dto.response;
 
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Builder
 public class TeamMemberParticipantResponseDto {
 
