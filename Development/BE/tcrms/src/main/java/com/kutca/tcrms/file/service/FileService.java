@@ -51,7 +51,7 @@ public class FileService {
         boolean allFilesCompleted = true;
 
         for (Participant participant : findParticipantList){
-            if(!participantFileRepository.findByParticipant_ParticipantId(participant.getParticipantId()).get().getIsAllFileCompleted()){
+            if(participantFileRepository.existsByParticipant_ParticipantIdAndIsAllFileCompletedFalse(participant.getParticipantId())){
                 allFilesCompleted = false;
                 break;
             }
@@ -59,7 +59,9 @@ public class FileService {
 
         return ResponseDto.builder()
                 .isSuccess(true)
-                .payload(allFilesCompleted)
+                .payload(FileResponseDto.Status.builder()
+                        .isFileCompleted(allFilesCompleted)
+                        .build())
                 .build();
 
     }
@@ -84,7 +86,7 @@ public class FileService {
                     .name(participant.getName())
                     .isForeigner(participant.getIsForeigner())
                     .identityNumber(participant.getIdentityNumber())
-                    .fileInfos(files.stream().map(FileResponseDto::fromEntity).collect(Collectors.toList()))
+                    .fileInfos(files.stream().map(FileResponseDto.Info::fromEntity).collect(Collectors.toList()))
                     .isAllFileConfirmed(participantFile.getIsAllFileCompleted())
                     .build();
 
@@ -136,7 +138,7 @@ public class FileService {
                                 .isAllFileCompleted(false)
                         .build()));
 
-        List<FileResponseDto> filesResponseDto = IntStream.range(0, filePaths.size()).mapToObj(idx ->{
+        List<FileResponseDto.Info> filesResponseDto = IntStream.range(0, filePaths.size()).mapToObj(idx ->{
             Long fileId = fileInfos.getFileInfos().get(idx).getFileId();
             String fileName = fileInfos.getFileInfos().get(idx).getFileName();
             String filePath = filePaths.get(idx);
@@ -149,7 +151,7 @@ public class FileService {
                             .participantFile(participantFile)
                     .build());
 
-            return FileResponseDto.builder()
+            return FileResponseDto.Info.builder()
                     .fileId(savedFile.getFileId())
                     .fileName(savedFile.getFileName())
                     .build();
