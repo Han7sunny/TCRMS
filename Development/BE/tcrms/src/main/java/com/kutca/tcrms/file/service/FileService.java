@@ -48,21 +48,18 @@ public class FileService {
                     .build();
         }
 
-        Boolean allFilesCompleted = null;
-//                findParticipantList.stream()
-//                .map(participant -> participantFileRepository.findByParticipant_ParticipantId(participant.getParticipantId()))
-//                .allMatch(ParticipantFile::getIsAllFileCompleted);
+        boolean allFilesCompleted = true;
 
-        if(!allFilesCompleted){
-            return ResponseDto.builder()
-                    .isSuccess(true)
-                    .payload(false)
-                    .build();
+        for (Participant participant : findParticipantList){
+            if(!participantFileRepository.findByParticipant_ParticipantId(participant.getParticipantId()).get().getIsAllFileCompleted()){
+                allFilesCompleted = false;
+                break;
+            }
         }
 
         return ResponseDto.builder()
                 .isSuccess(true)
-                .payload(true)
+                .payload(allFilesCompleted)
                 .build();
 
     }
