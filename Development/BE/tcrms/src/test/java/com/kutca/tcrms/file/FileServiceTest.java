@@ -1,10 +1,16 @@
 package com.kutca.tcrms.file;
 
 import com.kutca.tcrms.common.dto.response.ResponseDto;
+import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.file.controller.dto.response.FileResponseDto;
+import com.kutca.tcrms.file.entity.File;
+import com.kutca.tcrms.file.repository.FileRepository;
 import com.kutca.tcrms.file.service.FileService;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantFileResponseDto;
+import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
+import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
 import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import com.kutca.tcrms.participantfile.entity.ParticipantFile;
 import com.kutca.tcrms.participantfile.entity.ParticipantFileRepository;
@@ -18,9 +24,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 
@@ -37,11 +44,16 @@ public class FileServiceTest {
     private ParticipantApplicationRepository participantApplicationRepository;
 
     @Mock
+    private FileRepository fileRepository;
+
+    @Mock
     private ParticipantFileRepository participantFileRepository;
 
     private User user;
 
     private Participant findParticipant1, findParticipant2, findParticipant3;
+
+    private ParticipantApplication findParticipantApplication1, findParticipantApplication2, findParticipantApplication3;
 
     private ParticipantFile findParticipantFile1, findParticipantFile2, findParticipantFile3;
 
@@ -61,6 +73,28 @@ public class FileServiceTest {
 //                .weightClass(weightClassMap.get(1L))
                 .build();
 
+        findParticipantFile1 = ParticipantFile.builder()
+                .participantFileId(1L)
+                .isAllFileCompleted(false)
+                .build();
+
+        Event event1 = Event.builder()
+                .eventId(1L)
+                .eventName("개인전 여자 겨루기")
+                .build();
+
+        findParticipantApplication1 = ParticipantApplication.builder()
+                .participant(findParticipant1)
+                .event(event1)
+                .build();
+
+        Event event10 = Event.builder().eventId(10L).eventName("세컨").build();
+
+        findParticipantApplication2 = ParticipantApplication.builder()
+                .participant(findParticipant1)
+                .event(event10)
+                .build();
+
         findParticipant2 = Participant.builder()
                 .participantId(2L)
                 .name("Jennifer")
@@ -69,6 +103,18 @@ public class FileServiceTest {
                 .nationality("미국")
                 .phoneNumber("kakao@gmail.com")
 //                .weightClass(weightClassMap.get(2L))
+                .build();
+
+        findParticipantFile2 = ParticipantFile.builder()
+                .participantFileId(2L)
+                .isAllFileCompleted(true)
+                .build();
+
+        Event event11 = Event.builder().eventId(11L).eventName("자원봉사자").build();
+
+        findParticipantApplication3 = ParticipantApplication.builder()
+                .participant(findParticipant2)
+                .event(event11)
                 .build();
 
         findParticipant3 = Participant.builder()
@@ -156,6 +202,69 @@ public class FileServiceTest {
         assertTrue(responseDto.getIsSuccess());
         assertFalse(((FileResponseDto.Status)responseDto.getPayload()).isFileCompleted());
 
+    }
+
+    @Test
+    @DisplayName("참가자 및 관련 서류 정보")
+    void getFileInfoListSuccess(){
+
+        //  given
+        File findFile1 = File.builder()
+                .fileId(1L)
+                .participantFile(findParticipantFile1)
+                .build();
+
+        File findFile2 = File.builder()
+                .fileId(2L)
+                .participantFile(findParticipantFile1)
+                .build();
+
+        File findFile3 = File.builder()
+                .fileId(3L)
+                .participantFile(findParticipantFile1)
+                .build();
+
+//        File findFile4 = File.builder()
+//                .fileId(4L)
+//                .participantFile(findParticipantFile1)
+//                .build();
+
+        File findFile5 = File.builder()
+                .fileId(5L)
+                .participantFile(findParticipantFile2)
+                .build();
+
+
+        given(participantRepository.findAllByUser_UserId(user.getUserId())).willReturn(Arrays.asList(findParticipant1, findParticipant2));
+        given(participantFileRepository.findByParticipant_ParticipantId(findParticipant1.getParticipantId())).willReturn(Optional.of(findParticipantFile1));
+        given(fileRepository.findAllByParticipant_ParticipantId(findParticipant1.getParticipantId())).willReturn(Arrays.asList(findFile1, findFile2, findFile3));
+        given(participantFileRepository.findByParticipant_ParticipantId(findParticipant2.getParticipantId())).willReturn(Optional.of(findParticipantFile2));
+        given(fileRepository.findAllByParticipant_ParticipantId(findParticipant2.getParticipantId())).willReturn(Arrays.asList(findFile5));
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(findParticipant1.getParticipantId(), 1L, 9L)).willReturn(Arrays.asList(findParticipantApplication1, findParticipantApplication2));
+        given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(findParticipant1.getParticipantId(), 11L)).willReturn(false);
+        given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(findParticipant1.getParticipantId(), 10L)).willReturn(true);
+        given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(findParticipant2.getParticipantId(), 11L)).willReturn(true);
+
+        //  when
+        ResponseDto<?> responseDto = fileService.getFileInfoList(user.getUserId());
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+
+        List<ParticipantFileResponseDto> participants = ((ParticipantsResponseDto)responseDto.getPayload()).getParticipants();
+
+        assertEquals(participants.get(0).getTypes().size(), 2);
+        assertEquals(participants.get(0).getEvents().size(), 2);
+        assertEquals(participants.get(0).getTypes().get(0), "선수");
+        assertEquals(participants.get(0).getTypes().get(1), "세컨");
+        assertNotEquals(participants.get(0).getFileInfos().size(), 4);
+        assertFalse(participants.get(0).getIsAllFileConfirmed());
+
+        assertTrue(participants.get(1).getIsForeigner());
+        assertEquals(participants.get(1).getTypes().size(), 1);
+        assertEquals(participants.get(1).getTypes().get(0), "자원봉사자");
+        assertEquals(participants.get(1).getFileInfos().size(), 1);
+        assertTrue(participants.get(1).getIsAllFileConfirmed());
     }
 
 }
