@@ -16,6 +16,8 @@ public class UniversityApplication {
 
     private int teamCount;
 
+    private String period;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
