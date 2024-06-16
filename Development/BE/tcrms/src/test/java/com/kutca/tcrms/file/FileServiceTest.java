@@ -2,7 +2,10 @@ package com.kutca.tcrms.file;
 
 import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.event.entity.Event;
+import com.kutca.tcrms.file.controller.dto.request.FileRequestDto;
+import com.kutca.tcrms.file.controller.dto.request.FilesRequestDto;
 import com.kutca.tcrms.file.controller.dto.response.FileResponseDto;
+import com.kutca.tcrms.file.controller.dto.response.FilesResponseDto;
 import com.kutca.tcrms.file.entity.File;
 import com.kutca.tcrms.file.repository.FileRepository;
 import com.kutca.tcrms.file.service.FileService;
@@ -28,7 +31,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -265,6 +271,72 @@ public class FileServiceTest {
         assertEquals(participants.get(1).getTypes().get(0), "자원봉사자");
         assertEquals(participants.get(1).getFileInfos().size(), 1);
         assertTrue(participants.get(1).getIsAllFileConfirmed());
+    }
+
+    @Test
+    @DisplayName("선수별 서류 처음 + 재제출 (모든 서류 제출 X) 성공")
+    void uploadFileInfoWithNotAllFileSuccess(){
+
+        //  given
+        List<String> filePaths = Arrays.asList("증명사진 저장 경로", "서약서 저장 경로 변경됨", "학적부 저장 경로");
+        FilesRequestDto fileInfos = FilesRequestDto.builder()
+                .fileInfos(Arrays.asList(
+                        FileRequestDto.builder()
+//                                .fileId()
+                                .fileName("증명사진")
+                        .build(),
+                        FileRequestDto.builder()
+                                .fileId(1L)
+                                .fileName("서약서")
+                                .build(),
+                        FileRequestDto.builder()
+//                                .fileId()
+                                .fileName("학적부")
+                                .build()
+                ))
+                .build();
+
+        File savedFile1 = File.builder()
+                .fileId(2L)
+                .participantFile(findParticipantFile1)
+                .fileName(fileInfos.getFileInfos().get(0).getFileName())
+                .filePath(filePaths.get(0))
+                .build();
+
+        File findFile2 = File.builder()
+                .fileId(1L)
+                .participantFile(findParticipantFile1)
+                .fileName(fileInfos.getFileInfos().get(1).getFileName())
+                .filePath("기존 서약서 저장 경로")
+                .build();
+
+        File savedFile2 = findFile2.updateFilePath(fileInfos.getFileInfos().get(1).getFileName());
+
+        File savedFile3 = File.builder()
+                .fileId(3L)
+                .participantFile(findParticipantFile1)
+                .fileName(fileInfos.getFileInfos().get(2).getFileName())
+                .filePath(filePaths.get(2))
+                .build();
+
+        given(participantRepository.findById(findParticipant1.getParticipantId())).willReturn(Optional.of(findParticipant1));
+        given(participantFileRepository.findByParticipant_ParticipantId(findParticipant1.getParticipantId())).willReturn(Optional.of(findParticipantFile1));
+        given(fileRepository.save(any(File.class))).willReturn(savedFile1);
+        given(fileRepository.findById(findFile2.getFileId())).willReturn(Optional.of(findFile2));
+        given(fileRepository.countAllByParticipant_ParticipantId(findParticipant1.getParticipantId())).willReturn(fileInfos.getFileInfos().size());
+        given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventIdBetween(findParticipant1.getParticipantId(), 1L, 10L)).willReturn(true);
+
+        //  when
+        ResponseDto<?> responseDto = fileService.uploadFileInfo(findParticipant1.getParticipantId(), filePaths, fileInfos);
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+
+        List<FileResponseDto.Info> fileResponseList = ((FilesResponseDto)responseDto.getPayload()).getFileInfos();
+        assertEquals(fileResponseList.get(0).getFileId(), savedFile1.getFileId());
+
+        verify(participantFileRepository, times(0)).save(any(ParticipantFile.class));
+        verify(fileRepository, times(1)).findById(fileInfos.getFileInfos().get(1).getFileId());
     }
 
 }

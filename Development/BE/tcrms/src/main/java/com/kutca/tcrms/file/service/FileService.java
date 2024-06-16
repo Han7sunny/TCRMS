@@ -20,6 +20,7 @@ import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class FileService {
     private final FileRepository fileRepository;
     private final ParticipantFileRepository participantFileRepository;
 
+    @Transactional(readOnly = true)
     public ResponseDto<?> isFileCompleted(Long userId){
 
         List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(userId);
@@ -66,6 +68,7 @@ public class FileService {
 
     }
 
+    @Transactional(readOnly = true)
     public ResponseDto<?> getFileInfoList (Long userId){
 
         List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(userId);
@@ -121,6 +124,7 @@ public class FileService {
                 .build();
     }
 
+    @Transactional
     public ResponseDto<?> uploadFileInfo(Long participantId, List<String> filePaths, FilesRequestDto fileInfos){
 
         Optional<Participant> findParticipant = participantRepository.findById(participantId);
