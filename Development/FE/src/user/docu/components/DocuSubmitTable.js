@@ -4,10 +4,11 @@ import File from "../../../shared/components/TableInputElements/File";
 
 import "./DocuSubmitTable.css";
 
-const DocuSubmitTable = (props) => {
+const DocuSubmitTable = React.memo((props) => {
   const inputField = (colInfo, initVal, rowidx, colidx, key) => {
     switch (colInfo.type) {
       case "text":
+        console.log(initVal);
         return (
           <div
             id={
@@ -228,6 +229,6 @@ const DocuSubmitTable = (props) => {
     </table>
     // </form>
   );
-};
+});
 
 export default DocuSubmitTable;
