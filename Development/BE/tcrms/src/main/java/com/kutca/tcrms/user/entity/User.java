@@ -57,4 +57,10 @@ public class User {
         this.isFirstLogin = false;
         return this;
     }
+
+    public User updatePhoneNumberAndDepositorName(String phoneNumber, String depositorName){
+        this.phoneNumber = phoneNumber;
+        this.depositorName = depositorName;
+        return this;
+    }
 }

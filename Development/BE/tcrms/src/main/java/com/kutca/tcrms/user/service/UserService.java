@@ -4,6 +4,7 @@ import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.common.security.JWTTokenProvider;
 import com.kutca.tcrms.user.controller.dto.request.ChangePwRequestDto;
 import com.kutca.tcrms.user.controller.dto.request.LoginRequestDto;
+import com.kutca.tcrms.user.controller.dto.request.UserRequestDto;
 import com.kutca.tcrms.user.controller.dto.response.LoginResponseDto;
 import com.kutca.tcrms.user.controller.dto.response.UserResponseDto;
 import com.kutca.tcrms.user.entity.User;
@@ -84,5 +85,26 @@ public class UserService {
                                 .depositorName(user.getDepositorName())
                 )
                 .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> updateUserInfo(UserRequestDto.Info userInfoRequestDto){
+
+        Optional<User> findUser = userRepository.findById(userInfoRequestDto.getUserId());
+        if(findUser.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("대표자 정보를 조회할 수 없습니다.")
+                    .build();
+        }
+
+        User user = findUser.get();
+        user.updatePhoneNumberAndDepositorName(userInfoRequestDto.getPhoneNumber(), userInfoRequestDto.getDepositorName());
+        userRepository.save(user);
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .build();
+
     }
 }
