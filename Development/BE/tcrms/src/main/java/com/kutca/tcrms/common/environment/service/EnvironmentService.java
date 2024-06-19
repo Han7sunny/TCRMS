@@ -1,6 +1,8 @@
 package com.kutca.tcrms.common.environment.service;
 
+import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.common.enums.DatePeriod;
+import com.kutca.tcrms.common.environment.controller.dto.response.EnvironmentResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -15,7 +17,18 @@ public class EnvironmentService {
     private final LocalDate competitionPeriodStart = LocalDate.of(2024, 11,1);
     private final LocalDate competitionPeriodEnd = LocalDate.of(2024, 11,5);
 
-    public String getCurrentPeriod(){
+    public ResponseDto<?> getCurrentPeriod(){
+
+        String currentPeriod = calculateCurrentPeriod();
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(EnvironmentResponseDto.Period.builder().period(currentPeriod).build())
+                .build();
+
+    }
+
+    public String calculateCurrentPeriod(){
 
         LocalDate today = LocalDate.now();
 
