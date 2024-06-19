@@ -19,8 +19,10 @@ public class AccountService {
     private final SecondPeriodRepository secondPeriodRepository;
 
     @Transactional(readOnly = true)
-    public ResponseDto<?> getDepositAccountInfo(Long userId){
+    public ResponseDto<?> getDepositAccountInfo(){
 
+        //  관리자 userId
+        Long userId = null;
         Optional<SecondPeriod> findSecondPeriod = secondPeriodRepository.findByUser_UserId(userId);
         if(findSecondPeriod.isEmpty()){
             return ResponseDto.builder()

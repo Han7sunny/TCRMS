@@ -42,9 +42,9 @@ public class FinalSubmitController {
     @Operation(summary = "입금 정보 조회")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     @GetMapping("/api/user/final-submit/bank-info")
-    public ResponseEntity<?> getDepositAccountInfo(@RequestParam Long userId){
+    public ResponseEntity<?> getDepositAccountInfo(){
         try {
-            return new ResponseEntity<>(accountService.getDepositAccountInfo(userId), HttpStatus.OK);
+            return new ResponseEntity<>(accountService.getDepositAccountInfo(), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
