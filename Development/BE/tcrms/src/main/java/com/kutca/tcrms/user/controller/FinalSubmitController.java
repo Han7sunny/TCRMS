@@ -38,6 +38,30 @@ public class FinalSubmitController {
         }
     }
 
+    @Operation(summary = "대표자 정보 조회")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @GetMapping("/api/user/final-submit/user-info")
+    public ResponseEntity<?> getUserInfo(@RequestParam Long userId){
+        try {
+            return new ResponseEntity<>(userService.getUserInfo(userId), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "대표자 정보 등록", description = "대표자의 연락처, 입금자명 저장")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @PostMapping("/api/user/final-submit/user-info")
+    public ResponseEntity<?> updateUserInfo(@RequestBody UserRequestDto.Info userInfoRequestDto){
+        try {
+            return new ResponseEntity<>(userService.updateUserInfo(userInfoRequestDto), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Operation(summary = "입금 정보 조회")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     @GetMapping("/api/user/final-submit/bank-info")
@@ -65,21 +89,9 @@ public class FinalSubmitController {
     @Operation(summary = "대표자 정보 조회")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     @GetMapping("/api/user/after-final-submit/user-info")
-    public ResponseEntity<?> getUserInfo(@RequestParam Long userId){
+    public ResponseEntity<?> getUserInfoWithDepositInfo(@RequestParam Long userId){
         try {
             return new ResponseEntity<>(userService.getUserInfo(userId), HttpStatus.OK);
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Operation(summary = "대표자 정보 갱신", description = "대표자의 연락처, 입금자명 저장")
-    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-    @PostMapping("/api/user/after-final-submit/user-info")
-    public ResponseEntity<?> updateUserInfo(@RequestBody UserRequestDto.Info userInfoRequestDto){
-        try {
-            return new ResponseEntity<>(userService.updateUserInfo(userInfoRequestDto), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
