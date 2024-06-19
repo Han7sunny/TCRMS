@@ -14,4 +14,13 @@ public class ParticipantApplicationResponseDto {
         private int participantFee;
 
     }
+
+    @Builder
+    public static class SecondPeriod extends firstPeriod {
+
+        private int cancelParticipantCount;
+
+        private int refundParticipantFee;
+
+    }
 }
