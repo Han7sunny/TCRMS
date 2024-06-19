@@ -4,6 +4,7 @@ import com.kutca.tcrms.account.service.AccountService;
 import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.participantapplication.service.ParticipantApplicationService;
 import com.kutca.tcrms.universityapplication.service.UniversityApplicationService;
+import com.kutca.tcrms.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "FinalSubmitController")
 public class FinalSubmitController {
 
+    private final UserService userService;
     private final AccountService accountService;
     private final UniversityApplicationService universityApplicationService;
     private final ParticipantApplicationService participantApplicationService;
@@ -55,6 +57,18 @@ public class FinalSubmitController {
     public ResponseEntity<?> isFinalSubmitConfirmed(@RequestParam Long userId){
         try {
             return new ResponseEntity<>(universityApplicationService.isFinalSubmitConfirmed(userId), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "대표자 정보 조회")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @GetMapping("/api/user/after-final-submit/user-info")
+    public ResponseEntity<?> getUserInfo(@RequestParam Long userId){
+        try {
+            return new ResponseEntity<>(userService.getUserInfo(userId), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
