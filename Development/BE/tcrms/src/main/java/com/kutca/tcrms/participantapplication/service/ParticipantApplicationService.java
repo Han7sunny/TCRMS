@@ -14,6 +14,7 @@ import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
 import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import com.kutca.tcrms.secondperiod.entity.SecondPeriod;
 import com.kutca.tcrms.secondperiod.repository.SecondPeriodRepository;
+import com.kutca.tcrms.universityapplication.controller.dto.response.UniversityApplicationResponseDto;
 import com.kutca.tcrms.universityapplication.entity.UniversityApplication;
 import com.kutca.tcrms.universityapplication.repository.UniversityApplicationRepository;
 import com.kutca.tcrms.user.controller.dto.request.FinalSubmitRequestDto;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -160,6 +162,20 @@ public class ParticipantApplicationService {
 
     }
 
+    public ResponseDto<?> getFinalSubmitInfoInFirstPeriod(Long userId){
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(
+                        FinalSubmitResponseDto.FirstPeriod.builder()
+                                .participantApplicationInfos((ParticipantApplicationsResponseDto) getParticipantApplicationInfoFromUniversityApplication(userId, DatePeriod.FIRST.name()))
+                                .userInfo(getUserInfo(userId))
+                                .accountInfo(getDepositAccountInfo(KUTCA_ID))
+                                .build())
+                .build();
+
+    }
+
 
     @Transactional(readOnly = true)
     public ResponseDto<?> getCancelParticipantApplicationFeeInfo(Long userId){
@@ -238,6 +254,13 @@ public class ParticipantApplicationService {
                 createParticipantApplicationInfo("품새 단체전", teamCount.get("품새 단체전").size(), 6L),
                 createParticipantApplicationInfo("품새 페어", teamCount.get("품새 페어").size(), 9L)
         );
+    }
+
+    private List<UniversityApplicationResponseDto.FirstPeriod> getParticipantApplicationInfoFromUniversityApplication(Long userId, String period){
+
+        List<UniversityApplication> findUniversityApplications = universityApplicationRepository.findAllByUser_UserIdAndPeriod(userId, period);
+        return findUniversityApplications.stream().map(UniversityApplicationResponseDto.FirstPeriod::fromEntity).collect(Collectors.toList());
+
     }
 
     private ResponseDto<?> createResponseDto(AtomicInteger individualCount, Map<String, Set<Integer>> teamCount){
