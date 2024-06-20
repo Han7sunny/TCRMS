@@ -26,12 +26,12 @@ public class FinalSubmitController {
     private final UniversityApplicationService universityApplicationService;
     private final ParticipantApplicationService participantApplicationService;
 
-    @Operation(summary = "참가비 정보 조회")
+    @Operation(summary = "1차 기간 참가비 정보 조회")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-    @GetMapping("/api/user/final-submit/cost-info")
+    @GetMapping("/api/user/first-period-final-submit/cost-info")
     public ResponseEntity<?> getParticipantApplicationFeeInfo(@RequestParam Long userId){
         try {
-            return new ResponseEntity<>(participantApplicationService.getParticipantApplicationFeeInfo(userId), HttpStatus.OK);
+            return new ResponseEntity<>(participantApplicationService.getFirstPeriodParticipantApplicationFeeInfo(userId), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

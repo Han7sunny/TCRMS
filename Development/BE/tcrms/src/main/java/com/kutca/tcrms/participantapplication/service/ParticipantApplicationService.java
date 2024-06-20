@@ -1,5 +1,7 @@
 package com.kutca.tcrms.participantapplication.service;
 
+import com.kutca.tcrms.account.controller.dto.response.AccountResponseDto;
+import com.kutca.tcrms.account.entity.Account;
 import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
@@ -9,6 +11,12 @@ import com.kutca.tcrms.participantapplication.controller.dto.response.Participan
 import com.kutca.tcrms.participantapplication.controller.dto.response.ParticipantApplicationsResponseDto;
 import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
 import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
+import com.kutca.tcrms.secondperiod.entity.SecondPeriod;
+import com.kutca.tcrms.secondperiod.repository.SecondPeriodRepository;
+import com.kutca.tcrms.user.controller.dto.response.FinalSubmitResponseDto;
+import com.kutca.tcrms.user.controller.dto.response.UserResponseDto;
+import com.kutca.tcrms.user.entity.User;
+import com.kutca.tcrms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +28,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public class ParticipantApplicationService {
 
+    private final UserRepository userRepository;
+
     private final ParticipantApplicationRepository participantApplicationRepository;
     private final ParticipantRepository participantRepository;
     private final EventRepository eventRepository;
+
+//    @Value("${kutca.admin.id}")
+    private static final Long KUTCA_ID = 1L;   //  추후 application.properties에서 값 추출
 
     public ResponseDto<?> deleteParticipantApplication(IndividualParticipantRequestDto.Delete individualParticipantRequestDto){
 
@@ -45,10 +58,35 @@ public class ParticipantApplicationService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
-    public ResponseDto<?> getParticipantApplicationFeeInfo(Long userId){
+    private final SecondPeriodRepository secondPeriodRepository;
 
-        //  개인전(1 ~ 4), 겨루기 단체전(5,7), 품새 단체전(6,8), 품새 페어(9)
+//    @Transactional(readOnly = true)
+    public AccountResponseDto getDepositAccountInfo(Long userId){
+        //  userId에 해당하는 SecondPeriod 데이터 없을 경우 존재?
+        Account depositAccount = secondPeriodRepository.findByUser_UserId(userId).get().getAccount();
+
+        return AccountResponseDto.builder()
+                        .accountBank(depositAccount.getAccountBank())
+                        .accountNumber(depositAccount.getAccountNumber())
+                        .depositOwnerName(depositAccount.getDepositOwnerName())
+                .build();
+    }
+
+    public UserResponseDto getUserInfo(Long userId){
+
+        User user = userRepository.findById(userId).get();
+        return UserResponseDto.builder()
+                .userName(user.getUsername())
+                .phoneNumber(user.getPhoneNumber())
+                .universityName(user.getUniversityName())
+                .depositorName(user.getDepositorName())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseDto<?> getFirstPeriodParticipantApplicationFeeInfo(Long userId){
+
+        //  1차 참가비 및 임금, 대표자 정보 조회 (최종 제출 전)
 
         AtomicInteger individualCount = new AtomicInteger();
         Map<String, Set<Integer>> teamCount = initializeTeamCount();
@@ -70,7 +108,15 @@ public class ParticipantApplicationService {
 
         });
 
-        return createResponseDto(individualCount, teamCount);
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(
+                        FinalSubmitResponseDto.FirstPeriod.builder()
+                        .participantApplicationInfos((ParticipantApplicationsResponseDto) getParticipantApplicationInfos(individualCount, teamCount))
+                        .userInfo(getUserInfo(userId))
+                        .accountInfo(getDepositAccountInfo(KUTCA_ID))
+                        .build())
+                .build();
 
     }
 
@@ -132,11 +178,11 @@ public class ParticipantApplicationService {
         findParticipantApplications.forEach(participantApplication -> teamSet.add(participantApplication.getEventTeamNumber()));
     }
 
-    private ParticipantApplicationResponseDto.firstPeriod createParticipantApplicationInfo(String eventName, int participantCount, Long eventId){
+    private ParticipantApplicationResponseDto.FirstPeriod createParticipantApplicationInfo(String eventName, int participantCount, Long eventId){
 
         int participantFee = eventRepository.findById(eventId).get().getEventFee();
 
-        return ParticipantApplicationResponseDto.firstPeriod.builder()
+        return ParticipantApplicationResponseDto.FirstPeriod.builder()
                 .eventName(eventName)
                 .participantCount(participantCount)
                 .participantFee(participantCount * participantFee)
@@ -144,9 +190,18 @@ public class ParticipantApplicationService {
 
     }
 
+    private List<ParticipantApplicationResponseDto.FirstPeriod> getParticipantApplicationInfos(AtomicInteger individualCount, Map<String, Set<Integer>> teamCount){
+        return Arrays.asList(
+                createParticipantApplicationInfo("개인전", individualCount.get(), 1L),
+                createParticipantApplicationInfo("겨루기 단체전", teamCount.get("겨루기 단체전").size(), 5L),
+                createParticipantApplicationInfo("품새 단체전", teamCount.get("품새 단체전").size(), 6L),
+                createParticipantApplicationInfo("품새 페어", teamCount.get("품새 페어").size(), 9L)
+        );
+    }
+
     private ResponseDto<?> createResponseDto(AtomicInteger individualCount, Map<String, Set<Integer>> teamCount){
 
-        List<ParticipantApplicationResponseDto.firstPeriod> participantApplicationInfos = Arrays.asList(
+        List<ParticipantApplicationResponseDto.FirstPeriod> participantApplicationInfos = Arrays.asList(
                 createParticipantApplicationInfo("개인전", individualCount.get(), 1L),
                 createParticipantApplicationInfo("겨루기 단체전", teamCount.get("겨루기 단체전").size(), 5L),
                 createParticipantApplicationInfo("품새 단체전", teamCount.get("품새 단체전").size(), 6L),

@@ -5,7 +5,7 @@ import lombok.Builder;
 public class ParticipantApplicationResponseDto {
 
     @Builder
-    public static class firstPeriod {
+    public static class FirstPeriod {
 
         private String eventName;
 
@@ -16,7 +16,7 @@ public class ParticipantApplicationResponseDto {
     }
 
     @Builder
-    public static class SecondPeriod extends firstPeriod {
+    public static class SecondPeriod extends FirstPeriod {
 
         private int cancelParticipantCount;
 
