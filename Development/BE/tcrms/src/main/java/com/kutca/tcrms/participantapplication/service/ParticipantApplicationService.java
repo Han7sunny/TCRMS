@@ -3,6 +3,7 @@ package com.kutca.tcrms.participantapplication.service;
 import com.kutca.tcrms.account.controller.dto.response.AccountResponseDto;
 import com.kutca.tcrms.account.entity.Account;
 import com.kutca.tcrms.common.dto.response.ResponseDto;
+import com.kutca.tcrms.common.enums.DatePeriod;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
 import com.kutca.tcrms.participant.entity.Participant;
@@ -13,6 +14,9 @@ import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
 import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import com.kutca.tcrms.secondperiod.entity.SecondPeriod;
 import com.kutca.tcrms.secondperiod.repository.SecondPeriodRepository;
+import com.kutca.tcrms.universityapplication.entity.UniversityApplication;
+import com.kutca.tcrms.universityapplication.repository.UniversityApplicationRepository;
+import com.kutca.tcrms.user.controller.dto.request.FinalSubmitRequestDto;
 import com.kutca.tcrms.user.controller.dto.response.FinalSubmitResponseDto;
 import com.kutca.tcrms.user.controller.dto.response.UserResponseDto;
 import com.kutca.tcrms.user.entity.User;
@@ -33,6 +37,8 @@ public class ParticipantApplicationService {
     private final ParticipantApplicationRepository participantApplicationRepository;
     private final ParticipantRepository participantRepository;
     private final EventRepository eventRepository;
+
+    private final UniversityApplicationRepository universityApplicationRepository;
 
 //    @Value("${kutca.admin.id}")
     private static final Long KUTCA_ID = 1L;   //  추후 application.properties에서 값 추출
@@ -119,6 +125,41 @@ public class ParticipantApplicationService {
                 .build();
 
     }
+
+    public ResponseDto<?> finalSubmitInFirstPeriod(FinalSubmitRequestDto.FirstPeriod firstPeriodFinalSubmitRequestDto){
+
+        Optional<User> findUser = userRepository.findById(firstPeriodFinalSubmitRequestDto.getUserInfo().getUserId());
+        if(findUser.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("대표자 정보를 조회할 수 없습니다.")
+                    .build();
+        }
+
+        User user = findUser.get();
+        user.updatePhoneNumberAndDepositorName(firstPeriodFinalSubmitRequestDto.getUserInfo().getPhoneNumber(), firstPeriodFinalSubmitRequestDto.getUserInfo().getDepositorName());
+        userRepository.save(user);
+
+        firstPeriodFinalSubmitRequestDto.getParticipantApplicationInfos().getParticipantApplicationInfos().forEach(participantApplication ->
+            universityApplicationRepository.save(
+                    UniversityApplication.builder()
+                            .user(user)
+                            .eventName(participantApplication.getEventName())
+                            .teamCount(participantApplication.getParticipantCount())
+                            .teamFee(participantApplication.getParticipantFee())
+                            .period(DatePeriod.FIRST.name())
+                            .build()
+
+            )
+        );
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .message("1차 최종 제출이 성공적으로 완료되었습니다.")
+                .build();
+
+    }
+
 
     @Transactional(readOnly = true)
     public ResponseDto<?> getCancelParticipantApplicationFeeInfo(Long userId){

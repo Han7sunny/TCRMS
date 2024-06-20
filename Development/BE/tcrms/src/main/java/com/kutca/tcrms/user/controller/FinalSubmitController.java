@@ -4,6 +4,7 @@ import com.kutca.tcrms.account.service.AccountService;
 import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.participantapplication.service.ParticipantApplicationService;
 import com.kutca.tcrms.universityapplication.service.UniversityApplicationService;
+import com.kutca.tcrms.user.controller.dto.request.FinalSubmitRequestDto;
 import com.kutca.tcrms.user.controller.dto.request.UserRequestDto;
 import com.kutca.tcrms.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,12 +51,12 @@ public class FinalSubmitController {
         }
     }
 
-    @Operation(summary = "대표자 정보 등록", description = "대표자의 연락처, 입금자명 저장")
+    @Operation(summary = "1차 최종 제출", description = "대표자의 연락처, 입금자명 저장 및 학교별 종목 정보 저장")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-    @PostMapping("/api/user/final-submit/user-info")
-    public ResponseEntity<?> updateUserInfo(@RequestBody UserRequestDto.Info userInfoRequestDto){
+    @PostMapping("/api/user/first-period-final-submit")
+    public ResponseEntity<?> updateUserInfo(@RequestBody FinalSubmitRequestDto.FirstPeriod firstPeriodFinalSubmit){
         try {
-            return new ResponseEntity<>(userService.updateUserInfo(userInfoRequestDto), HttpStatus.OK);
+            return new ResponseEntity<>(participantApplicationService.finalSubmitInFirstPeriod(firstPeriodFinalSubmit), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
