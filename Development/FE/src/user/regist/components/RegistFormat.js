@@ -68,23 +68,26 @@ const RegistFormat = (props) => {
     const rowNum = Number(event.target.id.split("-")[0].replace("row", ""));
 
     try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
-        "DELETE",
-        JSON.stringify({
-          userId: auth.userId,
-          participantId: registState.inputs[rowNum].participantId,
-          participantApplicationId:
-            props.englishTitle === "individual"
-              ? Object.values(saveParticipant[rowNum].eventInfo)
-              : Object.values(saveParticipant[rowNum].eventInfo)[0],
-        }),
-        {
-          Authorization: `Bearer ${auth.token}`,
-          "Content-Type": "application/json",
-        },
-        `${props.errMsgPersonName} 삭제 실패`
-      );
+      // const responseData = await sendRequest(
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
+      //   "DELETE",
+      //   JSON.stringify({
+      //     userId: auth.userId,
+      //     participantId: registState.inputs[rowNum].participantId,
+      //     participantApplicationId:
+      //       props.englishTitle === "individual"
+      //         ? Object.values(saveParticipant[rowNum].eventInfo)
+      //         : Object.values(saveParticipant[rowNum].eventInfo)[0],
+      //   }),
+      //   {
+      //     Authorization: `Bearer ${auth.token}`,
+      //     "Content-Type": "application/json",
+      //   },
+      //   `${props.errMsgPersonName} 삭제 실패`
+      // );
+      const responseData = {
+        isSuccess: true,
+      };
 
       if (responseData.isSuccess) {
         deleteRow(rowNum);
@@ -183,26 +186,26 @@ const RegistFormat = (props) => {
 
   const registHandler = async () => {
     try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
-        "POST",
-        JSON.stringify({
-          userId: auth.userId,
-          participants: registState.inputs
-            .filter((participant) => participant.isNew)
-            .map((participant) => formatParticipant(participant, 2)),
-        }),
-        {
-          Authorization: `Bearer ${auth.token}`,
-          "Content-Type": "application/json",
-        },
-        `${props.errMsgPersonName} 등록 실패`
-      );
+      // const responseData = await sendRequest(
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
+      //   "POST",
+      //   JSON.stringify({
+      //     userId: auth.userId,
+      //     participants: registState.inputs
+      //       .filter((participant) => participant.isNew)
+      //       .map((participant) => formatParticipant(participant, 2)),
+      //   }),
+      //   {
+      //     Authorization: `Bearer ${auth.token}`,
+      //     "Content-Type": "application/json",
+      //   },
+      //   `${props.errMsgPersonName} 등록 실패`
+      // );
 
-      // // TODO: Remove Dummy data
-      // const responseData = {
-      //   isSuccess: true,
-      // };
+      // TODO: Remove Dummy data
+      const responseData = {
+        isSuccess: true,
+      };
       if (!responseData.isSuccess) {
         setError({
           title: `${props.errMsgPersonName} 등록 실패`,
@@ -236,38 +239,37 @@ const RegistFormat = (props) => {
       );
 
       if (formatData) {
-        const responseData = await sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
-          "PUT",
-          JSON.stringify({
-            // userId: auth.userId,
-            ...formatData,
-          }),
-          {
-            Authorization: `Bearer ${auth.token}`,
-            "Content-Type": "application/json",
-          },
-
-          `${props.errMsgPersonName} 수정 실패`
-        );
-        // const responseData = {
-        //   isSuccess: true,
-        //   message: "check please",
-        //   payload: {
-        //     participantId: 2,
-        //     // weightClassId: ,
-        //     name: "조땡땡",
-        //     identityNumber: "000000-0000001",
-        //     gender: "남성",
-        //     isForeigner: true,
-        //     nationality: "영국",
-        //     eventId: [4],
-        //     participantApplicationId: [8],
+        // const responseData = await sendRequest(
+        //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
+        //   "PUT",
+        //   JSON.stringify({
+        //     // userId: auth.userId,
+        //     ...formatData,
+        //   }),
+        //   {
+        //     Authorization: `Bearer ${auth.token}`,
+        //     "Content-Type": "application/json",
         //   },
-        // };
+
+        //   `${props.errMsgPersonName} 수정 실패`
+        // );
+        const responseData = {
+          isSuccess: true,
+          message: "check please",
+          payload: {
+            participantId: 2,
+            // weightClassId: ,
+            name: "조땡땡",
+            identityNumber: "000000-0000001",
+            gender: "남성",
+            isForeigner: true,
+            nationality: "영국",
+            eventInfo: { 4: 8 },
+          },
+        };
 
         if (responseData.isSuccess) {
-          let participantsData = registState.inputs;
+          let participantsData = [...registState.inputs];
           participantsData[rowNum] = formatParticipant(responseData.payload, 1);
           if (props.englishTitle !== "individual") {
             participantsData[rowNum].eventInfo =
@@ -285,8 +287,15 @@ const RegistFormat = (props) => {
           });
         }
       } else {
-        let participantsData = registState.inputs;
-        participantsData[rowNum].editable = false;
+        // let participantsData = registState.inputs;
+        // participantsData[rowNum].editable = false;
+        // setRegistData(participantsData);
+        let participantsData = [...registState.inputs];
+
+        participantsData[rowNum] = {
+          ...participantsData[rowNum],
+          editable: false,
+        };
         setRegistData(participantsData);
         return;
       }
@@ -295,18 +304,24 @@ const RegistFormat = (props) => {
     }
   };
 
-  const switchRowHanlder = (event) => {
+  const switchRowHandler = (event) => {
     event.preventDefault();
     const rowNum = Number(event.target.id.split("-")[0].replace("row", ""));
-    let participantsData = registState.inputs;
-    participantsData[rowNum].editable = true;
+
+    let participantsData = [...registState.inputs];
+
+    participantsData[rowNum] = {
+      ...participantsData[rowNum],
+      editable: true,
+    };
+    // participantsData[rowNum].editable = true;
     setRegistData(participantsData);
 
     //개인전 2차등록일 때 종목 2개이면 종목은 active 처리
     if (
       props.englishTitle === "individual" &&
       envPeriod === "second" &&
-      participantsData[rowNum].event.length > 1
+      registState.inputs[rowNum].event.length > 1
     ) {
       setEnableDropdownRow(rowNum); // Set the row number to enable the dropdown
     }
@@ -415,7 +430,6 @@ const RegistFormat = (props) => {
             <Button type="button" onClick={addRowHandler}>
               {props.personName} 추가
             </Button>
-            {console.log("RENDORING PARENTS")}
           </div>
           <RegistTable
             version="regist"
@@ -446,7 +460,7 @@ const RegistFormat = (props) => {
             }
             data={registState.inputs}
             inputHandler={inputHandler}
-            switchRowHanlder={switchRowHanlder}
+            switchRowHandler={switchRowHandler}
             modifyHandler={modifyRowHandler}
             deleteHandler={deleteDataHandler}
             showNumber
