@@ -3,12 +3,12 @@ package com.kutca.tcrms.secondperiod.entity;
 import com.kutca.tcrms.account.entity.Account;
 import com.kutca.tcrms.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SecondPeriod {
 

@@ -5,8 +5,8 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class ParticipantApplicationsRequestDto {
+public class ParticipantApplicationsRequestDto<T> {
 
-    private List<ParticipantApplicationRequestDto> participantApplicationInfos;
+    private List<T> participantApplicationInfos;
 
 }

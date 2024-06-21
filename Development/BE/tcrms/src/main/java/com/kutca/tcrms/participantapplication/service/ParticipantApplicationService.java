@@ -2,12 +2,14 @@ package com.kutca.tcrms.participantapplication.service;
 
 import com.kutca.tcrms.account.controller.dto.response.AccountResponseDto;
 import com.kutca.tcrms.account.entity.Account;
+import com.kutca.tcrms.account.repository.AccountRepository;
 import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.common.enums.DatePeriod;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
+import com.kutca.tcrms.participantapplication.controller.dto.request.ParticipantApplicationRequestDto;
 import com.kutca.tcrms.participantapplication.controller.dto.response.ParticipantApplicationResponseDto;
 import com.kutca.tcrms.participantapplication.controller.dto.response.ParticipantApplicationsResponseDto;
 import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
@@ -36,6 +38,8 @@ public class ParticipantApplicationService {
 
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final AccountRepository accountRepository;
+    private final SecondPeriodRepository secondPeriodRepository;
     private final ParticipantRepository participantRepository;
     private final ParticipantApplicationRepository participantApplicationRepository;
     private final UniversityApplicationRepository universityApplicationRepository;
@@ -196,6 +200,48 @@ public class ParticipantApplicationService {
                 .build();
 
     }
+
+    public ResponseDto<?> finalSubmitInSecondPeriod(FinalSubmitRequestDto.SecondPeriod secondPeriodFinalSubmitRequestDto){
+
+        Optional<User> findUser = userRepository.findById(secondPeriodFinalSubmitRequestDto.getAccountInfo().getUserId());
+        if(findUser.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("대표자 정보를 조회할 수 없습니다.")
+                    .build();
+        }
+
+        User user = findUser.get();
+        Account refundAccount = accountRepository.save(Account.builder()
+                        .accountBank(secondPeriodFinalSubmitRequestDto.getAccountInfo().getAccountBank())
+                        .accountNumber(secondPeriodFinalSubmitRequestDto.getAccountInfo().getAccountNumber())
+                        .depositOwnerName(secondPeriodFinalSubmitRequestDto.getAccountInfo().getDepositOwnerName())
+                .build());
+        secondPeriodRepository.save(SecondPeriod.builder()
+                .user(user)
+                .account(refundAccount)
+//                        .isSecondApply()
+                .build());
+
+        secondPeriodFinalSubmitRequestDto.getParticipantApplicationInfos().getParticipantApplicationInfos().forEach(participantApplication ->
+            universityApplicationRepository.save(
+                    UniversityApplication.builder()
+                            .user(user)
+                            .eventName(participantApplication.getEventName())
+                            .teamCount(participantApplication.getCancelParticipantCount())
+                            .teamFee(participantApplication.getRefundParticipantFee())
+                            .period(DatePeriod.SECOND.name())
+                            .build()
+
+            )
+        );
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .message("2차 최종 제출이 성공적으로 완료되었습니다.")
+                .build();
+    }
+
 
     public ResponseDto<?> getFinalSubmitInfoInFirstPeriod(Long userId){
 

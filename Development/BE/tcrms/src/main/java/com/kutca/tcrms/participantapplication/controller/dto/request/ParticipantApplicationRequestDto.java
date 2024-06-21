@@ -7,10 +7,26 @@ import lombok.Getter;
 @Getter
 public class ParticipantApplicationRequestDto {
 
-    private String eventName;
+    @Getter
+    public static class FirstPeriod {
 
-    private int participantCount;
+        private String eventName;
 
-    private int participantFee;
+        private int participantCount;
+
+        private int participantFee;
+
+    }
+
+    @Getter
+    public static class SecondPeriod {
+
+        private String eventName;
+
+        private int cancelParticipantCount;
+
+        private int refundParticipantFee;
+
+    }
 
 }

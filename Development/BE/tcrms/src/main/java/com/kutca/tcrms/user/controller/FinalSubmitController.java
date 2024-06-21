@@ -63,12 +63,24 @@ public class FinalSubmitController {
         }
     }
 
-    @Operation(summary = "1차 최종 제출", description = "대표자의 연락처, 입금자명 저장 및 학교별 종목 정보 저장")
+    @Operation(summary = "1차 최종 제출", description = "대표자 연락처, 입금자명 저장 및 학교별 종목 정보 저장")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-    @PostMapping("/api/user/first-period-final-submit")
-    public ResponseEntity<?> updateUserInfo(@RequestBody FinalSubmitRequestDto.FirstPeriod firstPeriodFinalSubmit){
+    @PostMapping("/api/user/final-submit/first-period")
+    public ResponseEntity<?> finalSubmitInFirstPeriod(@RequestBody FinalSubmitRequestDto.FirstPeriod firstPeriodFinalSubmit){
         try {
             return new ResponseEntity<>(participantApplicationService.finalSubmitInFirstPeriod(firstPeriodFinalSubmit), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "2차 최종 제출", description = "대표자 환불 계좌 정보 및 학교별 종목 정보 저장")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @PostMapping("/api/user/final-submit/second-period")
+    public ResponseEntity<?> finalSubmitInSecondPeriod(@RequestBody FinalSubmitRequestDto.SecondPeriod secondPeriodFinalSubmit){
+        try {
+            return new ResponseEntity<>(participantApplicationService.finalSubmitInSecondPeriod(secondPeriodFinalSubmit), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
