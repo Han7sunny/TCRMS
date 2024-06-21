@@ -17,4 +17,13 @@ public class FinalSubmitResponseDto {
 
     }
 
+    @Builder
+    public static class SecondPeriod {
+
+        private ParticipantApplicationsResponseDto participantApplicationInfos;
+
+        private boolean isRefundExist;
+
+    }
+
 }

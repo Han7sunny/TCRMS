@@ -29,10 +29,22 @@ public class FinalSubmitController {
 
     @Operation(summary = "1차 기간 참가비 정보 조회")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-    @GetMapping("/api/user/first-period-final-submit/cost-info")
+    @GetMapping("/api/user/final-submit/first-period-cost-info")
     public ResponseEntity<?> getParticipantApplicationFeeInfo(@RequestParam Long userId){
         try {
             return new ResponseEntity<>(participantApplicationService.getFirstPeriodParticipantApplicationFeeInfo(userId), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "2차 기간 참가비 정보 조회")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @GetMapping("/api/user/final-submit/second-period-cost-info")
+    public ResponseEntity<?> getParticipantApplicationFeeInfoInSecondPeriod(@RequestParam Long userId){
+        try {
+            return new ResponseEntity<>(participantApplicationService.getSecondPeriodParticipantApplicationFeeInfo(userId), HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

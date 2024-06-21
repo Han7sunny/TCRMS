@@ -2,6 +2,7 @@ package com.kutca.tcrms.universityapplication.controller.dto.response;
 
 import com.kutca.tcrms.universityapplication.entity.UniversityApplication;
 import lombok.Builder;
+import lombok.Getter;
 
 public class UniversityApplicationResponseDto {
 
@@ -12,6 +13,7 @@ public class UniversityApplicationResponseDto {
 
     }
 
+    @Getter
     @Builder
     public static class FirstPeriod {
 
@@ -30,4 +32,14 @@ public class UniversityApplicationResponseDto {
         }
 
     }
+
+    @Builder
+    public static class SecondPeriod extends FirstPeriod {
+
+        private int cancelParticipantCount;
+
+        private int refundParticipantFee;
+
+    }
+
 }
