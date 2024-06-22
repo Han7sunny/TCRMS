@@ -9,7 +9,6 @@ import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantRequestDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
-import com.kutca.tcrms.participantapplication.controller.dto.request.ParticipantApplicationRequestDto;
 import com.kutca.tcrms.participantapplication.controller.dto.response.ParticipantApplicationResponseDto;
 import com.kutca.tcrms.participantapplication.controller.dto.response.ParticipantApplicationsResponseDto;
 import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
@@ -68,8 +67,6 @@ public class ParticipantApplicationService {
                 .build();
     }
 
-    private final SecondPeriodRepository secondPeriodRepository;
-
 //    @Transactional(readOnly = true)
     public AccountResponseDto getDepositAccountInfo(Long userId){
         //  userId에 해당하는 SecondPeriod 데이터 없을 경우 존재?
@@ -122,7 +119,7 @@ public class ParticipantApplicationService {
                 .isSuccess(true)
                 .payload(
                         FinalSubmitResponseDto.FirstPeriod.builder()
-                        .participantApplicationInfos((ParticipantApplicationsResponseDto) getParticipantApplicationInfos(individualCount, teamCount))
+                        .participantApplicationInfos(new ParticipantApplicationsResponseDto<>(getParticipantApplicationInfos(individualCount, teamCount)))
                         .userInfo(getUserInfo(userId))
                         .accountInfo(getDepositAccountInfo(KUTCA_ID))
                         .build())
@@ -160,7 +157,7 @@ public class ParticipantApplicationService {
                 .isSuccess(true)
                 .payload(
                         FinalSubmitResponseDto.SecondPeriod.builder()
-                                .participantApplicationInfos((ParticipantApplicationsResponseDto) participantApplicationInfos)
+                                .participantApplicationInfos(new ParticipantApplicationsResponseDto<>(participantApplicationInfos))
                                 .isRefundExist(!participantApplicationInfos.isEmpty())
                                 .build())
                 .build();
@@ -245,17 +242,41 @@ public class ParticipantApplicationService {
 
     public ResponseDto<?> getFinalSubmitInfoInFirstPeriod(Long userId){
 
+        List<ParticipantApplicationResponseDto.FirstPeriod> finalSubmitInfoInFirstPeriod = getParticipantApplicationInfoFromUniversityApplication(userId, DatePeriod.FIRST.name()).stream().map(ParticipantApplicationResponseDto.FirstPeriod::fromUniversityApplication).toList();
+
         return ResponseDto.builder()
                 .isSuccess(true)
                 .payload(
                         FinalSubmitResponseDto.FirstPeriod.builder()
-                                .participantApplicationInfos((ParticipantApplicationsResponseDto) getParticipantApplicationInfoFromUniversityApplication(userId, DatePeriod.FIRST.name()))
+                                .participantApplicationInfos(new ParticipantApplicationsResponseDto<>(finalSubmitInfoInFirstPeriod))
                                 .userInfo(getUserInfo(userId))
                                 .accountInfo(getDepositAccountInfo(KUTCA_ID))
                                 .build())
                 .build();
 
     }
+
+    public ResponseDto<?> getFinalSubmitInfoInSecondPeriod(Long userId){
+
+        FinalSubmitResponseDto.Total finalSubmitInfoInSecondPeriod = getTotalParticipantApplicationInfoFromUniversityApplication(userId);
+
+        if(finalSubmitInfoInSecondPeriod.isRefundExist()){
+            Account refundAccount = secondPeriodRepository.findByUser_UserId(userId).get().getAccount();
+            finalSubmitInfoInSecondPeriod.setRefundInfo(
+                    AccountResponseDto.builder()
+                            .accountBank(refundAccount.getAccountBank())
+                            .accountNumber(refundAccount.getAccountNumber())
+                            .depositOwnerName(refundAccount.getDepositOwnerName())
+                            .build());
+        }
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(finalSubmitInfoInSecondPeriod)
+                .build();
+
+    }
+
 
     private Map<String, Set<Integer>> initializeTeamCount(){
         Map<String, Set<Integer>> teamCount = new HashMap<>();
@@ -354,5 +375,27 @@ public class ParticipantApplicationService {
         return findUniversityApplications.stream().map(UniversityApplicationResponseDto.FirstPeriod::fromEntity).collect(Collectors.toList());
 
     }
+
+    private FinalSubmitResponseDto.Total getTotalParticipantApplicationInfoFromUniversityApplication(Long userId){
+
+        List<UniversityApplicationResponseDto.FirstPeriod> firstPeriodParticipantApplications = getParticipantApplicationInfoFromUniversityApplication(userId, DatePeriod.FIRST.name());
+        List<ParticipantApplicationResponseDto.SecondPeriod> participantApplicationInfos = firstPeriodParticipantApplications.stream().map(universityApplication -> {
+            ParticipantApplicationResponseDto.SecondPeriod participantApplicationInfo = ParticipantApplicationResponseDto.SecondPeriod.fromUniversityApplication(universityApplication);
+            Optional<UniversityApplication> findSecondPeriodUniversityApplication = universityApplicationRepository.findByUser_UserIdAndEventNameAndPeriod(userId, universityApplication.getEventName(), DatePeriod.SECOND.name());
+            if(findSecondPeriodUniversityApplication.isPresent()){
+                UniversityApplication secondPeriodUniversityApplication = findSecondPeriodUniversityApplication.get();
+                participantApplicationInfo.setCancelParticipantCount(secondPeriodUniversityApplication.getTeamCount());
+                participantApplicationInfo.setRefundParticipantFee(secondPeriodUniversityApplication.getTeamFee());
+            }
+            return participantApplicationInfo;
+        }).toList();
+
+        return FinalSubmitResponseDto.Total.builder()
+                .participantApplicationInfos(new ParticipantApplicationsResponseDto<>(participantApplicationInfos))
+                .isRefundExist(!participantApplicationInfos.isEmpty())
+                .build();
+
+    }
+
 
 }

@@ -16,6 +16,14 @@ public class ParticipantApplicationResponseDto {
 
         private int participantFee;
 
+        public static FirstPeriod fromUniversityApplication(UniversityApplicationResponseDto.FirstPeriod universityApplication){
+            return FirstPeriod.builder()
+                    .eventName(universityApplication.getEventName())
+                    .participantCount(universityApplication.getParticipantCount())
+                    .participantFee(universityApplication.getParticipantFee())
+                    .build();
+        }
+
     }
 
     @Setter

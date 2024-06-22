@@ -9,7 +9,7 @@ public class ParticipantApplicationsResponseDto<T> {
 
     private List<T> participantApplicationInfos;
 
-//    public ParticipantApplicationsResponseDto(List<T> participantApplicationInfos){
-//        this.participantApplicationInfos = participantApplicationInfos;
-//    }
+    public ParticipantApplicationsResponseDto(List<T> participantApplicationInfos){
+        this.participantApplicationInfos = participantApplicationInfos;
+    }
 }

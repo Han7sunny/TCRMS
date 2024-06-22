@@ -99,6 +99,18 @@ public class FinalSubmitController {
         }
     }
 
+    @Operation(summary = "2차 기간 최종 제출 확인(조회)")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @GetMapping("/api/user/after-final-submit/second-period")
+    public ResponseEntity<?> getFinalSubmitInfoInSecondPeriod(@RequestParam Long userId){
+        try {
+            return new ResponseEntity<>(participantApplicationService.getFinalSubmitInfoInSecondPeriod(userId), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Operation(summary = "입금 정보 조회")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     @GetMapping("/api/user/final-submit/bank-info")
