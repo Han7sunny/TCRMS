@@ -25,7 +25,7 @@ public class ParticipantFileResponseDto {
 
     private List<String> events;
 
-    private List<FileResponseDto> fileInfos;    //  FilesResponseDto?
+    private List<FileResponseDto.Info> fileInfos;    //  FilesResponseDto?
 
     private Boolean isAllFileConfirmed;
 }

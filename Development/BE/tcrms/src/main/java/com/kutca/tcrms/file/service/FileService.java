@@ -20,6 +20,7 @@ import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class FileService {
     private final FileRepository fileRepository;
     private final ParticipantFileRepository participantFileRepository;
 
+    @Transactional(readOnly = true)
     public ResponseDto<?> isFileCompleted(Long userId){
 
         List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(userId);
@@ -48,25 +50,25 @@ public class FileService {
                     .build();
         }
 
-        Boolean allFilesCompleted = null;
-//                findParticipantList.stream()
-//                .map(participant -> participantFileRepository.findByParticipant_ParticipantId(participant.getParticipantId()))
-//                .allMatch(ParticipantFile::getIsAllFileCompleted);
+        boolean allFilesCompleted = true;
 
-        if(!allFilesCompleted){
-            return ResponseDto.builder()
-                    .isSuccess(true)
-                    .payload(false)
-                    .build();
+        for (Participant participant : findParticipantList){
+            if(participantFileRepository.existsByParticipant_ParticipantIdAndIsAllFileCompletedFalse(participant.getParticipantId())){
+                allFilesCompleted = false;
+                break;
+            }
         }
 
         return ResponseDto.builder()
                 .isSuccess(true)
-                .payload(true)
+                .payload(FileResponseDto.Status.builder()
+                        .isFileCompleted(allFilesCompleted)
+                        .build())
                 .build();
 
     }
 
+    @Transactional(readOnly = true)
     public ResponseDto<?> getFileInfoList (Long userId){
 
         List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(userId);
@@ -87,7 +89,7 @@ public class FileService {
                     .name(participant.getName())
                     .isForeigner(participant.getIsForeigner())
                     .identityNumber(participant.getIdentityNumber())
-                    .fileInfos(files.stream().map(FileResponseDto::fromEntity).collect(Collectors.toList()))
+                    .fileInfos(files.stream().map(FileResponseDto.Info::fromEntity).collect(Collectors.toList()))
                     .isAllFileConfirmed(participantFile.getIsAllFileCompleted())
                     .build();
 
@@ -122,6 +124,7 @@ public class FileService {
                 .build();
     }
 
+    @Transactional
     public ResponseDto<?> uploadFileInfo(Long participantId, List<String> filePaths, FilesRequestDto fileInfos){
 
         Optional<Participant> findParticipant = participantRepository.findById(participantId);
@@ -139,7 +142,7 @@ public class FileService {
                                 .isAllFileCompleted(false)
                         .build()));
 
-        List<FileResponseDto> filesResponseDto = IntStream.range(0, filePaths.size()).mapToObj(idx ->{
+        List<FileResponseDto.Info> filesResponseDto = IntStream.range(0, filePaths.size()).mapToObj(idx ->{
             Long fileId = fileInfos.getFileInfos().get(idx).getFileId();
             String fileName = fileInfos.getFileInfos().get(idx).getFileName();
             String filePath = filePaths.get(idx);
@@ -152,7 +155,7 @@ public class FileService {
                             .participantFile(participantFile)
                     .build());
 
-            return FileResponseDto.builder()
+            return FileResponseDto.Info.builder()
                     .fileId(savedFile.getFileId())
                     .fileName(savedFile.getFileName())
                     .build();

@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface ParticipantFileRepository extends JpaRepository<ParticipantFile, Long> {
     Optional<ParticipantFile> findByParticipant_ParticipantId(Long participant_id);
+    boolean existsByParticipant_ParticipantIdAndIsAllFileCompletedFalse(Long participant_id);
 }

@@ -19,5 +19,5 @@ public class Event {
 
     private String eventName;
 
-    private Long eventFee;
+    private int eventFee;
 }
