@@ -4,12 +4,14 @@ import com.kutca.tcrms.common.dto.response.ResponseDto;
 import com.kutca.tcrms.common.security.JWTTokenProvider;
 import com.kutca.tcrms.user.controller.dto.request.ChangePwRequestDto;
 import com.kutca.tcrms.user.controller.dto.request.LoginRequestDto;
+import com.kutca.tcrms.user.controller.dto.request.UserRequestDto;
 import com.kutca.tcrms.user.controller.dto.response.LoginResponseDto;
+import com.kutca.tcrms.user.controller.dto.response.UserResponseDto;
 import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -59,5 +61,50 @@ public class UserService {
                 .isSuccess(true)
                 .message("비밀번호가 변경되었습니다.")
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseDto<?> getUserInfo(Long userId){
+
+        Optional<User> findUser = userRepository.findById(userId);
+        if(findUser.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("대표자 정보를 조회할 수 없습니다.")
+                    .build();
+        }
+
+        User user = findUser.get();
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .payload(
+                        UserResponseDto.builder()
+                                .userName(user.getUsername())
+                                .phoneNumber(user.getPhoneNumber())
+                                .universityName(user.getUniversityName())
+                                .depositorName(user.getDepositorName())
+                )
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> updateUserInfo(UserRequestDto.Info userInfoRequestDto){
+
+        Optional<User> findUser = userRepository.findById(userInfoRequestDto.getUserId());
+        if(findUser.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(false)
+                    .message("대표자 정보를 조회할 수 없습니다.")
+                    .build();
+        }
+
+        User user = findUser.get();
+        user.updatePhoneNumberAndDepositorName(userInfoRequestDto.getPhoneNumber(), userInfoRequestDto.getDepositorName());
+        userRepository.save(user);
+
+        return ResponseDto.builder()
+                .isSuccess(true)
+                .build();
+
     }
 }
