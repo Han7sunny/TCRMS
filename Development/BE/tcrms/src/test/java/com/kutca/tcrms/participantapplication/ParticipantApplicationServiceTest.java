@@ -113,15 +113,15 @@ public class ParticipantApplicationServiceTest {
                 .account(kutcaAccount)
                 .build();
 
-        events.put(1L, Event.builder().eventId(1L).eventName("개인전 여자 겨루기").build());
-        events.put(2L, Event.builder().eventId(2L).eventName("개인전 여자 품새").build());
-        events.put(3L, Event.builder().eventId(3L).eventName("개인전 남자 겨루기").build());
-        events.put(4L, Event.builder().eventId(4L).eventName("개인전 남자 품새").build());
-        events.put(5L, Event.builder().eventId(5L).eventName("단체전 여자 겨루기").build());
-        events.put(6L, Event.builder().eventId(6L).eventName("단체전 여자 품새").build());
-        events.put(7L, Event.builder().eventId(7L).eventName("단체전 남자 겨루기").build());
-        events.put(8L, Event.builder().eventId(8L).eventName("단체전 남자 품새").build());
-        events.put(9L, Event.builder().eventId(9L).eventName("단체전 혼성 품새").build());
+        events.put(1L, Event.builder().eventId(1L).eventName("개인전 여자 겨루기").eventFee(30000).build());
+        events.put(2L, Event.builder().eventId(2L).eventName("개인전 여자 품새").eventFee(events.get(1L).getEventFee()).build());
+        events.put(3L, Event.builder().eventId(3L).eventName("개인전 남자 겨루기").eventFee(events.get(1L).getEventFee()).build());
+        events.put(4L, Event.builder().eventId(4L).eventName("개인전 남자 품새").eventFee(events.get(1L).getEventFee()).build());
+        events.put(5L, Event.builder().eventId(5L).eventName("단체전 여자 겨루기").eventFee(20000).build());
+        events.put(6L, Event.builder().eventId(6L).eventName("단체전 여자 품새").eventFee(20000).build());
+        events.put(7L, Event.builder().eventId(7L).eventName("단체전 남자 겨루기").eventFee(30000).build());
+        events.put(8L, Event.builder().eventId(8L).eventName("단체전 남자 품새").eventFee(30000).build());
+        events.put(9L, Event.builder().eventId(9L).eventName("단체전 혼성 품새").eventFee(30000).build());
 
         findParticipant1 = Participant.builder()
                 .participantId(1L)
@@ -260,6 +260,8 @@ public class ParticipantApplicationServiceTest {
         given(eventRepository.findById(1L)).willReturn(Optional.of(events.get(1L)));
         given(eventRepository.findById(5L)).willReturn(Optional.of(events.get(5L)));
         given(eventRepository.findById(6L)).willReturn(Optional.of(events.get(6L)));
+        given(eventRepository.findById(7L)).willReturn(Optional.of(events.get(7L)));
+        given(eventRepository.findById(8L)).willReturn(Optional.of(events.get(8L)));
         given(eventRepository.findById(9L)).willReturn(Optional.of(events.get(9L)));
 
         given(participantRepository.findAllByUser_UserId(findUser1.getUserId())).willReturn(Arrays.asList(findParticipant1, findParticipant2));
@@ -286,12 +288,12 @@ public class ParticipantApplicationServiceTest {
         assertEquals(firstPeriodParticipantApplicationInfos.size(), 4);
         assertEquals(firstPeriodParticipantApplicationInfos.get(0).getEventName(), "개인전");
         assertEquals(firstPeriodParticipantApplicationInfos.get(0).getParticipantCount(), 3);
-        assertEquals(firstPeriodParticipantApplicationInfos.get(1).getEventName(), "겨루기 단체전"); // 여자 5, 남자 7
-        assertEquals(firstPeriodParticipantApplicationInfos.get(1).getParticipantCount(), 3); // 2???
+        assertEquals(firstPeriodParticipantApplicationInfos.get(1).getEventName(), "겨루기 단체전");
+        assertEquals(firstPeriodParticipantApplicationInfos.get(1).getParticipantCount(), 3);
         assertEquals(firstPeriodParticipantApplicationInfos.get(2).getEventName(), "품새 단체전");
         assertEquals(firstPeriodParticipantApplicationInfos.get(2).getParticipantCount(), 0);
         assertEquals(firstPeriodParticipantApplicationInfos.get(3).getEventName(), "품새 페어");
-//        assertEquals(firstPeriodParticipantApplicationInfos.get(3).getParticipantCount(), 1);
+        assertEquals(firstPeriodParticipantApplicationInfos.get(3).getParticipantCount(), 1);
 
         assertEquals(firstPeriodResponseDto.getUserInfo().getUserName(), findUser1.getUsername());
         assertEquals(firstPeriodResponseDto.getUserInfo().getUniversityName(), findUser1.getUniversityName());

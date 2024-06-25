@@ -26,6 +26,12 @@ public class ParticipantApplicationResponseDto {
                     .build();
         }
 
+        public FirstPeriod calculateParticipantFee(int eventFee, int count){
+            this.participantFee += eventFee;
+            this.participantCount += count;
+            return this;
+        }
+
     }
 
     @Setter
