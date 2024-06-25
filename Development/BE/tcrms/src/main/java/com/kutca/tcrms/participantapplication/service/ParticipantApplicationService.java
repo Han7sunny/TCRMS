@@ -99,19 +99,26 @@ public class ParticipantApplicationService {
         Map<String, Set<Integer>> teamCount = initializeTeamCount();
 
         List<Participant> findParticipants = participantRepository.findAllByUser_UserId(userId);
+        if(findParticipants.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(true)
+                    .message("신청 내역이 존재하지 않습니다.")
+                    .build();
+        }
+
         findParticipants.forEach(participant -> {
 
             Long participantId = participant.getParticipantId();
 
             if("여성".equals(participant.getGender())){
-                countParticipantApplications(participantId, individualCount, teamCount, 1L, 2L, 5L, 6L);
+                countParticipantApplications(participantId, participant.getGender(), individualCount, teamCount, 1L, 2L, 5L, 6L);
             }
 
             if("남성".equals(participant.getGender())){
-                countParticipantApplications(participantId, individualCount, teamCount, 3L, 4L, 7L, 8L);
+                countParticipantApplications(participantId, participant.getGender(), individualCount, teamCount, 3L, 4L, 7L, 8L);
             }
 
-            addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 페어"), 9L, false);
+            addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 페어"), 9L, false, participant.getGender());
 
         });
 
@@ -146,7 +153,7 @@ public class ParticipantApplicationService {
                 countCancelParticipantApplications(participantId, individualCount, teamCount, 3L, 4L, 7L, 8L);
             }
 
-            addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 페어"), 9L, true);
+            addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 페어"), 9L, true, participant.getGender());
 
         });
 
@@ -286,19 +293,19 @@ public class ParticipantApplicationService {
         return teamCount;
     }
 
-    private void countParticipantApplications(Long participantId, AtomicInteger individualCount, Map<String, Set<Integer>> teamCount, Long startEventId, Long endEventId, Long sparringEventId, Long poomsaeEventId){
+    private void countParticipantApplications(Long participantId, String gender, AtomicInteger individualCount, Map<String, Set<Integer>> teamCount, Long startEventId, Long endEventId, Long sparringEventId, Long poomsaeEventId){
         individualCount.addAndGet(participantApplicationRepository.countAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participantId, startEventId, endEventId));
-        addParticipantApplicationsToTeamSet(participantId, teamCount.get("겨루기 단체전"), sparringEventId, false);
-        addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 단체전"), poomsaeEventId, false);
+        addParticipantApplicationsToTeamSet(participantId, teamCount.get("겨루기 단체전"), sparringEventId, false, gender);
+        addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 단체전"), poomsaeEventId, false, gender);
     }
 
     private void countCancelParticipantApplications(Long participantId, AtomicInteger individualCount, Map<String, Set<Integer>> teamCount, Long startEventId, Long endEventId, Long sparringEventId, Long poomsaeEventId){
         individualCount.addAndGet(participantApplicationRepository.countAllByParticipant_ParticipantIdAndEvent_EventIdBetweenAndIs2ndCancelTrue(participantId, startEventId, endEventId));
-        addParticipantApplicationsToTeamSet(participantId, teamCount.get("겨루기 단체전"), sparringEventId, true);
-        addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 단체전"), poomsaeEventId, true);
+//        addParticipantApplicationsToTeamSet(participantId, teamCount.get("겨루기 단체전"), sparringEventId, true);
+//        addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 단체전"), poomsaeEventId, true);
     }
 
-    private void addParticipantApplicationsToTeamSet(Long participantId, Set<Integer> teamSet, Long eventId, boolean isCancel){
+    private void addParticipantApplicationsToTeamSet(Long participantId, Set<Integer> teamSet, Long eventId, boolean isCancel, String gender){
         List<ParticipantApplication> findParticipantApplications;
         if(isCancel){
             findParticipantApplications = participantApplicationRepository.findAllByParticipant_ParticipantIdAndAndEvent_EventIdAndIs2ndCancelTrue(participantId, eventId);
@@ -306,7 +313,8 @@ public class ParticipantApplicationService {
         else {
             findParticipantApplications = participantApplicationRepository.findAllByParticipant_ParticipantIdAndAndEvent_EventId(participantId, eventId);
         }
-        findParticipantApplications.forEach(participantApplication -> teamSet.add(participantApplication.getEventTeamNumber()));
+        //  겨루기 단체전의 경우 여자, 남자 겨루기 단체전의 eventTeamNumber 가져오는데 이는 다르게 받아들여야함 (둘 다 1인 경우 총 개수는 1개가 아닌 2개여야 함)
+        findParticipantApplications.forEach(participantApplication -> teamSet.add(gender.equals("여성") ? participantApplication.getEventTeamNumber() : participantApplication.getEventTeamNumber() * 100));
     }
 
     private ParticipantApplicationResponseDto.FirstPeriod createParticipantApplicationInfo(String eventName, int participantCount, Long eventId){

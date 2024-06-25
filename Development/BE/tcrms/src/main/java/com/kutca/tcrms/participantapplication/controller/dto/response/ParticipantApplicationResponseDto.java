@@ -2,11 +2,13 @@ package com.kutca.tcrms.participantapplication.controller.dto.response;
 
 import com.kutca.tcrms.universityapplication.controller.dto.response.UniversityApplicationResponseDto;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 public class ParticipantApplicationResponseDto {
 
+    @Getter
     @SuperBuilder
     public static class FirstPeriod {
 

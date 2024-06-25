@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 
 public class FinalSubmitResponseDto {
 
+    @Getter
     @Builder
     public static class FirstPeriod {
 
