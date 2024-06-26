@@ -200,6 +200,25 @@ public class ParticipantApplicationServiceTest {
                 .event(events.get(9L))
                 .eventTeamNumber(1)
                 .build();
+
+        findParticipant3 = Participant.builder()
+                .participantId(3L)
+                .user(findUser1)
+                .name("Julie")
+                .gender("여성")
+                .identityNumber("000329-45671238")
+                .isForeigner(true)
+                .nationality("미국")
+                .universityName(findUser1.getUniversityName())
+//                .weightClass(weightClassMap.get(1L))
+                .build();
+
+        findParticipantApplication8 = ParticipantApplication.builder()
+                .participantApplicationId(8L)
+                .participant(findParticipant3)
+                .event(events.get(6L))
+                .eventTeamNumber(1)
+                .build();
     }
 
     @Test
@@ -308,7 +327,7 @@ public class ParticipantApplicationServiceTest {
 
     @Test
     @DisplayName("2차 참가비 정보 조회(2차 기간 내 변경 사항 없음, 취소 내역 없음) 성공")
-    void getSecondPeriodParticipantApplicationFeeInfo(){
+    void getSecondPeriodParticipantApplicationFeeInfoWithNoRefundExist(){
 
         //  given
 
@@ -377,6 +396,128 @@ public class ParticipantApplicationServiceTest {
 
         assertEquals(secondPeriodParticipantApplicationInfos.get(0).getParticipantCount(), findUniversityApplicationInFirstPeriod1.getTeamCount());
         assertEquals(secondPeriodParticipantApplicationInfos.get(0).getCancelParticipantCount(), 0);
+
+    }
+
+    @Test
+    @DisplayName("2차 참가비 정보 조회 성공")
+    void getSecondPeriodParticipantApplicationFeeInfoSuccess(){
+
+        //  given
+
+        UniversityApplication findUniversityApplicationInFirstPeriod1 = UniversityApplication.builder()
+                .universityApplicationId(1L)
+                .user(findUser1)
+                .eventName("개인전")
+                .teamCount(4)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod2 = UniversityApplication.builder()
+                .universityApplicationId(2L)
+                .user(findUser1)
+                .eventName("겨루기 단체전")
+                .teamCount(3)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod3 = UniversityApplication.builder()
+                .universityApplicationId(3L)
+                .user(findUser1)
+                .eventName("품새 단체전")
+                .teamCount(1)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod4 = UniversityApplication.builder()
+                .universityApplicationId(4L)
+                .user(findUser1)
+                .eventName("품새 페어")
+                .teamCount(1)
+                .teamFee(events.get(9L).getEventFee())
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        ParticipantApplication findCancelParticipantApplication1 = ParticipantApplication.builder()
+                .participantApplicationId(1L)
+                .participant(findParticipant1)
+                .event(events.get(5L))
+                .eventTeamNumber(1)
+                .is2ndCancel(true)
+                .build();
+
+        ParticipantApplication findCancelParticipantApplication2 = ParticipantApplication.builder()
+                .participantApplicationId(2L)
+                .participant(findParticipant1)
+                .event(events.get(9L))
+                .eventTeamNumber(1)
+                .is2ndCancel(true)
+                .build();
+
+        ParticipantApplication findCancelParticipantApplication3 = ParticipantApplication.builder()
+                .participantApplicationId(3L)
+                .participant(findParticipant2)
+                .event(events.get(9L))
+                .eventTeamNumber(1)
+                .is2ndCancel(true)
+                .build();
+
+        ParticipantApplication findCancelParticipantApplication4 = ParticipantApplication.builder()
+                .participantApplicationId(4L)
+                .participant(findParticipant2)
+                .event(events.get(8L))
+                .eventTeamNumber(1)
+                .is2ndCancel(true)
+                .build();
+
+        ParticipantApplication findCancelParticipantApplication5 = ParticipantApplication.builder()
+                .participantApplicationId(5L)
+                .participant(findParticipant3)
+                .event(events.get(6L))
+                .eventTeamNumber(1)
+                .is2ndCancel(true)
+                .build();
+
+        given(participantRepository.findAllByUser_UserId(findUser1.getUserId())).willReturn(Arrays.asList(findParticipant1, findParticipant2));
+        given(universityApplicationRepository.findAllByUser_UserIdAndPeriod(findUser1.getUserId(), DatePeriod.FIRST.name())).willReturn(Arrays.asList(findUniversityApplicationInFirstPeriod1, findUniversityApplicationInFirstPeriod2, findUniversityApplicationInFirstPeriod3, findUniversityApplicationInFirstPeriod4));
+
+        given(eventRepository.findById(1L)).willReturn(Optional.of(events.get(1L)));
+        given(eventRepository.findById(5L)).willReturn(Optional.of(events.get(5L)));
+        given(eventRepository.findById(6L)).willReturn(Optional.of(events.get(6L)));
+        given(eventRepository.findById(7L)).willReturn(Optional.of(events.get(7L)));
+        given(eventRepository.findById(8L)).willReturn(Optional.of(events.get(8L)));
+        given(eventRepository.findById(9L)).willReturn(Optional.of(events.get(9L)));
+
+        given(participantApplicationRepository.countAllByParticipant_ParticipantIdAndEvent_EventIdBetweenAndIs2ndCancelTrue(findParticipant1.getParticipantId(), 1L, 2L)).willReturn(1);
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndAndEvent_EventIdAndIs2ndCancelTrue(findParticipant1.getParticipantId(), 5L)).willReturn(Arrays.asList(findCancelParticipantApplication1));
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndAndEvent_EventIdAndIs2ndCancelTrue(findParticipant1.getParticipantId(), 6L)).willReturn(Arrays.asList(findCancelParticipantApplication5));
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndAndEvent_EventIdAndIs2ndCancelTrue(findParticipant1.getParticipantId(), 9L)).willReturn(Arrays.asList(findCancelParticipantApplication2));
+
+        given(participantApplicationRepository.countAllByParticipant_ParticipantIdAndEvent_EventIdBetweenAndIs2ndCancelTrue(findParticipant2.getParticipantId(), 3L, 4L)).willReturn(2);
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndAndEvent_EventIdAndIs2ndCancelTrue(findParticipant2.getParticipantId(), 7L)).willReturn(Collections.emptyList());
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndAndEvent_EventIdAndIs2ndCancelTrue(findParticipant2.getParticipantId(), 8L)).willReturn(Arrays.asList(findCancelParticipantApplication4));
+        given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndAndEvent_EventIdAndIs2ndCancelTrue(findParticipant2.getParticipantId(), 9L)).willReturn(Arrays.asList(findCancelParticipantApplication3));
+
+        //  when
+        ResponseDto<?> responseDto = participantApplicationService.getSecondPeriodParticipantApplicationFeeInfo(findUser1.getUserId());
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+
+        FinalSubmitResponseDto.SecondPeriod secondPeriodResponseDto = (FinalSubmitResponseDto.SecondPeriod)responseDto.getPayload();
+        List<ParticipantApplicationResponseDto.SecondPeriod> secondPeriodParticipantApplicationInfos = secondPeriodResponseDto.getParticipantApplicationInfos().getParticipantApplicationInfos();
+
+        assertTrue(secondPeriodResponseDto.isRefundExist());
+
+        assertEquals(secondPeriodParticipantApplicationInfos.get(0).getParticipantCount(), findUniversityApplicationInFirstPeriod1.getTeamCount());
+        assertEquals(secondPeriodParticipantApplicationInfos.get(0).getCancelParticipantCount(), 3);
+        assertEquals(secondPeriodParticipantApplicationInfos.get(1).getEventName(), "겨루기 단체전");
+        assertEquals(secondPeriodParticipantApplicationInfos.get(1).getCancelParticipantCount(), 1);
+        assertEquals(secondPeriodParticipantApplicationInfos.get(2).getEventName(), "품새 단체전");
+        assertEquals(secondPeriodParticipantApplicationInfos.get(2).getCancelParticipantCount(), 2);
+        assertEquals(secondPeriodParticipantApplicationInfos.get(3).getEventName(), "품새 페어");
+        assertEquals(secondPeriodParticipantApplicationInfos.get(3).getCancelParticipantCount(), 1);
+        assertEquals(secondPeriodParticipantApplicationInfos.get(3).getParticipantFee(), secondPeriodParticipantApplicationInfos.get(3).getRefundParticipantFee());
 
     }
 }
