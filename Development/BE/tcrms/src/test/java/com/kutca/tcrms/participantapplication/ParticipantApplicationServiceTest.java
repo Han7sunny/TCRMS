@@ -521,4 +521,64 @@ public class ParticipantApplicationServiceTest {
         assertEquals(secondPeriodParticipantApplicationInfos.get(3).getParticipantFee(), secondPeriodParticipantApplicationInfos.get(3).getRefundParticipantFee());
 
     }
+
+    @Test
+    @DisplayName("1차 최종 제출 확인(조회) 성공")
+    void getFinalSubmitInfoInFirstPeriodSuccess(){
+
+        //  given
+        UniversityApplication findUniversityApplicationInFirstPeriod1 = UniversityApplication.builder()
+                .universityApplicationId(1L)
+                .user(findUser1)
+                .eventName("개인전")
+                .teamCount(3)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod2 = UniversityApplication.builder()
+                .universityApplicationId(2L)
+                .user(findUser1)
+                .eventName("겨루기 단체전")
+                .teamCount(3)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod3 = UniversityApplication.builder()
+                .universityApplicationId(3L)
+                .user(findUser1)
+                .eventName("품새 단체전")
+                .teamCount(0)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod4 = UniversityApplication.builder()
+                .universityApplicationId(4L)
+                .user(findUser1)
+                .eventName("품새 페어")
+                .teamCount(1)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        given(userRepository.findById(findUser1.getUserId())).willReturn(Optional.of(findUser1));
+        given(secondPeriodRepository.findByUser_UserId(kutca.getUserId())).willReturn(Optional.of(kutcaSecondPeriod));
+        given(universityApplicationRepository.findAllByUser_UserIdAndPeriod(findUser1.getUserId(), DatePeriod.FIRST.name())).willReturn(Arrays.asList(findUniversityApplicationInFirstPeriod1, findUniversityApplicationInFirstPeriod2, findUniversityApplicationInFirstPeriod3, findUniversityApplicationInFirstPeriod4));
+
+        //  when
+        ResponseDto<?> responseDto = participantApplicationService.getFinalSubmitInfoInFirstPeriod(findUser1.getUserId());
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+
+        FinalSubmitResponseDto.FirstPeriod firstPeriodResponseDto = (FinalSubmitResponseDto.FirstPeriod)responseDto.getPayload();
+        List<ParticipantApplicationResponseDto.FirstPeriod> firstPeriodParticipantApplicationInfos = firstPeriodResponseDto.getParticipantApplicationInfos().getParticipantApplicationInfos();
+
+        assertEquals(firstPeriodResponseDto.getUserInfo().getUserName(), findUser1.getUsername());
+        assertEquals(firstPeriodResponseDto.getAccountInfo().getDepositOwnerName(), kutcaSecondPeriod.getAccount().getDepositOwnerName());
+
+        assertEquals(firstPeriodParticipantApplicationInfos.get(0).getParticipantCount(), findUniversityApplicationInFirstPeriod1.getTeamCount());
+        assertEquals(firstPeriodParticipantApplicationInfos.get(1).getParticipantCount(), findUniversityApplicationInFirstPeriod2.getTeamCount());
+        assertEquals(firstPeriodParticipantApplicationInfos.get(2).getParticipantCount(), findUniversityApplicationInFirstPeriod3.getTeamCount());
+        assertEquals(firstPeriodParticipantApplicationInfos.get(3).getParticipantCount(), findUniversityApplicationInFirstPeriod4.getTeamCount());
+
+    }
 }
