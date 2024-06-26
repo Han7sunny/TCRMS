@@ -515,6 +515,7 @@ public class ParticipantApplicationServiceTest {
         assertEquals(secondPeriodParticipantApplicationInfos.get(1).getCancelParticipantCount(), 1);
         assertEquals(secondPeriodParticipantApplicationInfos.get(2).getEventName(), "품새 단체전");
         assertEquals(secondPeriodParticipantApplicationInfos.get(2).getCancelParticipantCount(), 2);
+        assertEquals(secondPeriodParticipantApplicationInfos.get(2).getRefundParticipantFee(), 50000);
         assertEquals(secondPeriodParticipantApplicationInfos.get(3).getEventName(), "품새 페어");
         assertEquals(secondPeriodParticipantApplicationInfos.get(3).getCancelParticipantCount(), 1);
         assertEquals(secondPeriodParticipantApplicationInfos.get(3).getParticipantFee(), secondPeriodParticipantApplicationInfos.get(3).getRefundParticipantFee());
