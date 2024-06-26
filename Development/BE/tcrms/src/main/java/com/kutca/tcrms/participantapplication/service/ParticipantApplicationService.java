@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -410,6 +411,8 @@ public class ParticipantApplicationService {
 
     private FinalSubmitResponseDto.Total getTotalParticipantApplicationInfoFromUniversityApplication(Long userId){
 
+        AtomicBoolean isRefundExist = new AtomicBoolean(false);
+
         List<UniversityApplicationResponseDto.FirstPeriod> firstPeriodParticipantApplications = getParticipantApplicationInfoFromUniversityApplication(userId, DatePeriod.FIRST.name());
         List<ParticipantApplicationResponseDto.SecondPeriod> participantApplicationInfos = firstPeriodParticipantApplications.stream().map(universityApplication -> {
             ParticipantApplicationResponseDto.SecondPeriod participantApplicationInfo = ParticipantApplicationResponseDto.SecondPeriod.fromUniversityApplication(universityApplication);
@@ -418,13 +421,14 @@ public class ParticipantApplicationService {
                 UniversityApplication secondPeriodUniversityApplication = findSecondPeriodUniversityApplication.get();
                 participantApplicationInfo.setCancelParticipantCount(secondPeriodUniversityApplication.getTeamCount());
                 participantApplicationInfo.setRefundParticipantFee(secondPeriodUniversityApplication.getTeamFee());
+                isRefundExist.set(true);
             }
             return participantApplicationInfo;
         }).toList();
 
         return FinalSubmitResponseDto.Total.builder()
                 .participantApplicationInfos(new ParticipantApplicationsResponseDto<>(participantApplicationInfos))
-                .isRefundExist(!participantApplicationInfos.isEmpty())
+                .isRefundExist(isRefundExist.get())
                 .build();
 
     }

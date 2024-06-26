@@ -10,6 +10,7 @@ import com.kutca.tcrms.participant.controller.dto.request.IndividualParticipantR
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
 import com.kutca.tcrms.participantapplication.controller.dto.response.ParticipantApplicationResponseDto;
+import com.kutca.tcrms.participantapplication.controller.dto.response.ParticipantApplicationsResponseDto;
 import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
 import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import com.kutca.tcrms.participantapplication.service.ParticipantApplicationService;
@@ -580,5 +581,59 @@ public class ParticipantApplicationServiceTest {
         assertEquals(firstPeriodParticipantApplicationInfos.get(2).getParticipantCount(), findUniversityApplicationInFirstPeriod3.getTeamCount());
         assertEquals(firstPeriodParticipantApplicationInfos.get(3).getParticipantCount(), findUniversityApplicationInFirstPeriod4.getTeamCount());
 
+    }
+
+    @Test
+    @DisplayName("2차 최종 제출 확인(2차 기간 내 변경 사항 없음, 취소 내역 없음) 성공")
+    void getFinalSubmitInfoInSecondPeriodWithNoRefundExist(){
+
+        //  given
+        UniversityApplication findUniversityApplicationInFirstPeriod1 = UniversityApplication.builder()
+                .universityApplicationId(1L)
+                .user(findUser1)
+                .eventName("개인전")
+                .teamCount(3)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod2 = UniversityApplication.builder()
+                .universityApplicationId(2L)
+                .user(findUser1)
+                .eventName("겨루기 단체전")
+                .teamCount(3)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod3 = UniversityApplication.builder()
+                .universityApplicationId(3L)
+                .user(findUser1)
+                .eventName("품새 단체전")
+                .teamCount(0)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInFirstPeriod4 = UniversityApplication.builder()
+                .universityApplicationId(4L)
+                .user(findUser1)
+                .eventName("품새 페어")
+                .teamCount(1)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        given(universityApplicationRepository.findAllByUser_UserIdAndPeriod(findUser1.getUserId(), DatePeriod.FIRST.name())).willReturn(Arrays.asList(findUniversityApplicationInFirstPeriod1, findUniversityApplicationInFirstPeriod2, findUniversityApplicationInFirstPeriod3, findUniversityApplicationInFirstPeriod4));
+        given(universityApplicationRepository.findByUser_UserIdAndEventNameAndPeriod(findUser1.getUserId(), "개인전", DatePeriod.SECOND.name())).willReturn(Optional.empty());
+
+        //  when
+        ResponseDto<?> responseDto = participantApplicationService.getFinalSubmitInfoInSecondPeriod(findUser1.getUserId());
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+
+        FinalSubmitResponseDto.Total secondPeriodResponseDto = (FinalSubmitResponseDto.Total)responseDto.getPayload();
+        List<ParticipantApplicationResponseDto.SecondPeriod> totalParticipantApplicationInfos = secondPeriodResponseDto.getParticipantApplicationInfos().getParticipantApplicationInfos();
+        assertFalse(secondPeriodResponseDto.isRefundExist());
+        assertEquals(totalParticipantApplicationInfos.get(0).getEventName(), "개인전");
+        assertEquals(totalParticipantApplicationInfos.get(0).getParticipantCount(), findUniversityApplicationInFirstPeriod1.getTeamCount());
+        assertEquals(totalParticipantApplicationInfos.get(0).getCancelParticipantCount(), 0);
     }
 }
