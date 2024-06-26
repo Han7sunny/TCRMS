@@ -45,6 +45,7 @@ public class ParticipantApplicationService {
 
 //    @Value("${kutca.admin.id}")
     private static final Long KUTCA_ID = 1L;   //  추후 application.properties에서 값 추출
+//    private final individual
 
     public ResponseDto<?> deleteParticipantApplication(IndividualParticipantRequestDto.Delete individualParticipantRequestDto){
 
@@ -165,7 +166,7 @@ public class ParticipantApplicationService {
                 .payload(
                         FinalSubmitResponseDto.SecondPeriod.builder()
                                 .participantApplicationInfos(new ParticipantApplicationsResponseDto<>(participantApplicationInfos))
-                                .isRefundExist(!participantApplicationInfos.isEmpty())
+                                .isRefundExist(individualCount.get() != 0 && !teamCount.isEmpty())
                                 .build())
                 .build();
 
@@ -356,14 +357,16 @@ public class ParticipantApplicationService {
         return Arrays.asList(individual, sparringTeam, poomsaeTeam, poomsaePair);
     }
 
-    private List<ParticipantApplicationResponseDto.SecondPeriod> getParticipantApplicationInfosInSecondPeriod(List<UniversityApplicationResponseDto.FirstPeriod> universityApplicationInfos, AtomicInteger individualCount, Map<Long, Set<Integer>> teamCount){
+    private List<ParticipantApplicationResponseDto.SecondPeriod> getParticipantApplicationInfosInSecondPeriod(List<UniversityApplicationResponseDto.FirstPeriod> universityApplicationInFirstPeriodInfos, AtomicInteger individualCount, Map<Long, Set<Integer>> teamCount){
 
         int individualFee = eventRepository.findById(1L).get().getEventFee();
-        int sparringTeamFee = eventRepository.findById(5L).get().getEventFee();
-        int poomsaeTeamFee = eventRepository.findById(6L).get().getEventFee();
+        int sparringFemaleTeamFee = eventRepository.findById(5L).get().getEventFee();
+        int poomsaeFemaleTeamFee = eventRepository.findById(6L).get().getEventFee();
+        int sparringMaleTeamFee = eventRepository.findById(7L).get().getEventFee();
+        int poomsaeMaleTeamFee = eventRepository.findById(8L).get().getEventFee();
         int poomsaePairFee = eventRepository.findById(9L).get().getEventFee();
 
-        return universityApplicationInfos.stream().map(universityApplicationInfo -> {
+        return universityApplicationInFirstPeriodInfos.stream().map(universityApplicationInfo -> { // 무조건 4번 반복
 
             ParticipantApplicationResponseDto.SecondPeriod participantApplicationInfo = ParticipantApplicationResponseDto.SecondPeriod.fromUniversityApplication(universityApplicationInfo);
 
@@ -373,19 +376,21 @@ public class ParticipantApplicationService {
             }
 
             if("겨루기 단체전".equals(universityApplicationInfo.getEventName())){
-                int sparringTeamCount = teamCount.get(universityApplicationInfo.getEventName()).size();
-                participantApplicationInfo.setCancelParticipantCount(sparringTeamCount);
-                participantApplicationInfo.setRefundParticipantFee(sparringTeamCount * sparringTeamFee);
+                int sparringFemaleTeamCount = teamCount.get(5L).size();
+                int sparringMaleTeamCount = teamCount.get(7L).size();
+                participantApplicationInfo.setCancelParticipantCount(sparringFemaleTeamCount + sparringMaleTeamCount);
+                participantApplicationInfo.setRefundParticipantFee(sparringFemaleTeamCount * sparringFemaleTeamFee + sparringMaleTeamCount * sparringMaleTeamFee);
             }
 
             if("품새 단체전".equals(universityApplicationInfo.getEventName())){
-                int poomsaeTeamCount = teamCount.get(universityApplicationInfo.getEventName()).size();
-                participantApplicationInfo.setCancelParticipantCount(poomsaeTeamCount);
-                participantApplicationInfo.setRefundParticipantFee(poomsaeTeamCount * poomsaeTeamFee);
+                int poomsaeFemaleTeamCount = teamCount.get(6L).size();
+                int poomsaeMaleTeamCount = teamCount.get(8L).size();
+                participantApplicationInfo.setCancelParticipantCount(poomsaeFemaleTeamCount + poomsaeMaleTeamCount);
+                participantApplicationInfo.setRefundParticipantFee(poomsaeFemaleTeamCount * poomsaeFemaleTeamFee + poomsaeMaleTeamCount * poomsaeMaleTeamFee);
             }
 
             if("품새 페어".equals(universityApplicationInfo.getEventName())){
-                int poomsaePairCount = teamCount.get(universityApplicationInfo.getEventName()).size();
+                int poomsaePairCount = teamCount.get(9L).size();
                 participantApplicationInfo.setCancelParticipantCount(poomsaePairCount);
                 participantApplicationInfo.setRefundParticipantFee(poomsaePairCount * poomsaePairFee);
             }

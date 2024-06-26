@@ -34,6 +34,7 @@ public class ParticipantApplicationResponseDto {
 
     }
 
+    @Getter
     @Setter
     @SuperBuilder
     public static class SecondPeriod extends FirstPeriod {
