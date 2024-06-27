@@ -33,22 +33,22 @@ const RegistFormat = (props) => {
 
   const periodGetHandler = useCallback(async () => {
     try {
-      // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/env/period`,
-      //   "GET",
-      //   null,
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //     "Content-Type": "application/json",
-      //   },
-      //   `기간 호출 실패`
-      // );
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/env/period`,
+        "GET",
+        null,
+        {
+          Authorization: `Bearer ${auth.token}`,
+          "Content-Type": "application/json",
+        },
+        `기간 호출 실패`
+      );
 
-      // TODO: Remove Dummy data
-      const responseData = {
-        isSuccess: true,
-        payload: { period: "first" },
-      };
+      // // TODO: Remove Dummy data
+      // const responseData = {
+      //   isSuccess: true,
+      //   payload: { period: "first" },
+      // };
 
       if (!responseData.isSuccess) {
         setError({
@@ -68,26 +68,26 @@ const RegistFormat = (props) => {
     const rowNum = Number(event.target.id.split("-")[0].replace("row", ""));
 
     try {
-      // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
-      //   "DELETE",
-      //   JSON.stringify({
-      //     userId: auth.userId,
-      //     participantId: registState.inputs[rowNum].participantId,
-      //     participantApplicationId:
-      //       props.englishTitle === "individual"
-      //         ? Object.values(saveParticipant[rowNum].eventInfo)
-      //         : Object.values(saveParticipant[rowNum].eventInfo)[0],
-      //   }),
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //     "Content-Type": "application/json",
-      //   },
-      //   `${props.errMsgPersonName} 삭제 실패`
-      // );
-      const responseData = {
-        isSuccess: true,
-      };
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
+        "DELETE",
+        JSON.stringify({
+          userId: auth.userId,
+          participantId: registState.inputs[rowNum].participantId,
+          participantApplicationId:
+            props.englishTitle === "individual"
+              ? Object.values(saveParticipant[rowNum].eventInfo)
+              : Object.values(saveParticipant[rowNum].eventInfo)[0],
+        }),
+        {
+          Authorization: `Bearer ${auth.token}`,
+          "Content-Type": "application/json",
+        },
+        `${props.errMsgPersonName} 삭제 실패`
+      );
+      // const responseData = {
+      //   isSuccess: true,
+      // };
 
       if (responseData.isSuccess) {
         deleteRow(rowNum);
@@ -109,47 +109,47 @@ const RegistFormat = (props) => {
   // 개인전 페이지 들어오면 먼저 개인전 저장된 데이터 있는지 체크
   const listHandler = useCallback(async () => {
     try {
-      // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
-      //   "GET",
-      //   null,
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //   },
-      //   `${errMsgPersonName} 로드 실패`
-      // );
-
-      // TODO : change Dummy DATA
-      const responseData = {
-        isSuccess: true,
-        payload: {
-          isEditable: true,
-          isParticipantExists: true,
-          participants: [
-            {
-              participantId: 1,
-              weightClassId: 1,
-              name: "조서영",
-              identityNumber: "961201-0000000",
-              gender: "여성",
-              isForeigner: false,
-              phoneNumber: "010-5137-8081",
-              nationality: "",
-              eventInfo: { 1: 5, 2: 10 },
-            },
-            {
-              participantId: 2,
-              //weightClassId: ,
-              name: "조땡땡",
-              identityNumber: "961201-0000001",
-              gender: "남성",
-              isForeigner: true,
-              nationality: "영국",
-              eventInfo: { 4: 8 },
-            },
-          ],
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
+        "GET",
+        null,
+        {
+          Authorization: `Bearer ${auth.token}`,
         },
-      };
+        `${errMsgPersonName} 로드 실패`
+      );
+
+      // // TODO : change Dummy DATA
+      // const responseData = {
+      //   isSuccess: true,
+      //   payload: {
+      //     isEditable: true,
+      //     isParticipantExists: true,
+      //     participants: [
+      //       {
+      //         participantId: 1,
+      //         weightClassId: 1,
+      //         name: "조서영",
+      //         identityNumber: "961201-0000000",
+      //         gender: "여성",
+      //         isForeigner: false,
+      //         phoneNumber: "010-5137-8081",
+      //         nationality: "",
+      //         eventInfo: { 1: 5, 2: 10 },
+      //       },
+      //       {
+      //         participantId: 2,
+      //         //weightClassId: ,
+      //         name: "조땡땡",
+      //         identityNumber: "961201-0000001",
+      //         gender: "남성",
+      //         isForeigner: true,
+      //         nationality: "영국",
+      //         eventInfo: { 4: 8 },
+      //       },
+      //     ],
+      //   },
+      // };
       // const responseData = {
       //   isSuccess: true,
       //   payload: { isParticipantExists: false },
@@ -186,26 +186,27 @@ const RegistFormat = (props) => {
 
   const registHandler = async () => {
     try {
-      // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
-      //   "POST",
-      //   JSON.stringify({
-      //     userId: auth.userId,
-      //     participants: registState.inputs
-      //       .filter((participant) => participant.isNew)
-      //       .map((participant) => formatParticipant(participant, 2)),
-      //   }),
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //     "Content-Type": "application/json",
-      //   },
-      //   `${props.errMsgPersonName} 등록 실패`
-      // );
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
+        "POST",
+        JSON.stringify({
+          userId: auth.userId,
+          participants: registState.inputs
+            .filter((participant) => participant.isNew)
+            .map((participant) => formatParticipant(participant, 2)),
+        }),
+        {
+          Authorization: `Bearer ${auth.token}`,
+          "Content-Type": "application/json",
+        },
+        `${props.errMsgPersonName} 등록 실패`
+      );
 
-      // TODO: Remove Dummy data
-      const responseData = {
-        isSuccess: true,
-      };
+      // // TODO: Remove Dummy data
+      // const responseData = {
+      //   isSuccess: true,
+      // };
+
       if (!responseData.isSuccess) {
         setError({
           title: `${props.errMsgPersonName} 등록 실패`,
@@ -239,34 +240,36 @@ const RegistFormat = (props) => {
       );
 
       if (formatData) {
-        // const responseData = await sendRequest(
-        //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
-        //   "PUT",
-        //   JSON.stringify({
-        //     // userId: auth.userId,
-        //     ...formatData,
-        //   }),
-        //   {
-        //     Authorization: `Bearer ${auth.token}`,
-        //     "Content-Type": "application/json",
-        //   },
-
-        //   `${props.errMsgPersonName} 수정 실패`
-        // );
-        const responseData = {
-          isSuccess: true,
-          message: "check please",
-          payload: {
-            participantId: 2,
-            // weightClassId: ,
-            name: "조땡땡",
-            identityNumber: "000000-0000001",
-            gender: "남성",
-            isForeigner: true,
-            nationality: "영국",
-            eventInfo: { 4: 8 },
+        const responseData = await sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/api/user/${props.englishTitle}`,
+          "PUT",
+          JSON.stringify({
+            // userId: auth.userId,
+            ...formatData,
+          }),
+          {
+            Authorization: `Bearer ${auth.token}`,
+            "Content-Type": "application/json",
           },
-        };
+
+          `${props.errMsgPersonName} 수정 실패`
+        );
+
+        // DUMMY DATA
+        // const responseData = {
+        //   isSuccess: true,
+        //   message: "check please",
+        //   payload: {
+        //     participantId: 2,
+        //     // weightClassId: ,
+        //     name: "조땡땡",
+        //     identityNumber: "000000-0000001",
+        //     gender: "남성",
+        //     isForeigner: true,
+        //     nationality: "영국",
+        //     eventInfo: { 4: 8 },
+        //   },
+        // };
 
         if (responseData.isSuccess) {
           let participantsData = [...registState.inputs];

@@ -7,11 +7,13 @@ import inputField from "./TableInputField";
 import { deepEqual } from "../../../shared/util/deepEqual";
 
 function areEqual(prevProps, nextProps) {
+  console.log(prevProps);
+  console.log(nextProps);
   // 같으면 true 다르면 false
   return (
-    deepEqual(prevProps.rowData, nextProps.rowData) &&
     prevProps.isEditable === nextProps.isEditable &&
-    prevProps.hideText === nextProps.hideText
+    prevProps.hideText === nextProps.hideText &&
+    deepEqual(prevProps.rowData, nextProps.rowData)
   );
 }
 

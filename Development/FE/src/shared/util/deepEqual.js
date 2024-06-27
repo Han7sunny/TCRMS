@@ -1,8 +1,8 @@
 export function deepEqual(obj1, obj2) {
   // Check if they are the same object reference
-  if (obj1 === obj2) {
-    return true;
-  }
+  // if (obj1 === obj2) {
+  //   return true;
+  // }
 
   // Check if they are both objects or arrays
   if (
@@ -23,8 +23,18 @@ export function deepEqual(obj1, obj2) {
 
   // Recursively compare nested objects or arrays
   for (let key of keys1) {
-    if (!deepEqual(obj1[key], obj2[key])) {
+    // if (!deepEqual(obj1[key], obj2[key])) {
+    //   return false;
+    // }
+    if (obj1[key] !== obj2[key]) {
       return false;
+    }
+    //
+    // Check if they are both objects or arrays
+    if (typeof obj1[key] === "object") {
+      if (typeof obj2[key] !== "object" || !deepEqual(obj1[key], obj2[key])) {
+        return false;
+      }
     }
   }
 

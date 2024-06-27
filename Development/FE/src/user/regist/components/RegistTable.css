@@ -36,6 +36,10 @@ td {
 
 .regist-table .div-flex {
   display: flex;
+
+  .table-input {
+    width: 45%;
+  }
 }
 
 .regist-table .table-column__hide-btn {

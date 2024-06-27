@@ -274,22 +274,22 @@ const RegistTeam = () => {
 
   const periodGetHandler = useCallback(async () => {
     try {
-      // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/env/period`,
-      //   "GET",
-      //   null,
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //     "Content-Type": "application/json",
-      //   },
-      //   `기간 호출 실패`
-      // );
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/env/period`,
+        "GET",
+        null,
+        {
+          Authorization: `Bearer ${auth.token}`,
+          "Content-Type": "application/json",
+        },
+        `기간 호출 실패`
+      );
 
-      // TODO: Remove Dummy data
-      const responseData = {
-        isSuccess: true,
-        payload: { period: "first" },
-      };
+      // // TODO: Remove Dummy data
+      // const responseData = {
+      //   isSuccess: true,
+      //   payload: { period: "first" },
+      // };
 
       if (!responseData.isSuccess) {
         setError({
@@ -346,8 +346,9 @@ const RegistTeam = () => {
         },
         `${errMsgPersonName} 삭제 실패`
       );
+      // DUMMY DATA
       // const responseData = {
-      //   isSuccess: false,
+      //   isSuccess: true,
       //   message: "NO"
       // }
 
@@ -365,156 +366,119 @@ const RegistTeam = () => {
   // 단체전 페이지 들어오면 먼저 단체전 저장된 데이터 있는지 체크
   const teamListHandler = useCallback(async () => {
     try {
-      // let responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
-      //   "GET",
-      //   null,
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //   },
-      //   "단체전 선수 로드 실패"
-      // );
-
-      // // TODO : change Dummy DATA
-      let responseData = {
-        isSuccess: true,
-        payload: {
-          isTeamExists: true,
-          isEditable: true,
-          teams: [
-            {
-              eventTeamNumber: 2,
-              eventId: 5,
-              teamMembers: [
-                {
-                  participantId: 1,
-                  participantApplicationId: 100,
-                  indexInTeam: "1번 선수",
-                  name: "조서영",
-                  gender: "여성",
-                  isForeigner: false,
-                  nationality: "",
-                  identityNumber: "961201-0000000",
-                  weightClassId: 2,
-                  phoneNumber: "010-0000-0000",
-                },
-                {
-                  participantId: 2,
-                  participantApplicationId: 101,
-                  indexInTeam: "2번 선수",
-                  name: "조투투",
-                  gender: "여성",
-                  isForeigner: false,
-                  nationality: "",
-                  identityNumber: "961202-0000000",
-                  weightClassId: 3,
-                  phoneNumber: "",
-                },
-                {
-                  participantId: 3,
-                  participantApplicationId: 103,
-                  indexInTeam: "3번 선수",
-                  name: "조삼삼",
-                  gender: "여성",
-                  isForeigner: false,
-                  nationality: "",
-                  identityNumber: "961203-0000000",
-                  weightClassId: 4,
-                  phoneNumber: "",
-                },
-                {
-                  participantId: 4,
-                  participantApplicationId: 104,
-                  indexInTeam: "후보 선수",
-                  name: "조후보",
-                  gender: "여성",
-                  isForeigner: false,
-                  nationality: "",
-                  identityNumber: "961204-0000000",
-                  weightClassId: 2,
-                  phoneNumber: "",
-                },
-              ],
-            },
-            {
-              eventTeamNumber: 4,
-              eventId: 7,
-              teamMembers: [
-                {
-                  participantId: 1,
-                  indexInTeam: "1번 선수",
-                  name: "조서영",
-                  gender: "남성",
-                  isForeigner: false,
-                  nationality: "",
-                  identityNumber: "961201-0000000",
-                  weightClassId: 2,
-                  phoneNumber: "010-0000-0000",
-                },
-                {
-                  participantId: 2,
-                  indexInTeam: "2번 선수",
-                  name: "조투투",
-                  gender: "남성",
-                  isForeigner: false,
-                  nationality: "",
-                  identityNumber: "961202-0000000",
-                  weightClassId: 3,
-                  phoneNumber: "",
-                },
-                {
-                  participantId: 3,
-                  indexInTeam: "3번 선수",
-                  name: "조삼삼",
-                  gender: "남성",
-                  isForeigner: false,
-                  nationality: "",
-                  identityNumber: "961203-0000000",
-                  weightClassId: 4,
-                  phoneNumber: "",
-                },
-              ],
-            },
-            // {
-            //   eventTeamNumber: 3,
-            //   eventId: 8,
-
-            //   teamMembers: [
-            //     {
-            //       participantId: 1,
-            //       indexInTeam: "1번 선수",
-            //       name: "조서영",
-            //       gender: "남성",
-            //       isForeigner: false,
-            //       nationality: "",
-            //       identityNumber: "961201-0000000",
-            //       weightClassId: 7,
-            //     },
-            //     {
-            //       participantId: 2,
-            //       indexInTeam: "2번 선수",
-            //       name: "조투투",
-            //       gender: "남성",
-            //       isForeigner: false,
-            //       nationality: "",
-            //       identityNumber: "961202-0000000",
-            //       weightClassId: 8,
-            //     },
-            //     {
-            //       participantId: 3,
-            //       indexInTeam: "3번 선수",
-            //       name: "조삼삼",
-            //       gender: "남성",
-            //       isForeigner: false,
-            //       nationality: "",
-            //       identityNumber: "961203-0000000",
-            //       weightClassId: 6,
-            //     },
-            //   ],
-            // },
-          ],
+      let responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
+        "GET",
+        null,
+        {
+          Authorization: `Bearer ${auth.token}`,
         },
-      };
+        "단체전 선수 로드 실패"
+      );
+
+      // // // TODO : change Dummy DATA
+      // let responseData = {
+      //   isSuccess: true,
+      //   payload: {
+      //     isTeamExists: true,
+      //     isEditable: true,
+      //     teams: [
+      //       {
+      //         eventTeamNumber: 2,
+      //         eventId: 5,
+      //         teamMembers: [
+      //           {
+      //             participantId: 1,
+      //             participantApplicationId: 100,
+      //             indexInTeam: "1번 선수",
+      //             name: "조서영",
+      //             gender: "여성",
+      //             isForeigner: false,
+      //             nationality: "",
+      //             identityNumber: "961201-0000000",
+      //             weightClassId: 2,
+      //             phoneNumber: "010-0000-0000",
+      //           },
+      //           {
+      //             participantId: 2,
+      //             participantApplicationId: 101,
+      //             indexInTeam: "2번 선수",
+      //             name: "조투투",
+      //             gender: "여성",
+      //             isForeigner: false,
+      //             nationality: "",
+      //             identityNumber: "961202-0000000",
+      //             weightClassId: 3,
+      //             phoneNumber: "",
+      //           },
+      //           {
+      //             participantId: 3,
+      //             participantApplicationId: 103,
+      //             indexInTeam: "3번 선수",
+      //             name: "조삼삼",
+      //             gender: "여성",
+      //             isForeigner: false,
+      //             nationality: "",
+      //             identityNumber: "961203-0000000",
+      //             weightClassId: 4,
+      //             phoneNumber: "",
+      //           },
+      //           {
+      //             participantId: 4,
+      //             participantApplicationId: 104,
+      //             indexInTeam: "후보 선수",
+      //             name: "조후보",
+      //             gender: "여성",
+      //             isForeigner: false,
+      //             nationality: "",
+      //             identityNumber: "961204-0000000",
+      //             weightClassId: 2,
+      //             phoneNumber: "",
+      //           },
+      //         ],
+      //       },
+      //       {
+      //         eventTeamNumber: 4,
+      //         eventId: 7,
+      //         teamMembers: [
+      //           {
+      //             participantId: 1,
+      //             indexInTeam: "1번 선수",
+      //             name: "조서영",
+      //             gender: "남성",
+      //             isForeigner: false,
+      //             nationality: "",
+      //             identityNumber: "961201-0000000",
+      //             weightClassId: 2,
+      //             phoneNumber: "010-0000-0000",
+      //           },
+      //           {
+      //             participantId: 2,
+      //             indexInTeam: "2번 선수",
+      //             name: "조투투",
+      //             gender: "남성",
+      //             isForeigner: false,
+      //             nationality: "",
+      //             identityNumber: "961202-0000000",
+      //             weightClassId: 3,
+      //             phoneNumber: "",
+      //           },
+      //           {
+      //             participantId: 3,
+      //             indexInTeam: "3번 선수",
+      //             name: "조삼삼",
+      //             gender: "남성",
+      //             isForeigner: false,
+      //             nationality: "",
+      //             identityNumber: "961203-0000000",
+      //             weightClassId: 4,
+      //             phoneNumber: "",
+      //           },
+      //         ],
+      //       },
+      // ],
+      // },
+      // };
       // const responseData = {
       //   isSuccess: true,
       //   payload: { isTeamExists: false },
@@ -670,7 +634,10 @@ const RegistTeam = () => {
       // let teamsData = registState.inputs;
       // teamsData[teamNum].editable = false;
       // setRegistData(teamsData);
-      setRegistData(saveTeam.map((team) => formatTeam(team, 1)));
+      let teamsData = registState.inputs;
+      teamsData[teamNum] = formatTeam(saveTeam[teamNum], 1);
+      setRegistData(teamsData);
+      // setRegistData(saveTeam.map((team) => formatTeam(team, 1)));
       return;
     }
   };

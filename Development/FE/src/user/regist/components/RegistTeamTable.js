@@ -9,9 +9,26 @@ import Button from "../../../shared/components/TableInputElements/Button";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import "./RegistTable.css";
+import { deepEqual } from "../../../shared/util/deepEqual";
 
-const RegistTeamTable = (props) => {
+function areEqual(prevProps, nextProps) {
+  console.log(prevProps);
+  console.log(nextProps);
+  // 같으면 true 다르면 false
+  return (
+    prevProps.editMode === nextProps.editMode &&
+    prevProps.teamId === nextProps.teamId &&
+    prevProps.data.reduce(
+      (acc, curr, i) => acc && deepEqual(curr, nextProps.data[i])
+    )
+    // deepEqual(prevProps.data, nextProps.data)
+  );
+}
+
+const RegistTeamTable = React.memo((props) => {
   const teamId = props.teamId || "";
+
+  console.log(teamId);
 
   const inputField = (colInfo, initVal, rowidx, colidx, key, disabled) => {
     switch (colInfo.type) {
@@ -261,6 +278,6 @@ const RegistTeamTable = (props) => {
       <tbody>{bodyElement}</tbody>
     </table>
   );
-};
+}, areEqual);
 
 export default RegistTeamTable;

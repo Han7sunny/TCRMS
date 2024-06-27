@@ -3,6 +3,18 @@ import React, { useState } from "react";
 import File from "../../../shared/components/TableInputElements/File";
 
 import "./DocuSubmitTable.css";
+import { deepEqual } from "../../../shared/util/deepEqual";
+
+function areEqual(prevProps, nextProps) {
+  console.log(prevProps);
+  console.log(nextProps);
+  // 같으면 true 다르면 false
+  return (
+    // prevProps.isEditable === nextProps.isEditable &&
+    // prevProps.hideText === nextProps.hideText &&
+    deepEqual(prevProps.data, nextProps.data)
+  );
+}
 
 const DocuSubmitTable = React.memo((props) => {
   const inputField = (colInfo, initVal, rowidx, colidx, key) => {
@@ -229,6 +241,6 @@ const DocuSubmitTable = React.memo((props) => {
     </table>
     // </form>
   );
-});
+}, areEqual);
 
 export default DocuSubmitTable;
