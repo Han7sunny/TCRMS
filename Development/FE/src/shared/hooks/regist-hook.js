@@ -20,7 +20,7 @@ const registReducer = (state, action) => {
         ...state,
         inputs: data,
       };
-    
+
     case "INPUT_CHANGE_TEAM":
       let idArrTeam = action.inputId.split("-");
       let teamIdx = Number(idArrTeam[0].replace("team", ""));
@@ -32,7 +32,8 @@ const registReducer = (state, action) => {
       }
       if (idArrTeam.length === 5) {
         let subidx = Number(idArrTeam[4].replace("input", ""));
-        dataTeam[teamIdx].teamMembers[memberIdx][idArrTeam[3]][subidx] = action.value;
+        dataTeam[teamIdx].teamMembers[memberIdx][idArrTeam[3]][subidx] =
+          action.value;
       }
 
       return {
@@ -81,7 +82,7 @@ export const useRegist = (initialInputs, defaultInputs) => {
         value: value,
         isValid: isValid,
         inputId: id,
-      })
+      });
     } else {
       dispatch({
         type: "INPUT_CHANGE",
@@ -92,12 +93,15 @@ export const useRegist = (initialInputs, defaultInputs) => {
     }
   }, []);
 
-  const addRow = useCallback((input) => {
-    dispatch({
-      type: "ADD_ROW",
-      value: input ? input : defaultInputs,
-    });
-  }, [defaultInputs]);
+  const addRow = useCallback(
+    (input) => {
+      dispatch({
+        type: "ADD_ROW",
+        value: input ? input : defaultInputs,
+      });
+    },
+    [defaultInputs]
+  );
 
   const deleteRow = useCallback((row) => {
     dispatch({

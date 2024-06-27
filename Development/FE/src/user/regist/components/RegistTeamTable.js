@@ -3,15 +3,34 @@ import React, { useState } from "react";
 import Input from "../../../shared/components/TableInputElements/Input";
 import RadioGroup from "../../../shared/components/TableInputElements/RadioGroup";
 import CheckboxGroup from "../../../shared/components/TableInputElements/CheckboxGroup";
+import CheckboxBool from "../../../shared/components/TableInputElements/CheckboxBool";
 import Dropdown from "../../../shared/components/TableInputElements/Dropdown";
 import Button from "../../../shared/components/TableInputElements/Button";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import "./RegistTable.css";
+import { deepEqual } from "../../../shared/util/deepEqual";
 
-const RegistTeamTable = (props) => {
+function areEqual(prevProps, nextProps) {
+  console.log(prevProps);
+  console.log(nextProps);
+  // 같으면 true 다르면 false
+  return (
+    prevProps.editMode === nextProps.editMode &&
+    prevProps.teamId === nextProps.teamId &&
+    prevProps.data.reduce(
+      (acc, curr, i) => acc && deepEqual(curr, nextProps.data[i])
+    )
+    // deepEqual(prevProps.data, nextProps.data)
+  );
+}
+
+const RegistTeamTable = React.memo((props) => {
   const teamId = props.teamId || "";
 
-  const inputField = (colInfo, initVal, rowidx, colidx, key) => {
+  console.log(teamId);
+
+  const inputField = (colInfo, initVal, rowidx, colidx, key, disabled) => {
     switch (colInfo.type) {
       case "text":
         if (Array.isArray(initVal)) {
@@ -25,6 +44,26 @@ const RegistTeamTable = (props) => {
               &nbsp;
             </div>
           );
+        } else if (initVal === "후보 선수") {
+          return (
+            <div
+              id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
+              key={key}
+              className="display-flex"
+            >
+              &nbsp;{initVal}&nbsp;
+              {props.editMode && (
+                <CheckboxBool
+                  id={teamId + "row" + rowidx + "-col" + colidx + "-editable"}
+                  key={key}
+                  item={true}
+                  initialValue={!disabled} //!row.editable = disabled
+                  onInput={props.inputHandler}
+                  teamId={teamId}
+                />
+              )}
+            </div>
+          );
         } else {
           return (
             <div
@@ -36,7 +75,8 @@ const RegistTeamTable = (props) => {
           );
         }
       case "text-hidden":
-        const val = initVal.join("");
+        let val = initVal.join("");
+        if (val === "-") val = "";
         return (
           <div
             id={teamId + "row" + rowidx + "-col" + colidx + "-" + colInfo.id}
@@ -62,6 +102,7 @@ const RegistTeamTable = (props) => {
             validators={colInfo.detail.validators}
             placeholder={colInfo.detail.placeholder}
             initialValue={initVal}
+            disabled={disabled || colInfo.detail.disabled}
           />
         );
       case "radio-group":
@@ -75,7 +116,7 @@ const RegistTeamTable = (props) => {
             teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
-            disabled={colInfo.detail.disabled}
+            disabled={disabled || colInfo.detail.disabled}
           />
         );
       case "checkbox-group":
@@ -89,6 +130,7 @@ const RegistTeamTable = (props) => {
             teamId={teamId}
             showLabel={colInfo.detail.showLabel}
             affector={colInfo.detail.affector}
+            disabled={disabled || colInfo.detail.disabled}
           />
         );
       case "dropdown":
@@ -100,7 +142,7 @@ const RegistTeamTable = (props) => {
             onInput={props.inputHandler}
             teamId={teamId}
             initialValue={initVal}
-            disabled={colInfo.detail.disabled}
+            disabled={disabled || colInfo.detail.disabled}
           />
         );
       case "button":
@@ -122,7 +164,14 @@ const RegistTeamTable = (props) => {
             key={key}
           >
             {colInfo.detail.map((item, i) =>
-              inputField(item, initVal[i], rowidx, colidx, colInfo.id + i)
+              inputField(
+                item,
+                initVal[i],
+                rowidx,
+                colidx,
+                colInfo.id + i,
+                disabled
+              )
             )}
           </div>
         );
@@ -138,16 +187,39 @@ const RegistTeamTable = (props) => {
       {props.editMode
         ? props.modifyColumns.map((col, j) => (
             <td key={"row" + i + "col" + j}>
-              {inputField(col, row[col.id], i, j)}
+              {inputField(col, row[col.id], i, j, null, !row.editable)}
             </td>
-          ))
+          )) // editable
         : props.columns.map((col, j) => (
             <td key={"row" + i + "col" + j}>
-              {inputField(col, row[col.id], i, j)}
+              {inputField(col, row[col.id], i, j, null, false)}
             </td>
           ))}
     </tr>
   ));
+
+  const infoToolTip = (
+    <Tooltip
+      title={
+        <div className="table-comments">
+          외국인 선수이며{" "}
+          <span className="info-highlight-case">
+            외국인등록번호가 없는 경우
+          </span>
+          <br />
+          개인식별을 위해 <span className="info-highlight">폰번호</span>나{" "}
+          <span className="info-highlight">이메일 주소</span> 기입
+        </div>
+      }
+      placement="top"
+    >
+      <img
+        src={`${process.env.PUBLIC_URL}/img/info_24dp.png`}
+        width={"14px"}
+        alt="비고"
+      />
+    </Tooltip>
+  );
 
   return (
     <table id={props.tableId} className="regist-table">
@@ -162,30 +234,50 @@ const RegistTeamTable = (props) => {
       <thead>
         <tr>
           {props.showNumber && <th></th>}
-          {props.columns.map((col) => {
-            if (col.type === "text-hidden") {
-              return (
-                <th key={col.id}>
-                  {col.name}{" "}
-                  <button
-                    className="table-column__hide-btn"
-                    onClick={() => {
-                      setHideText(!hideText);
-                    }}
-                  >
-                    {hideText ? "보이기" : "숨기기"}
-                  </button>
-                </th>
-              );
-            } else {
-              return <th key={col.id}>{col.name}</th>;
-            }
-          })}
+          {props.editMode
+            ? props.modifyColumns.map((col) => {
+                if (col.name === "비고") {
+                  return (
+                    <th key={col.id}>
+                      {col.name}
+                      {infoToolTip}{" "}
+                    </th>
+                  );
+                } else {
+                  return <th key={col.id}>{col.name}</th>;
+                }
+              })
+            : props.columns.map((col) => {
+                if (col.type === "text-hidden") {
+                  return (
+                    <th key={col.id}>
+                      {col.name}{" "}
+                      <button
+                        className="table-column__hide-btn"
+                        onClick={() => {
+                          setHideText(!hideText);
+                        }}
+                      >
+                        {hideText ? "보이기" : "숨기기"}
+                      </button>
+                    </th>
+                  );
+                } else if (col.name === "비고") {
+                  return (
+                    <th key={col.id}>
+                      {col.name}
+                      {infoToolTip}{" "}
+                    </th>
+                  );
+                } else {
+                  return <th key={col.id}>{col.name}</th>;
+                }
+              })}
         </tr>
       </thead>
       <tbody>{bodyElement}</tbody>
     </table>
   );
-};
+}, areEqual);
 
 export default RegistTeamTable;

@@ -18,6 +18,7 @@ const RegistFormat = (props) => {
 
   const [saveParticipant, setSaveParticipant] = useState([]);
   const [envPeriod, setEnvPeriod] = useState("none");
+  const [isEditable, setIsEditable] = useState(false);
   const [enableDropdownRow, setEnableDropdownRow] = useState(null);
 
   const [registState, inputHandler, addRow, deleteRow, setRegistData] =
@@ -32,22 +33,22 @@ const RegistFormat = (props) => {
 
   const periodGetHandler = useCallback(async () => {
     try {
-      // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/env/period`,
-      //   "GET",
-      //   null,
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //     "Content-Type": "application/json",
-      //   },
-      //   `기간 호출 실패`
-      // );
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/env/period`,
+        "GET",
+        null,
+        {
+          Authorization: `Bearer ${auth.token}`,
+          "Content-Type": "application/json",
+        },
+        `기간 호출 실패`
+      );
 
-      // TODO: Remove Dummy data
-      const responseData = {
-        isSuccess: true,
-        payload: { period: "second" },
-      };
+      // // TODO: Remove Dummy data
+      // const responseData = {
+      //   isSuccess: true,
+      //   payload: { period: "first" },
+      // };
 
       if (!responseData.isSuccess) {
         setError({
@@ -60,7 +61,7 @@ const RegistFormat = (props) => {
     } catch (err) {
       throw err;
     }
-  }, [envPeriod]);
+  }, [setError]);
 
   const deleteDataHandler = async (event) => {
     event.preventDefault();
@@ -73,9 +74,10 @@ const RegistFormat = (props) => {
         JSON.stringify({
           userId: auth.userId,
           participantId: registState.inputs[rowNum].participantId,
-          participantApplicationId: Object.values(
-            saveParticipant[rowNum].eventInfo
-          ),
+          participantApplicationId:
+            props.englishTitle === "individual"
+              ? Object.values(saveParticipant[rowNum].eventInfo)
+              : Object.values(saveParticipant[rowNum].eventInfo)[0],
         }),
         {
           Authorization: `Bearer ${auth.token}`,
@@ -83,6 +85,9 @@ const RegistFormat = (props) => {
         },
         `${props.errMsgPersonName} 삭제 실패`
       );
+      // const responseData = {
+      //   isSuccess: true,
+      // };
 
       if (responseData.isSuccess) {
         deleteRow(rowNum);
@@ -104,52 +109,54 @@ const RegistFormat = (props) => {
   // 개인전 페이지 들어오면 먼저 개인전 저장된 데이터 있는지 체크
   const listHandler = useCallback(async () => {
     try {
-      // const responseData = await sendRequest(
-      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
-      //   "GET",
-      //   null,
-      //   {
-      //     Authorization: `Bearer ${auth.token}`,
-      //   },
-      //   `${errMsgPersonName} 로드 실패`
-      // );
-
-      // TODO : change Dummy DATA
-      const responseData = {
-        isSuccess: true,
-        payload: {
-          isParticipantExists: true,
-          participants: [
-            {
-              participantId: 1,
-              weightClassId: 1,
-              name: "조서영",
-              identityNumber: "961201-0000000",
-              gender: "여성",
-              isForeigner: false,
-              phoneNumber: "010-5137-8081",
-              nationality: "",
-              eventInfo: { 1: 5, 2: 10 },
-            },
-            {
-              participantId: 2,
-              //weightClassId: ,
-              name: "조땡땡",
-              identityNumber: "961201-0000001",
-              gender: "남성",
-              isForeigner: true,
-              nationality: "영국",
-              eventInfo: { 4: 8 },
-            },
-          ],
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${englishTitle}?userId=${auth.userId}`,
+        "GET",
+        null,
+        {
+          Authorization: `Bearer ${auth.token}`,
         },
-      };
+        `${errMsgPersonName} 로드 실패`
+      );
+
+      // // TODO : change Dummy DATA
+      // const responseData = {
+      //   isSuccess: true,
+      //   payload: {
+      //     isEditable: true,
+      //     isParticipantExists: true,
+      //     participants: [
+      //       {
+      //         participantId: 1,
+      //         weightClassId: 1,
+      //         name: "조서영",
+      //         identityNumber: "961201-0000000",
+      //         gender: "여성",
+      //         isForeigner: false,
+      //         phoneNumber: "010-5137-8081",
+      //         nationality: "",
+      //         eventInfo: { 1: 5, 2: 10 },
+      //       },
+      //       {
+      //         participantId: 2,
+      //         //weightClassId: ,
+      //         name: "조땡땡",
+      //         identityNumber: "961201-0000001",
+      //         gender: "남성",
+      //         isForeigner: true,
+      //         nationality: "영국",
+      //         eventInfo: { 4: 8 },
+      //       },
+      //     ],
+      //   },
+      // };
       // const responseData = {
       //   isSuccess: true,
       //   payload: { isParticipantExists: false },
       // };
 
       if (responseData.payload.isParticipantExists) {
+        setIsEditable(responseData.payload.isEditable);
         setIsRegistMode(false);
         setRegistData(
           responseData.payload.participants.map((participant) =>
@@ -157,7 +164,7 @@ const RegistFormat = (props) => {
           )
         );
         setSaveParticipant(responseData.payload.participants);
-      } else {
+      } else if (responseData.payload.isEditable) {
         setIsRegistMode(true); //useRegist 초기값 정하기
         addRow();
       }
@@ -168,6 +175,7 @@ const RegistFormat = (props) => {
     }
   }, [
     auth.token,
+    auth.userId,
     sendRequest,
     setRegistData,
     addRow,
@@ -198,6 +206,7 @@ const RegistFormat = (props) => {
       // const responseData = {
       //   isSuccess: true,
       // };
+
       if (!responseData.isSuccess) {
         setError({
           title: `${props.errMsgPersonName} 등록 실패`,
@@ -236,7 +245,7 @@ const RegistFormat = (props) => {
           "PUT",
           JSON.stringify({
             // userId: auth.userId,
-            ...formatParticipant(participantData, 3, saveParticipant[rowNum]),
+            ...formatData,
           }),
           {
             Authorization: `Bearer ${auth.token}`,
@@ -245,6 +254,8 @@ const RegistFormat = (props) => {
 
           `${props.errMsgPersonName} 수정 실패`
         );
+
+        // DUMMY DATA
         // const responseData = {
         //   isSuccess: true,
         //   message: "check please",
@@ -256,14 +267,17 @@ const RegistFormat = (props) => {
         //     gender: "남성",
         //     isForeigner: true,
         //     nationality: "영국",
-        //     eventId: [4],
-        //     participantApplicationId: [8],
+        //     eventInfo: { 4: 8 },
         //   },
         // };
 
         if (responseData.isSuccess) {
-          let participantsData = registState.inputs;
+          let participantsData = [...registState.inputs];
           participantsData[rowNum] = formatParticipant(responseData.payload, 1);
+          if (props.englishTitle !== "individual") {
+            participantsData[rowNum].eventInfo =
+              registState.inputs[rowNum].eventInfo;
+          }
           setRegistData(participantsData);
 
           let saveParticipantData = saveParticipant;
@@ -276,8 +290,15 @@ const RegistFormat = (props) => {
           });
         }
       } else {
-        let participantsData = registState.inputs;
-        participantsData[rowNum].editable = false;
+        // let participantsData = registState.inputs;
+        // participantsData[rowNum].editable = false;
+        // setRegistData(participantsData);
+        let participantsData = [...registState.inputs];
+
+        participantsData[rowNum] = {
+          ...participantsData[rowNum],
+          editable: false,
+        };
         setRegistData(participantsData);
         return;
       }
@@ -286,18 +307,24 @@ const RegistFormat = (props) => {
     }
   };
 
-  const switchRowHanlder = (event) => {
+  const switchRowHandler = (event) => {
     event.preventDefault();
     const rowNum = Number(event.target.id.split("-")[0].replace("row", ""));
-    let participantsData = registState.inputs;
-    participantsData[rowNum].editable = true;
+
+    let participantsData = [...registState.inputs];
+
+    participantsData[rowNum] = {
+      ...participantsData[rowNum],
+      editable: true,
+    };
+    // participantsData[rowNum].editable = true;
     setRegistData(participantsData);
 
     //개인전 2차등록일 때 종목 2개이면 종목은 active 처리
     if (
       props.englishTitle === "individual" &&
       envPeriod === "second" &&
-      participantsData[rowNum].event.length > 1
+      registState.inputs[rowNum].event.length > 1
     ) {
       setEnableDropdownRow(rowNum); // Set the row number to enable the dropdown
     }
@@ -343,6 +370,14 @@ const RegistFormat = (props) => {
         errMsg = `${props.personName} 한 명 이상 신청해주세요.`;
       }
 
+      if (
+        props.englishTitle === "second" &&
+        participantNumber > process.env.REACT_APP_SECOND_NUM_LIMIT
+      ) {
+        isValidity = false;
+        errMsg = `${props.personName}은 ${process.env.REACT_APP_SECOND_NUM_LIMIT}명 이하로 신청해주세요.`;
+      }
+
       if (!isValidity) {
         setError({ title: "입력정보 확인", detail: errMsg });
         return;
@@ -383,7 +418,7 @@ const RegistFormat = (props) => {
         }
       })
       .catch(() => {});
-  }, [periodGetHandler, listHandler]);
+  }, [periodGetHandler, listHandler, envPeriod]);
 
   return (
     <div className="regist-event" id={`${props.englishTitle}-regist-event`}>
@@ -402,6 +437,7 @@ const RegistFormat = (props) => {
           <RegistTable
             version="regist"
             columns={props.registTableColumn}
+            isEditable={isEditable}
             checkColumns={props.checkTableColumn}
             data={registState.inputs}
             inputHandler={inputHandler}
@@ -419,6 +455,7 @@ const RegistFormat = (props) => {
           <RegistTable
             version="check"
             columns={props.checkTableColumn}
+            isEditable={isEditable}
             modifyColumns={
               envPeriod === "first"
                 ? props.registTableColumn
@@ -426,12 +463,12 @@ const RegistFormat = (props) => {
             }
             data={registState.inputs}
             inputHandler={inputHandler}
-            switchRowHanlder={switchRowHanlder}
+            switchRowHandler={switchRowHandler}
             modifyHandler={modifyRowHandler}
             deleteHandler={deleteDataHandler}
             showNumber
           />
-          {envPeriod === "first" && (
+          {envPeriod === "first" && isEditable && (
             <div className="check-btn-submit">
               <Button onClick={switchModeHandler} disabled={apiFail}>
                 추가하기

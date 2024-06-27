@@ -38,7 +38,7 @@ const CheckboxGroup = (props) => {
     isValid: props.initialValid || false,
   });
 
-  const { id, onInput, initialValue, validators, teamId } = props;
+  const { id, onInput, initialValue, teamId } = props;
   const { values, isValid } = inputState;
 
   useEffect(() => {
@@ -70,21 +70,19 @@ const CheckboxGroup = (props) => {
         }
       });
     }
-  }, [values, id, props.affector, teamId]);
+  }, [values, id, props.affector, teamId, props.disabled]);
 
   useEffect(() => {
     dispatch({
       type: "SET",
       val: initialValue,
-      validators: validators,
     });
-  }, [initialValue, validators]);
+  }, [initialValue]);
 
   const changeHandler = (event) => {
     dispatch({
       type: "CHANGE",
       val: event.target.value,
-      validators: validators,
     });
   };
 

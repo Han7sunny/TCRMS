@@ -1,0 +1,10 @@
+.file-upload .button-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-upload .file-name {
+  font-size: 10px;
+  text-align: center;
+}

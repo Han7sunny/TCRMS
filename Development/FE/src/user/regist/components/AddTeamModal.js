@@ -4,7 +4,7 @@ import Button from "../../../shared/components/TableInputElements/Button";
 
 import "./AddTeamModal.css";
 
-import { teamInitialFormat } from "../../../shared/util/regist-team-defaultFormat";
+import { teamInitialFormat } from "../../../shared/util/regist/regist-team-defaultFormat";
 
 const AddTeamModal = (props) => {
   const eventNameArr = [
