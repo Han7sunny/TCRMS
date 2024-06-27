@@ -183,106 +183,101 @@ const DocuSubmit = () => {
   const { sendRequest, setError } = useContext(HttpContext);
 
   // API
-  const listHandler = useCallback(
-    async () => {
-      try {
-        const responseData = await sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/api/user/file`,
-          "GET",
-          null,
-          {
-            Authorization: `Bearer ${auth.token}`,
-          },
-          `데이터 로드 실패`
-        );
+  const listHandler = useCallback(async () => {
+    try {
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/file`,
+        "GET",
+        null,
+        {
+          Authorization: `Bearer ${auth.token}`,
+        },
+        `데이터 로드 실패`
+      );
 
-        // // TODO : change Dummy DATA
-        // const responseData = {
-        //   isSuccess: true,
-        //   payload: {
-        //     participants: [
-        //       {
-        //         participantId: 1,
-        //         name: "조서영",
-        //         isForeigner: false,
-        //         identityNumber: "961201-0000000",
-        //         types: ["선수", "세컨"],
-        //         events: ["품새 개인전", "품새 단체전"],
-        //         fileInfos: [
-        //           { fileId: 1, fileName: "증명사진" },
-        //           { fileId: 2, fileName: "학적부" },
-        //         ],
-        //         isAllFileConfirmed: false,
-        //       },
-        //       {
-        //         participantId: 2,
-        //         name: "조땡땡",
-        //         isForeigner: true,
-        //         identityNumber: null,
-        //         types: ["선수"],
-        //         events: ["겨루기 개인전"],
-        //         fileInfos: [],
-        //         isAllFileConfirmed: false,
-        //       },
-        //       {
-        //         participantId: 3,
-        //         name: "조삼삼",
-        //         isForeigner: true,
-        //         identityNumber: "",
-        //         types: ["세컨"],
-        //         events: [],
-        //         fileInfos: [{ fileId: 3, fileName: "증명사진" }],
-        //         isAllFileConfirmed: false,
-        //       },
-        //       {
-        //         participantId: 4,
-        //         name: "조사삼",
-        //         isForeigner: true,
-        //         identityNumber: "",
-        //         types: ["자원봉사자"],
-        //         fileInfos: [{ fileId: 4, fileName: "증명사진" }],
-        //         isAllFileConfirmed: true,
-        //       },
-        //       {
-        //         participantId: 5,
-        //         name: "조오옹",
-        //         isForeigner: true,
-        //         identityNumber: "",
-        //         types: ["자원봉사자"],
-        //         fileInfos: [],
-        //         isAllFileConfirmed: false,
-        //       },
-        //     ],
-        //   },
-        // };
-        // // const responseData = {
-        // //   isSuccess: true,
-        // //   payload: { isParticipantExists: false },
-        // // };
+      // // TODO : change Dummy DATA
+      // const responseData = {
+      //   isSuccess: true,
+      //   payload: {
+      //     participants: [
+      //       {
+      //         participantId: 1,
+      //         name: "조서영",
+      //         isForeigner: false,
+      //         identityNumber: "961201-0000000",
+      //         types: ["선수", "세컨"],
+      //         events: ["품새 개인전", "품새 단체전"],
+      //         fileInfos: [
+      //           { fileId: 1, fileName: "증명사진" },
+      //           { fileId: 2, fileName: "학적부" },
+      //         ],
+      //         isAllFileConfirmed: false,
+      //       },
+      //       {
+      //         participantId: 2,
+      //         name: "조땡땡",
+      //         isForeigner: true,
+      //         identityNumber: null,
+      //         types: ["선수"],
+      //         events: ["겨루기 개인전"],
+      //         fileInfos: [],
+      //         isAllFileConfirmed: false,
+      //       },
+      //       {
+      //         participantId: 3,
+      //         name: "조삼삼",
+      //         isForeigner: true,
+      //         identityNumber: "",
+      //         types: ["세컨"],
+      //         events: [],
+      //         fileInfos: [{ fileId: 3, fileName: "증명사진" }],
+      //         isAllFileConfirmed: false,
+      //       },
+      //       {
+      //         participantId: 4,
+      //         name: "조사삼",
+      //         isForeigner: true,
+      //         identityNumber: "",
+      //         types: ["자원봉사자"],
+      //         fileInfos: [{ fileId: 4, fileName: "증명사진" }],
+      //         isAllFileConfirmed: true,
+      //       },
+      //       {
+      //         participantId: 5,
+      //         name: "조오옹",
+      //         isForeigner: true,
+      //         identityNumber: "",
+      //         types: ["자원봉사자"],
+      //         fileInfos: [],
+      //         isAllFileConfirmed: false,
+      //       },
+      //     ],
+      //   },
+      // };
+      // // const responseData = {
+      // //   isSuccess: true,
+      // //   payload: { isParticipantExists: false },
+      // // };
 
-        if (responseData.payload.participants) {
-          let participantsData = {
-            sunsuSeconds: [],
-            volunteers: [],
-          };
+      if (responseData.payload.participants) {
+        let participantsData = {
+          sunsuSeconds: [],
+          volunteers: [],
+        };
 
-          responseData.payload.participants.forEach((participant) => {
-            const participantData = formatParticipant(participant);
-            if (participantData.types === "자원봉사자") {
-              participantsData.volunteers.push(participantData);
-            } else {
-              participantsData.sunsuSeconds.push(participantData);
-            }
-          });
+        responseData.payload.participants.forEach((participant) => {
+          const participantData = formatParticipant(participant);
+          if (participantData.types === "자원봉사자") {
+            participantsData.volunteers.push(participantData);
+          } else {
+            participantsData.sunsuSeconds.push(participantData);
+          }
+        });
 
-          setParticipants(participantsData);
-        }
-      } catch (err) {}
-    },
-    [
-      // auth.token, sendRequest, formatParticipant
-    ]
-  );
+        setParticipants(participantsData);
+      }
+    } catch (err) {}
+  }, [auth.token, sendRequest]);
 
   const submitOneFileHandler = useCallback(
     async (file, id) => {
@@ -348,7 +343,7 @@ const DocuSubmit = () => {
         }
       } catch (error) {}
     },
-    [participants]
+    [participants, auth.token, sendRequest, setError]
   );
 
   const submitMultipleFileHandler = useCallback(
@@ -473,7 +468,7 @@ const DocuSubmit = () => {
         }
       } catch (error) {}
     },
-    [participants]
+    [participants, auth.token, sendRequest, setError]
   );
 
   useEffect(() => {

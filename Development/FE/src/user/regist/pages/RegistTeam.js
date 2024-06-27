@@ -302,7 +302,7 @@ const RegistTeam = () => {
     } catch (err) {
       throw err;
     }
-  }, [setError]);
+  }, [setError, auth.token, sendRequest]);
 
   const addTeamHandler = (event) => {
     event.preventDefault();

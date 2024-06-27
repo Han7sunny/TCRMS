@@ -61,7 +61,7 @@ const RegistFormat = (props) => {
     } catch (err) {
       throw err;
     }
-  }, [setError]);
+  }, [setError, auth.token, sendRequest]);
 
   const deleteDataHandler = async (event) => {
     event.preventDefault();
