@@ -2,10 +2,11 @@ import React, { useCallback } from "react";
 
 import {
   TABLE_COLUMNS_REGIST_SECOND,
+  TABLE_COLUMNS_REGIST_PERIOD2_SECOND,
   TABLE_COLUMNS_CHECK_SECOND,
-} from "../../../shared/util/regist-columns";
-import { EVENT_ID } from "../../../shared/util/const-event";
-import { checkValiditySecond } from "../../../shared/util/regist-validators";
+} from "../../../shared/util/regist/regist-columns";
+// import { EVENT_ID } from "../../../shared/util/const-event";
+import { checkValiditySecond } from "../../../shared/util/regist/regist-validators";
 
 import RegistFormat from "../components/RegistFormat";
 
@@ -18,7 +19,7 @@ const RegistSecond = () => {
 
         return {
           participantId: participant.participantId,
-          participantApplicationId: participant.participantApplicationId,
+          eventInfo: participant.eventInfo,
           name: participant.name,
           sex: participant.gender, // 남성,여성인지 체크
           foreigner: participant.isForeigner ? ["외국인"] : [],
@@ -26,6 +27,7 @@ const RegistSecond = () => {
           idnumber: participant.identityNumber
             ? [idnumber[0], "-", idnumber[1]]
             : [],
+          phoneNumber: participant.phoneNumber,
         };
       }
 
@@ -35,12 +37,13 @@ const RegistSecond = () => {
         if (identityNumber === "-") identityNumber = null;
 
         let sendData = {
-          name: participant.name,
+          name: participant.name.trim(),
           gender: participant.sex,
           isForeigner: participant.foreigner.length > 0 ? true : false,
           nationality: participant.nationality,
           identityNumber: identityNumber,
-          eventId: EVENT_ID["세컨"],
+          phoneNumber: participant.phoneNumber.trim(),
+          // eventId: EVENT_ID["세컨"],
         };
 
         if (mode === 2) {
@@ -49,31 +52,35 @@ const RegistSecond = () => {
 
         if (mode === 3) {
           //modify (PUT)
-          // const isNullData = (data) => {
-          //   if (data === null || data === "" || data === undefined) return true;
-          //   else return data;
-          // };
+          const isNullData = (data) => {
+            if (data === null || data === "" || data === undefined) return true;
+            else return data;
+          };
 
-          // let isParticipantChange = false;
-          // let isEventChange = false;
-          // let isWeightClassChange = false;
-          // if (
-          //   sendData.name !== saveParticipant.name ||
-          //   sendData.gender !== saveParticipant.gender ||
-          //   sendData.isForeigner !== saveParticipant.isForeigner ||
-          //   isNullData(sendData.nationality) !==
-          //     isNullData(saveParticipant.nationality) ||
-          //   isNullData(sendData.identityNumber) !==
-          //     isNullData(saveParticipant.identityNumber)
-          // ) {
-          //   isParticipantChange = true;
-          // }
+          let isParticipantChange = false;
+          if (
+            sendData.name !== saveParticipant.name ||
+            sendData.gender !== saveParticipant.gender ||
+            sendData.isForeigner !== saveParticipant.isForeigner ||
+            isNullData(sendData.nationality) !==
+              isNullData(saveParticipant.nationality) ||
+            isNullData(sendData.identityNumber) !==
+              isNullData(saveParticipant.identityNumber) ||
+            isNullData(sendData.phoneNumber) !==
+              isNullData(saveParticipant.phoneNumber)
+          ) {
+            isParticipantChange = true;
+          }
+
+          if (!isParticipantChange) {
+            return false;
+          }
 
           return {
             ...sendData,
             participantId: participant.participantId,
-            // participantApplicationId: participant.participantApplicationId,
             // isParticipantChange: isParticipantChange,
+            // eventInfo: eventInfo,
           };
         }
       }
@@ -88,6 +95,7 @@ const RegistSecond = () => {
       foreigner: [],
       nationality: "",
       idnumber: ["", "-", ""],
+      phoneNumber: "",
       isNew: true,
     },
     []
@@ -99,6 +107,7 @@ const RegistSecond = () => {
       englishTitle="second"
       personName="세컨"
       registTableColumn={TABLE_COLUMNS_REGIST_SECOND}
+      registTableColumnSecondPeriod={TABLE_COLUMNS_REGIST_PERIOD2_SECOND}
       checkTableColumn={TABLE_COLUMNS_CHECK_SECOND}
       newPersonFormat={newPersonFormat}
       checkValidity={checkValiditySecond}

@@ -20,6 +20,7 @@ import RegistIndividual from "./user/regist/pages/RegistIndividual";
 import RegistTeam from "./user/regist/pages/RegistTeam";
 import RegistSecond from "./user/regist/pages/RegistSecond";
 import RegistVolunteer from "./user/regist/pages/RegistVolunteer";
+import DocuSubmit from "./user/docu/pages/DocuSubmit";
 
 const App = () => {
   const {
@@ -63,9 +64,7 @@ const App = () => {
           <Route path="/regist/second" exact component={RegistSecond} />
           <Route path="/regist/volunteer" exact component={RegistVolunteer} />
 
-          <Route path="/docu" exact>
-            {/* <NewPlace /> */}
-          </Route>
+          <Route path="/docu" exact component={DocuSubmit}></Route>
           <Route path="/submit" exact>
             {/* <NewPlace /> */}
           </Route>

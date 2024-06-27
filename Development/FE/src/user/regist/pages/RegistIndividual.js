@@ -4,9 +4,9 @@ import {
   TABLE_COLUMNS_REGIST_INDIVIDUAL,
   TABLE_COLUMNS_REGIST_PERIOD2_INDIVIDUAL,
   TABLE_COLUMNS_CHECK_INDIVIDUAL,
-} from "../../../shared/util/regist-columns";
+} from "../../../shared/util/regist/regist-columns";
 import { EVENT_ID, WEIGHT_ID } from "../../../shared/util/const-event";
-import { checkValidityIndividual } from "../../../shared/util/regist-validators";
+import { checkValidityIndividual } from "../../../shared/util/regist/regist-validators";
 
 import RegistFormat from "../components/RegistFormat";
 
@@ -32,7 +32,8 @@ const RegistIndividual = () => {
         if (participant.weightClassId) {
           weight = Object.keys(WEIGHT_ID[participant.gender]).find(
             (key) =>
-              WEIGHT_ID[participant.gender][key] === participant.weightClassId
+              WEIGHT_ID[participant.gender][key].id ===
+              participant.weightClassId
           );
         }
 
@@ -49,6 +50,7 @@ const RegistIndividual = () => {
           idnumber: participant.identityNumber
             ? [idnumber[0], "-", idnumber[1]]
             : [],
+          phoneNumber: participant.phoneNumber,
           event: event,
           weight: weight,
           editable: false,
@@ -67,7 +69,7 @@ const RegistIndividual = () => {
         });
 
         let weightClassId = participant.weight
-          ? WEIGHT_ID[participant.sex][participant.weight]
+          ? WEIGHT_ID[participant.sex][participant.weight].id
           : null;
 
         let sendData = {
@@ -102,7 +104,9 @@ const RegistIndividual = () => {
             isNullData(sendData.nationality) !==
               isNullData(saveParticipant.nationality) ||
             isNullData(sendData.identityNumber) !==
-              isNullData(saveParticipant.identityNumber)
+              isNullData(saveParticipant.identityNumber) ||
+            isNullData(sendData.phoneNumber) !==
+              isNullData(saveParticipant.phoneNumber)
           ) {
             isParticipantChange = true;
           }
@@ -146,7 +150,6 @@ const RegistIndividual = () => {
           return {
             ...sendData,
             participantId: participant.participantId,
-            participantApplicationId: participant.participantApplicationId,
             isParticipantChange: isParticipantChange,
             isEventChange: isEventChange,
             isWeightClassChange: isWeightClassChange,
@@ -167,6 +170,7 @@ const RegistIndividual = () => {
       idnumber: ["", "-", ""],
       event: [],
       weight: "",
+      phoneNumber: "",
       isNew: true,
     },
     []

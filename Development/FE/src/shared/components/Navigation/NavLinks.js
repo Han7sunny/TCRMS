@@ -76,7 +76,7 @@ const NavLinks = () => {
         <NavLink to="/docu">서류제출</NavLink>
       </li>
       <li>
-        <NavLink to="/submit">신청내역</NavLink>
+        <NavLink to="/submit">입금 및 최종제출</NavLink>
       </li>
     </React.Fragment>
   );

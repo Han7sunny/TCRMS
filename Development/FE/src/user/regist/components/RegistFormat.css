@@ -1,6 +1,7 @@
 .regist-event {
   margin: 24px auto;
   width: fit-content;
+  padding: 0px 20px;
 }
 
 .regist-event-title {
@@ -92,6 +93,7 @@
   /* 국적 */
   width: 122px;
 }
+
 #individual-regist-event .table-col-5 {
   /* 주민등록번호 */
   width: 160px;
@@ -118,7 +120,7 @@
 
 #team-regist-event .table-col-0 {
   /* 인덱스 */
-  width: 80px;
+  width: 96px;
 }
 
 #team-regist-event .table-col-1 {
@@ -151,6 +153,11 @@
   width: 120px;
 }
 
+#team-regist-event .table-col-7 {
+  /* 비고 */
+  width: 150px;
+}
+
 #second-regist-event .table-col-0 {
   /* 인덱스 */
   width: 30px;
@@ -179,6 +186,11 @@
 #second-regist-event .table-col-5 {
   /* 주민등록번호 */
   width: 160px;
+}
+
+#second-regist-event .table-col-6 {
+  /* 비고 */
+  width: 150px;
 }
 
 #second-regist-event .table-col-btn {

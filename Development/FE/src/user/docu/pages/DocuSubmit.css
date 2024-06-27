@@ -1,0 +1,52 @@
+.docu-submit {
+  /* margin: 24px; */
+  margin: 24px auto;
+  width: fit-content;
+  padding-left: 20px;
+
+  .docu-submit-title {
+    /* margin-left: 10px; */
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+
+  .docu-submit-noti {
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+
+  .table-col-5,
+  .table-col-6,
+  .table-col-7,
+  .table-col-8,
+  .table-col-9 {
+    width: 100px;
+  }
+
+  .docu-tables-wrap {
+    display: flex;
+    flex-wrap: wrap; /* 요소들이 넘칠 경우 다음 줄로 넘어가게 합니다 */
+  }
+
+  .docu-tables-wrap > div:not(:last-child) {
+    border-right: 1px solid #c8c8c8; /* 마지막 요소를 제외한 모든 요소의 오른쪽에 구분선 추가 */
+    margin-bottom: 5px;
+    padding-right: 10px;
+    margin-right: 10px;
+  }
+
+  .docu-table-subtitle {
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+
+  @media (max-width: 1570px) {
+    .docu-tables-wrap {
+      flex-direction: column; /* 세로로 배치 */
+    }
+
+    .docu-tables-wrap > div:not(:last-child) {
+      border-right: none; /* 세로 배치 시 오른쪽 구분선 제거 */
+    }
+  }
+}
