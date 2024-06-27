@@ -1,5 +1,6 @@
 package com.kutca.tcrms.participant.controller.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -7,6 +8,7 @@ public class TeamMemberParticipantRequestDto {
 
     @Getter
     @Builder
+    @Schema(name = "TeamMemberRegist")
     public static class Regist {
 
         private String name;
@@ -28,6 +30,7 @@ public class TeamMemberParticipantRequestDto {
 
     @Getter
     @Builder
+    @Schema(name = "TeamMemberModify")
     public static class Modify {
 
         private Long participantId;
