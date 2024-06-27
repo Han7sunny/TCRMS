@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,7 @@ public class ParticipantApplicationService {
 
 //    @Value("${kutca.admin.id}")
     private static final Long KUTCA_ID = 1L;   //  추후 application.properties에서 값 추출
+//    private final individual
 
     public ResponseDto<?> deleteParticipantApplication(IndividualParticipantRequestDto.Delete individualParticipantRequestDto){
 
@@ -96,9 +98,16 @@ public class ParticipantApplicationService {
         //  1차 참가비 및 임금, 대표자 정보 조회 (최종 제출 전)
 
         AtomicInteger individualCount = new AtomicInteger();
-        Map<String, Set<Integer>> teamCount = initializeTeamCount();
+        Map<Long, Set<Integer>> teamCount = initializeTeamCount();
 
         List<Participant> findParticipants = participantRepository.findAllByUser_UserId(userId);
+        if(findParticipants.isEmpty()){
+            return ResponseDto.builder()
+                    .isSuccess(true)
+                    .message("신청 내역이 존재하지 않습니다.")
+                    .build();
+        }
+
         findParticipants.forEach(participant -> {
 
             Long participantId = participant.getParticipantId();
@@ -111,7 +120,7 @@ public class ParticipantApplicationService {
                 countParticipantApplications(participantId, individualCount, teamCount, 3L, 4L, 7L, 8L);
             }
 
-            addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 페어"), 9L, false);
+            addParticipantApplicationsToTeamSet(participantId, teamCount.get(9L), 9L, false);
 
         });
 
@@ -131,7 +140,7 @@ public class ParticipantApplicationService {
     public ResponseDto<?> getSecondPeriodParticipantApplicationFeeInfo(Long userId){
 
         AtomicInteger individualCount = new AtomicInteger();
-        Map<String, Set<Integer>> teamCount = initializeTeamCount();
+        Map<Long, Set<Integer>> teamCount = initializeTeamCount();
 
         List<Participant> findParticipants = participantRepository.findAllByUser_UserId(userId);
         findParticipants.forEach(participant -> {
@@ -146,7 +155,7 @@ public class ParticipantApplicationService {
                 countCancelParticipantApplications(participantId, individualCount, teamCount, 3L, 4L, 7L, 8L);
             }
 
-            addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 페어"), 9L, true);
+            addParticipantApplicationsToTeamSet(participantId, teamCount.get(9L), 9L, true);
 
         });
 
@@ -158,7 +167,7 @@ public class ParticipantApplicationService {
                 .payload(
                         FinalSubmitResponseDto.SecondPeriod.builder()
                                 .participantApplicationInfos(new ParticipantApplicationsResponseDto<>(participantApplicationInfos))
-                                .isRefundExist(!participantApplicationInfos.isEmpty())
+                                .isRefundExist(individualCount.get() != 0 && !teamCount.isEmpty())
                                 .build())
                 .build();
 
@@ -278,24 +287,26 @@ public class ParticipantApplicationService {
     }
 
 
-    private Map<String, Set<Integer>> initializeTeamCount(){
-        Map<String, Set<Integer>> teamCount = new HashMap<>();
-        teamCount.put("겨루기 단체전", new HashSet<>());
-        teamCount.put("품새 단체전", new HashSet<>());
-        teamCount.put("품새 페어", new HashSet<>());
+    private Map<Long, Set<Integer>> initializeTeamCount(){
+        Map<Long, Set<Integer>> teamCount = new HashMap<>();
+        teamCount.put(5L, new HashSet<>());
+        teamCount.put(6L, new HashSet<>());
+        teamCount.put(7L, new HashSet<>());
+        teamCount.put(8L, new HashSet<>());
+        teamCount.put(9L, new HashSet<>());
         return teamCount;
     }
 
-    private void countParticipantApplications(Long participantId, AtomicInteger individualCount, Map<String, Set<Integer>> teamCount, Long startEventId, Long endEventId, Long sparringEventId, Long poomsaeEventId){
+    private void countParticipantApplications(Long participantId, AtomicInteger individualCount, Map<Long, Set<Integer>> teamCount, Long startEventId, Long endEventId, Long sparringEventId, Long poomsaeEventId){
         individualCount.addAndGet(participantApplicationRepository.countAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participantId, startEventId, endEventId));
-        addParticipantApplicationsToTeamSet(participantId, teamCount.get("겨루기 단체전"), sparringEventId, false);
-        addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 단체전"), poomsaeEventId, false);
+        addParticipantApplicationsToTeamSet(participantId, teamCount.get(sparringEventId), sparringEventId, false);
+        addParticipantApplicationsToTeamSet(participantId, teamCount.get(poomsaeEventId), poomsaeEventId, false);
     }
 
-    private void countCancelParticipantApplications(Long participantId, AtomicInteger individualCount, Map<String, Set<Integer>> teamCount, Long startEventId, Long endEventId, Long sparringEventId, Long poomsaeEventId){
+    private void countCancelParticipantApplications(Long participantId, AtomicInteger individualCount, Map<Long, Set<Integer>> teamCount, Long startEventId, Long endEventId, Long sparringEventId, Long poomsaeEventId){
         individualCount.addAndGet(participantApplicationRepository.countAllByParticipant_ParticipantIdAndEvent_EventIdBetweenAndIs2ndCancelTrue(participantId, startEventId, endEventId));
-        addParticipantApplicationsToTeamSet(participantId, teamCount.get("겨루기 단체전"), sparringEventId, true);
-        addParticipantApplicationsToTeamSet(participantId, teamCount.get("품새 단체전"), poomsaeEventId, true);
+        addParticipantApplicationsToTeamSet(participantId, teamCount.get(sparringEventId), sparringEventId, true);
+        addParticipantApplicationsToTeamSet(participantId, teamCount.get(poomsaeEventId), poomsaeEventId, true);
     }
 
     private void addParticipantApplicationsToTeamSet(Long participantId, Set<Integer> teamSet, Long eventId, boolean isCancel){
@@ -309,34 +320,54 @@ public class ParticipantApplicationService {
         findParticipantApplications.forEach(participantApplication -> teamSet.add(participantApplication.getEventTeamNumber()));
     }
 
-    private ParticipantApplicationResponseDto.FirstPeriod createParticipantApplicationInfo(String eventName, int participantCount, Long eventId){
+//    private ParticipantApplicationResponseDto.FirstPeriod createParticipantApplicationInfo(Long eventId, int participantCount){
+//
+//        int participantFee = eventRepository.findById(eventId).get().getEventFee();
+//        return ParticipantApplicationResponseDto.FirstPeriod.builder()
+//                .eventName(eventName)
+//                .participantCount(participantCount)
+//                .participantFee(participantCount * participantFee)
+//                .build();
+//
+//    }
 
-        int participantFee = eventRepository.findById(eventId).get().getEventFee();
-        return ParticipantApplicationResponseDto.FirstPeriod.builder()
-                .eventName(eventName)
-                .participantCount(participantCount)
-                .participantFee(participantCount * participantFee)
+    private List<ParticipantApplicationResponseDto.FirstPeriod> getParticipantApplicationInfos(AtomicInteger individualCount, Map<Long, Set<Integer>> teamCount){
+        //  단체전의 경우에만 성별에 따라 가격 상이하다는 가정하에 로직 작성
+
+        ParticipantApplicationResponseDto.FirstPeriod individual = ParticipantApplicationResponseDto.FirstPeriod.builder()
+                .eventName("개인전")
+                .participantCount(individualCount.get())
+                .participantFee(eventRepository.findById(1L).get().getEventFee() * individualCount.get())
                 .build();
+        ParticipantApplicationResponseDto.FirstPeriod sparringTeam = ParticipantApplicationResponseDto.FirstPeriod.builder().eventName("겨루기 단체전").build();
+        ParticipantApplicationResponseDto.FirstPeriod poomsaeTeam = ParticipantApplicationResponseDto.FirstPeriod.builder().eventName("품새 단체전").build();
+        ParticipantApplicationResponseDto.FirstPeriod poomsaePair = ParticipantApplicationResponseDto.FirstPeriod.builder().eventName("품새 페어").build();
 
+        teamCount.forEach((eventId, count) -> {
+
+            int participantFee = eventRepository.findById(eventId).get().getEventFee();
+            if(eventId == 9L)
+                poomsaePair.calculateParticipantFee(participantFee * count.size(), count.size());
+            else if(eventId % 2 == 0)
+                poomsaeTeam.calculateParticipantFee(participantFee * count.size(), count.size());
+            else
+                sparringTeam.calculateParticipantFee(participantFee * count.size(), count.size());
+
+        });
+
+        return Arrays.asList(individual, sparringTeam, poomsaeTeam, poomsaePair);
     }
 
-    private List<ParticipantApplicationResponseDto.FirstPeriod> getParticipantApplicationInfos(AtomicInteger individualCount, Map<String, Set<Integer>> teamCount){
-        return Arrays.asList(
-                createParticipantApplicationInfo("개인전", individualCount.get(), 1L),
-                createParticipantApplicationInfo("겨루기 단체전", teamCount.get("겨루기 단체전").size(), 5L),
-                createParticipantApplicationInfo("품새 단체전", teamCount.get("품새 단체전").size(), 6L),
-                createParticipantApplicationInfo("품새 페어", teamCount.get("품새 페어").size(), 9L)
-        );
-    }
-
-    private List<ParticipantApplicationResponseDto.SecondPeriod> getParticipantApplicationInfosInSecondPeriod(List<UniversityApplicationResponseDto.FirstPeriod> universityApplicationInfos, AtomicInteger individualCount, Map<String, Set<Integer>> teamCount){
+    private List<ParticipantApplicationResponseDto.SecondPeriod> getParticipantApplicationInfosInSecondPeriod(List<UniversityApplicationResponseDto.FirstPeriod> universityApplicationInFirstPeriodInfos, AtomicInteger individualCount, Map<Long, Set<Integer>> teamCount){
 
         int individualFee = eventRepository.findById(1L).get().getEventFee();
-        int sparringTeamFee = eventRepository.findById(5L).get().getEventFee();
-        int poomsaeTeamFee = eventRepository.findById(6L).get().getEventFee();
+        int sparringFemaleTeamFee = eventRepository.findById(5L).get().getEventFee();
+        int poomsaeFemaleTeamFee = eventRepository.findById(6L).get().getEventFee();
+        int sparringMaleTeamFee = eventRepository.findById(7L).get().getEventFee();
+        int poomsaeMaleTeamFee = eventRepository.findById(8L).get().getEventFee();
         int poomsaePairFee = eventRepository.findById(9L).get().getEventFee();
 
-        return universityApplicationInfos.stream().map(universityApplicationInfo -> {
+        return universityApplicationInFirstPeriodInfos.stream().map(universityApplicationInfo -> { // 무조건 4번 반복
 
             ParticipantApplicationResponseDto.SecondPeriod participantApplicationInfo = ParticipantApplicationResponseDto.SecondPeriod.fromUniversityApplication(universityApplicationInfo);
 
@@ -346,19 +377,21 @@ public class ParticipantApplicationService {
             }
 
             if("겨루기 단체전".equals(universityApplicationInfo.getEventName())){
-                int sparringTeamCount = teamCount.get(universityApplicationInfo.getEventName()).size();
-                participantApplicationInfo.setCancelParticipantCount(sparringTeamCount);
-                participantApplicationInfo.setRefundParticipantFee(sparringTeamCount * sparringTeamFee);
+                int sparringFemaleTeamCount = teamCount.get(5L).size();
+                int sparringMaleTeamCount = teamCount.get(7L).size();
+                participantApplicationInfo.setCancelParticipantCount(sparringFemaleTeamCount + sparringMaleTeamCount);
+                participantApplicationInfo.setRefundParticipantFee(sparringFemaleTeamCount * sparringFemaleTeamFee + sparringMaleTeamCount * sparringMaleTeamFee);
             }
 
             if("품새 단체전".equals(universityApplicationInfo.getEventName())){
-                int poomsaeTeamCount = teamCount.get(universityApplicationInfo.getEventName()).size();
-                participantApplicationInfo.setCancelParticipantCount(poomsaeTeamCount);
-                participantApplicationInfo.setRefundParticipantFee(poomsaeTeamCount * poomsaeTeamFee);
+                int poomsaeFemaleTeamCount = teamCount.get(6L).size();
+                int poomsaeMaleTeamCount = teamCount.get(8L).size();
+                participantApplicationInfo.setCancelParticipantCount(poomsaeFemaleTeamCount + poomsaeMaleTeamCount);
+                participantApplicationInfo.setRefundParticipantFee(poomsaeFemaleTeamCount * poomsaeFemaleTeamFee + poomsaeMaleTeamCount * poomsaeMaleTeamFee);
             }
 
             if("품새 페어".equals(universityApplicationInfo.getEventName())){
-                int poomsaePairCount = teamCount.get(universityApplicationInfo.getEventName()).size();
+                int poomsaePairCount = teamCount.get(9L).size();
                 participantApplicationInfo.setCancelParticipantCount(poomsaePairCount);
                 participantApplicationInfo.setRefundParticipantFee(poomsaePairCount * poomsaePairFee);
             }
@@ -378,6 +411,8 @@ public class ParticipantApplicationService {
 
     private FinalSubmitResponseDto.Total getTotalParticipantApplicationInfoFromUniversityApplication(Long userId){
 
+        AtomicBoolean isRefundExist = new AtomicBoolean(false);
+
         List<UniversityApplicationResponseDto.FirstPeriod> firstPeriodParticipantApplications = getParticipantApplicationInfoFromUniversityApplication(userId, DatePeriod.FIRST.name());
         List<ParticipantApplicationResponseDto.SecondPeriod> participantApplicationInfos = firstPeriodParticipantApplications.stream().map(universityApplication -> {
             ParticipantApplicationResponseDto.SecondPeriod participantApplicationInfo = ParticipantApplicationResponseDto.SecondPeriod.fromUniversityApplication(universityApplication);
@@ -386,13 +421,14 @@ public class ParticipantApplicationService {
                 UniversityApplication secondPeriodUniversityApplication = findSecondPeriodUniversityApplication.get();
                 participantApplicationInfo.setCancelParticipantCount(secondPeriodUniversityApplication.getTeamCount());
                 participantApplicationInfo.setRefundParticipantFee(secondPeriodUniversityApplication.getTeamFee());
+                isRefundExist.set(true);
             }
             return participantApplicationInfo;
         }).toList();
 
         return FinalSubmitResponseDto.Total.builder()
                 .participantApplicationInfos(new ParticipantApplicationsResponseDto<>(participantApplicationInfos))
-                .isRefundExist(!participantApplicationInfos.isEmpty())
+                .isRefundExist(isRefundExist.get())
                 .build();
 
     }

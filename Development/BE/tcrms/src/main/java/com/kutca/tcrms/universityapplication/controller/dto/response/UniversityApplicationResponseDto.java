@@ -3,6 +3,7 @@ package com.kutca.tcrms.universityapplication.controller.dto.response;
 import com.kutca.tcrms.universityapplication.entity.UniversityApplication;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 public class UniversityApplicationResponseDto {
 
@@ -14,7 +15,7 @@ public class UniversityApplicationResponseDto {
     }
 
     @Getter
-    @Builder
+    @SuperBuilder
     public static class FirstPeriod {
 
         private String eventName;
@@ -33,7 +34,7 @@ public class UniversityApplicationResponseDto {
 
     }
 
-    @Builder
+    @SuperBuilder
     public static class SecondPeriod extends FirstPeriod {
 
         private int cancelParticipantCount;

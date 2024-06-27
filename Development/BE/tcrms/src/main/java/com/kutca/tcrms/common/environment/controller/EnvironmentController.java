@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -33,5 +34,15 @@ public class EnvironmentController {
         }
     }
 
-
+    @Operation(summary = "현재 사용자 정보 조회")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    @GetMapping("/api/env/user")
+    public ResponseEntity<?> getUserInfoFromToken(@RequestHeader("Authorization") String authorizationHeader){
+        try {
+            return new ResponseEntity<>(environmentService.getUserInfoFromToken(authorizationHeader), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("예외발생", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
