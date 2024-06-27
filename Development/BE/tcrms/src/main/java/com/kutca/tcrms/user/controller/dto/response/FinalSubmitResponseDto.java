@@ -32,6 +32,7 @@ public class FinalSubmitResponseDto {
 
     }
 
+    @Getter
     @Setter
     @SuperBuilder
     public static class Total extends SecondPeriod{

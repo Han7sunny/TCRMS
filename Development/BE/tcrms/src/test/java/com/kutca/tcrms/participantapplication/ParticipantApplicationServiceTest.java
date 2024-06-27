@@ -65,6 +65,7 @@ public class ParticipantApplicationServiceTest {
     private Map<Long, Event> events = new HashMap<>();
     private Participant findParticipant1, findParticipant2, findParticipant3;
     private ParticipantApplication findParticipantApplication1, findParticipantApplication2, findParticipantApplication3, findParticipantApplication4, findParticipantApplication5, findParticipantApplication6, findParticipantApplication7, findParticipantApplication8;
+    private UniversityApplication findUniversityApplicationInFirstPeriod1, findUniversityApplicationInFirstPeriod2, findUniversityApplicationInFirstPeriod3, findUniversityApplicationInFirstPeriod4;
 
     @BeforeEach
     void setUp(){
@@ -220,6 +221,38 @@ public class ParticipantApplicationServiceTest {
                 .event(events.get(6L))
                 .eventTeamNumber(1)
                 .build();
+
+        findUniversityApplicationInFirstPeriod1 = UniversityApplication.builder()
+                .universityApplicationId(1L)
+                .user(findUser1)
+                .eventName("개인전")
+                .teamCount(3)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        findUniversityApplicationInFirstPeriod2 = UniversityApplication.builder()
+                .universityApplicationId(2L)
+                .user(findUser1)
+                .eventName("겨루기 단체전")
+                .teamCount(3)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        findUniversityApplicationInFirstPeriod3 = UniversityApplication.builder()
+                .universityApplicationId(3L)
+                .user(findUser1)
+                .eventName("품새 단체전")
+                .teamCount(0)
+                .period(DatePeriod.FIRST.name())
+                .build();
+
+        findUniversityApplicationInFirstPeriod4 = UniversityApplication.builder()
+                .universityApplicationId(4L)
+                .user(findUser1)
+                .eventName("품새 페어")
+                .teamCount(1)
+                .period(DatePeriod.FIRST.name())
+                .build();
     }
 
     @Test
@@ -331,39 +364,6 @@ public class ParticipantApplicationServiceTest {
     void getSecondPeriodParticipantApplicationFeeInfoWithNoRefundExist(){
 
         //  given
-
-        UniversityApplication findUniversityApplicationInFirstPeriod1 = UniversityApplication.builder()
-                .universityApplicationId(1L)
-                .user(findUser1)
-                .eventName("개인전")
-                .teamCount(3)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod2 = UniversityApplication.builder()
-                .universityApplicationId(2L)
-                .user(findUser1)
-                .eventName("겨루기 단체전")
-                .teamCount(3)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod3 = UniversityApplication.builder()
-                .universityApplicationId(3L)
-                .user(findUser1)
-                .eventName("품새 단체전")
-                .teamCount(0)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod4 = UniversityApplication.builder()
-                .universityApplicationId(4L)
-                .user(findUser1)
-                .eventName("품새 페어")
-                .teamCount(1)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
         given(participantRepository.findAllByUser_UserId(findUser1.getUserId())).willReturn(Arrays.asList(findParticipant1, findParticipant2));
         given(universityApplicationRepository.findAllByUser_UserIdAndPeriod(findUser1.getUserId(), DatePeriod.FIRST.name())).willReturn(Arrays.asList(findUniversityApplicationInFirstPeriod1, findUniversityApplicationInFirstPeriod2, findUniversityApplicationInFirstPeriod3, findUniversityApplicationInFirstPeriod4));
 
@@ -528,38 +528,6 @@ public class ParticipantApplicationServiceTest {
     void getFinalSubmitInfoInFirstPeriodSuccess(){
 
         //  given
-        UniversityApplication findUniversityApplicationInFirstPeriod1 = UniversityApplication.builder()
-                .universityApplicationId(1L)
-                .user(findUser1)
-                .eventName("개인전")
-                .teamCount(3)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod2 = UniversityApplication.builder()
-                .universityApplicationId(2L)
-                .user(findUser1)
-                .eventName("겨루기 단체전")
-                .teamCount(3)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod3 = UniversityApplication.builder()
-                .universityApplicationId(3L)
-                .user(findUser1)
-                .eventName("품새 단체전")
-                .teamCount(0)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod4 = UniversityApplication.builder()
-                .universityApplicationId(4L)
-                .user(findUser1)
-                .eventName("품새 페어")
-                .teamCount(1)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
         given(userRepository.findById(findUser1.getUserId())).willReturn(Optional.of(findUser1));
         given(secondPeriodRepository.findByUser_UserId(kutca.getUserId())).willReturn(Optional.of(kutcaSecondPeriod));
         given(universityApplicationRepository.findAllByUser_UserIdAndPeriod(findUser1.getUserId(), DatePeriod.FIRST.name())).willReturn(Arrays.asList(findUniversityApplicationInFirstPeriod1, findUniversityApplicationInFirstPeriod2, findUniversityApplicationInFirstPeriod3, findUniversityApplicationInFirstPeriod4));
@@ -588,38 +556,6 @@ public class ParticipantApplicationServiceTest {
     void getFinalSubmitInfoInSecondPeriodWithNoRefundExist(){
 
         //  given
-        UniversityApplication findUniversityApplicationInFirstPeriod1 = UniversityApplication.builder()
-                .universityApplicationId(1L)
-                .user(findUser1)
-                .eventName("개인전")
-                .teamCount(3)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod2 = UniversityApplication.builder()
-                .universityApplicationId(2L)
-                .user(findUser1)
-                .eventName("겨루기 단체전")
-                .teamCount(3)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod3 = UniversityApplication.builder()
-                .universityApplicationId(3L)
-                .user(findUser1)
-                .eventName("품새 단체전")
-                .teamCount(0)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
-        UniversityApplication findUniversityApplicationInFirstPeriod4 = UniversityApplication.builder()
-                .universityApplicationId(4L)
-                .user(findUser1)
-                .eventName("품새 페어")
-                .teamCount(1)
-                .period(DatePeriod.FIRST.name())
-                .build();
-
         given(universityApplicationRepository.findAllByUser_UserIdAndPeriod(findUser1.getUserId(), DatePeriod.FIRST.name())).willReturn(Arrays.asList(findUniversityApplicationInFirstPeriod1, findUniversityApplicationInFirstPeriod2, findUniversityApplicationInFirstPeriod3, findUniversityApplicationInFirstPeriod4));
         given(universityApplicationRepository.findByUser_UserIdAndEventNameAndPeriod(findUser1.getUserId(), "개인전", DatePeriod.SECOND.name())).willReturn(Optional.empty());
 
@@ -635,5 +571,79 @@ public class ParticipantApplicationServiceTest {
         assertEquals(totalParticipantApplicationInfos.get(0).getEventName(), "개인전");
         assertEquals(totalParticipantApplicationInfos.get(0).getParticipantCount(), findUniversityApplicationInFirstPeriod1.getTeamCount());
         assertEquals(totalParticipantApplicationInfos.get(0).getCancelParticipantCount(), 0);
+    }
+
+    @Test
+    @DisplayName("2차 최종 제출 확인 성공")
+    void getFinalSubmitInfoInSecondPeriodSuccess(){
+
+        //  given
+        Account findUserAccount = Account.builder()
+                .accountId(1L)
+                .accountBank("한국은행")
+                .accountNumber("111-111-1111111")
+                .depositOwnerName(findUser1.getDepositorName())
+                .build();
+
+        SecondPeriod findUserSecondPeriod = SecondPeriod.builder()
+                .user(findUser1)
+                .account(findUserAccount)
+                .build();
+
+        UniversityApplication findUniversityApplicationInSecondPeriod1 = UniversityApplication.builder()
+                .universityApplicationId(5L)
+                .user(findUser1)
+                .eventName("개인전")
+                .teamCount(1)
+                .period(DatePeriod.SECOND.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInSecondPeriod2 = UniversityApplication.builder()
+                .universityApplicationId(6L)
+                .user(findUser1)
+                .eventName("겨루기 단체전")
+                .teamCount(2)
+                .period(DatePeriod.SECOND.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInSecondPeriod3 = UniversityApplication.builder()
+                .universityApplicationId(7L)
+                .user(findUser1)
+                .eventName("품새 단체전")
+                .teamCount(0)
+                .period(DatePeriod.SECOND.name())
+                .build();
+
+        UniversityApplication findUniversityApplicationInSecondPeriod4 = UniversityApplication.builder()
+                .universityApplicationId(8L)
+                .user(findUser1)
+                .eventName("품새 페어")
+                .teamCount(1)
+                .period(DatePeriod.SECOND.name())
+                .build();
+
+        given(secondPeriodRepository.findByUser_UserId(findUser1.getUserId())).willReturn(Optional.of(findUserSecondPeriod));
+        given(universityApplicationRepository.findAllByUser_UserIdAndPeriod(findUser1.getUserId(), DatePeriod.FIRST.name())).willReturn(Arrays.asList(findUniversityApplicationInFirstPeriod1, findUniversityApplicationInFirstPeriod2, findUniversityApplicationInFirstPeriod3, findUniversityApplicationInFirstPeriod4));
+        given(universityApplicationRepository.findByUser_UserIdAndEventNameAndPeriod(findUser1.getUserId(), "개인전", DatePeriod.SECOND.name())).willReturn(Optional.of(findUniversityApplicationInSecondPeriod1));
+        given(universityApplicationRepository.findByUser_UserIdAndEventNameAndPeriod(findUser1.getUserId(), "겨루기 단체전", DatePeriod.SECOND.name())).willReturn(Optional.of(findUniversityApplicationInSecondPeriod2));
+        given(universityApplicationRepository.findByUser_UserIdAndEventNameAndPeriod(findUser1.getUserId(), "품새 단체전", DatePeriod.SECOND.name())).willReturn(Optional.of(findUniversityApplicationInSecondPeriod3));
+        given(universityApplicationRepository.findByUser_UserIdAndEventNameAndPeriod(findUser1.getUserId(), "품새 페어", DatePeriod.SECOND.name())).willReturn(Optional.of(findUniversityApplicationInSecondPeriod4));
+
+        //  when
+        ResponseDto<?> responseDto = participantApplicationService.getFinalSubmitInfoInSecondPeriod(findUser1.getUserId());
+
+        //  then
+        assertTrue(responseDto.getIsSuccess());
+
+        FinalSubmitResponseDto.Total secondPeriodResponseDto = (FinalSubmitResponseDto.Total)responseDto.getPayload();
+        List<ParticipantApplicationResponseDto.SecondPeriod> totalParticipantApplicationInfos = secondPeriodResponseDto.getParticipantApplicationInfos().getParticipantApplicationInfos();
+
+        assertTrue(secondPeriodResponseDto.isRefundExist());
+        assertEquals(secondPeriodResponseDto.getRefundInfo().getAccountBank(), findUserAccount.getAccountBank());
+        assertEquals(secondPeriodResponseDto.getRefundInfo().getAccountNumber(), findUserAccount.getAccountNumber());
+
+        assertEquals(totalParticipantApplicationInfos.get(0).getParticipantCount(), findUniversityApplicationInFirstPeriod1.getTeamCount());
+        assertEquals(totalParticipantApplicationInfos.get(0).getCancelParticipantCount(), findUniversityApplicationInSecondPeriod1.getTeamCount());
+
     }
 }
