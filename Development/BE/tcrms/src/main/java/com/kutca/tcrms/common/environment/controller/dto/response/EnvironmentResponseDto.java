@@ -11,4 +11,15 @@ public class EnvironmentResponseDto {
 
     }
 
+    @Builder
+    public static class UserInfo{
+
+        private Long userId;
+
+        private boolean isFirstLogin;
+
+        private String userAuth;
+
+    }
+
 }

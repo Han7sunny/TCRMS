@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 
 public class FinalSubmitResponseDto {
 
+    @Getter
     @Builder
     public static class FirstPeriod {
 
@@ -31,6 +32,7 @@ public class FinalSubmitResponseDto {
 
     }
 
+    @Getter
     @Setter
     @SuperBuilder
     public static class Total extends SecondPeriod{
