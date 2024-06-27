@@ -1,6 +1,7 @@
 package com.kutca.tcrms.participant.controller.dto.request;
 
 import com.kutca.tcrms.file.controller.dto.request.FilesRequestDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,6 +13,7 @@ public class IndividualParticipantRequestDto {
 
     @Getter
     @Builder
+    @Schema(name = "IndividualRegist")
     public static class Regist {
 
         private String name;
@@ -33,6 +35,7 @@ public class IndividualParticipantRequestDto {
 
     @Getter
     @Builder
+    @Schema(name = "IndividualModify")
     public static class Modify {
 
         private Long participantId;
@@ -62,6 +65,7 @@ public class IndividualParticipantRequestDto {
 
     @Getter
     @Builder
+    @Schema(name = "IndividualDelete")
     public static class Delete {
 
         private Long userId;
