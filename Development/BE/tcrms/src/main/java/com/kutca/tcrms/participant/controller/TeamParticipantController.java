@@ -45,7 +45,7 @@ public class TeamParticipantController {
 
     @Operation(summary = "단체전 신청 수정")
     @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-    @PostMapping("/api/user/team")
+    @PutMapping("/api/user/team")
     public ResponseEntity<?> modifyTeam(@RequestBody TeamParticipantRequestDto.Modify teamParticipantRequestDto){
         try {
             return new ResponseEntity<>(teamParticipantService.modifyTeam(teamParticipantRequestDto), HttpStatus.OK);

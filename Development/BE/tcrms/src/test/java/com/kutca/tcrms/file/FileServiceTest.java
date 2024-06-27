@@ -243,9 +243,9 @@ public class FileServiceTest {
 
         given(participantRepository.findAllByUser_UserId(user.getUserId())).willReturn(Arrays.asList(findParticipant1, findParticipant2));
         given(participantFileRepository.findByParticipant_ParticipantId(findParticipant1.getParticipantId())).willReturn(Optional.of(findParticipantFile1));
-        given(fileRepository.findAllByParticipant_ParticipantId(findParticipant1.getParticipantId())).willReturn(Arrays.asList(findFile1, findFile2, findFile3));
+        given(fileRepository.findAllByParticipantFile_ParticipantFileId(findParticipantFile1.getParticipantFileId())).willReturn(Arrays.asList(findFile1, findFile2, findFile3));
         given(participantFileRepository.findByParticipant_ParticipantId(findParticipant2.getParticipantId())).willReturn(Optional.of(findParticipantFile2));
-        given(fileRepository.findAllByParticipant_ParticipantId(findParticipant2.getParticipantId())).willReturn(Arrays.asList(findFile5));
+        given(fileRepository.findAllByParticipantFile_ParticipantFileId(findParticipantFile2.getParticipantFileId())).willReturn(Arrays.asList(findFile5));
         given(participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(findParticipant1.getParticipantId(), 1L, 9L)).willReturn(Arrays.asList(findParticipantApplication1, findParticipantApplication2));
         given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(findParticipant1.getParticipantId(), 11L)).willReturn(false);
         given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(findParticipant1.getParticipantId(), 10L)).willReturn(true);
@@ -323,7 +323,7 @@ public class FileServiceTest {
         given(participantFileRepository.findByParticipant_ParticipantId(findParticipant1.getParticipantId())).willReturn(Optional.of(findParticipantFile1));
         given(fileRepository.save(any(File.class))).willReturn(savedFile1);
         given(fileRepository.findById(findFile2.getFileId())).willReturn(Optional.of(findFile2));
-        given(fileRepository.countAllByParticipant_ParticipantId(findParticipant1.getParticipantId())).willReturn(fileInfos.getFileInfos().size());
+        given(fileRepository.countAllByParticipantFile_ParticipantFileId(findParticipantFile1.getParticipantFileId())).willReturn(fileInfos.getFileInfos().size());
         given(participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventIdBetween(findParticipant1.getParticipantId(), 1L, 10L)).willReturn(true);
 
         //  when
