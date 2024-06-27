@@ -82,7 +82,7 @@ public class FileService {
         List<ParticipantFileResponseDto> participants = findParticipantList.stream().map(participant -> {
 
             ParticipantFile participantFile = participantFileRepository.findByParticipant_ParticipantId(participant.getParticipantId()).get();
-            List<File> files = fileRepository.findAllByParticipant_ParticipantId(participant.getParticipantId());
+            List<File> files = fileRepository.findAllByParticipantFile_ParticipantFileId(participantFile.getParticipantFileId());
 
             ParticipantFileResponseDto participantFileResponseDto = ParticipantFileResponseDto.builder()
                     .participantId(participant.getParticipantId())
@@ -162,7 +162,8 @@ public class FileService {
         }).collect(Collectors.toList());
 
         int requiredFileCount = participant.getIsForeigner() ? 1 : 0;
-        int submittedFileCount = fileRepository.countAllByParticipant_ParticipantId(participant.getParticipantId());
+
+        int submittedFileCount = fileRepository.countAllByParticipantFile_ParticipantFileId(participantFile.getParticipantFileId());
 
         //  선수 또는 세컨 신청 내역 존재할 경우 최소 4개
         if (participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(), 1L, 10L)){
