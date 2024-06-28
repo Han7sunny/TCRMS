@@ -1,9 +1,11 @@
 package com.kutca.tcrms.common.environment.controller.dto.response;
 
 import lombok.Builder;
+import lombok.Getter;
 
 public class EnvironmentResponseDto {
 
+    @Getter
     @Builder
     public static class Period{
 
@@ -11,6 +13,7 @@ public class EnvironmentResponseDto {
 
     }
 
+    @Getter
     @Builder
     public static class UserInfo{
 
