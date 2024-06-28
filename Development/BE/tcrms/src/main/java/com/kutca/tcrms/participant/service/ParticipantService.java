@@ -93,33 +93,32 @@ public class ParticipantService {
 
         List<Event> eventList = eventRepository.findAllByEventIdBetween(1L, 4L);
 
-        individualParticipantRequestDto.getRequestDtoList().stream().forEach(participant -> {
+        individualParticipantRequestDto.getRequestDtoList().forEach(participant -> {
 
             Optional<Participant> findParticipant = (participant.getIsForeigner() && participant.getIdentityNumber() == null)
                     ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), participant.getName(), participant.getPhoneNumber())
                     : participantRepository.findByUser_UserIdAndNameAndIdentityNumber(user.getUserId(), participant.getName(), participant.getIdentityNumber());
 
-            Participant individualParticipant = findParticipant.isEmpty()
-                    ? participantRepository.save(
-                        Participant.builder()
-                                .name(participant.getName())
-                                .identityNumber(participant.getIdentityNumber())
-                                .gender(participant.getGender())
-                                .universityName(user.getUniversityName())
-                                .isForeigner(participant.getIsForeigner())
-                                .nationality(participant.getNationality())
-                                .user(user)
-                                .weightClass(participant.getWeightClassId() == null ? null : weightClassRepository.findById(participant.getWeightClassId()).get())
-                                .build())
-                    : findParticipant.get();
+            Participant individualParticipant = findParticipant.orElseGet(() -> participantRepository.save(
+                    Participant.builder()
+                            .name(participant.getName())
+                            .identityNumber(participant.getIdentityNumber())
+                            .gender(participant.getGender())
+                            .universityName(user.getUniversityName())
+                            .isForeigner(participant.getIsForeigner())
+                            .nationality(participant.getNationality())
+                            .phoneNumber(participant.getPhoneNumber())
+                            .user(user)
+                            .weightClass(participant.getWeightClassId() == null ? null : weightClassRepository.findById(participant.getWeightClassId()).get())
+                            .build()));
 
-            participant.getEventIds().stream().forEach(eventId -> {
+            participant.getEventIds().forEach(eventId -> {
                     Optional<ParticipantApplication> findParticipantApplication = participantApplicationRepository.findTopByEvent_EventId(eventId);
-                    int eventTeamNumber = findParticipantApplication.isEmpty() ? 1 : findParticipantApplication.get().getEventTeamNumber() + 1;
+                    int eventTeamNumber = findParticipantApplication.map(participantApplication -> participantApplication.getEventTeamNumber() + 1).orElse(1); // 개인전의 경우 eventTeamNumber 동일해도 무방
                     participantApplicationRepository.save(
                         ParticipantApplication.builder()
                             .participant(individualParticipant)
-                            .event(eventList.get(Math.toIntExact(eventId)))
+                            .event(eventList.get(Math.toIntExact(eventId) - 1))
                             .eventTeamNumber(eventTeamNumber)
                             .is2ndCancel(null)
                             .is2ndChange(null)
