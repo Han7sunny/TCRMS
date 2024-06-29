@@ -94,7 +94,7 @@ public class SecondParticipantService {
         Event event = eventRepository.findById(SECOND_EVENT_ID).get();
         AtomicInteger eventTeamNumber = new AtomicInteger(participantApplicationRepository.findTopByEvent_EventId(SECOND_EVENT_ID).map(pa -> pa.getEventTeamNumber() + 1).orElse(1));
 
-        secondParticipantRequestDto.getRequestDtoList().forEach(second -> {
+        secondParticipantRequestDto.getParticipants().forEach(second -> {
 
             Optional<Participant> findParticipant = (second.getIsForeigner() && second.getIdentityNumber() == null)
                     ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), second.getName(), second.getPhoneNumber())

@@ -93,7 +93,7 @@ public class ParticipantService {
 
         List<Event> eventList = eventRepository.findAllByEventIdBetween(1L, 4L);
 
-        individualParticipantRequestDto.getRequestDtoList().forEach(participant -> {
+        individualParticipantRequestDto.getParticipants().forEach(participant -> {
 
             Optional<Participant> findParticipant = (participant.getIsForeigner() && participant.getIdentityNumber() == null)
                     ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), participant.getName(), participant.getPhoneNumber())
