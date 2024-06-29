@@ -92,7 +92,7 @@ public class VolunteerParticipantServiceTest {
 
         registRequestDto = RequestDto.<VolunteerParticipantRequestDto.Regist>builder()
                 .userId(user.getUserId())
-                .requestDtoList(Arrays.asList(volunteer1, volunteer2, volunteer3))
+                .participants(Arrays.asList(volunteer1, volunteer2, volunteer3))
                 .build();
     }
 
@@ -104,26 +104,26 @@ public class VolunteerParticipantServiceTest {
         //  given
         Participant savedVolunteer1 = Participant.builder()
                 .participantId(1L)
-                .name(registRequestDto.getRequestDtoList().get(0).getName())
-                .gender(registRequestDto.getRequestDtoList().get(0).getGender())
+                .name(registRequestDto.getParticipants().get(0).getName())
+                .gender(registRequestDto.getParticipants().get(0).getGender())
                 .universityName(user.getUniversityName())
-                .phoneNumber(registRequestDto.getRequestDtoList().get(0).getPhoneNumber())
+                .phoneNumber(registRequestDto.getParticipants().get(0).getPhoneNumber())
                 .build();
 
         Participant savedVolunteer2 = Participant.builder()
                 .participantId(2L)
-                .name(registRequestDto.getRequestDtoList().get(1).getName())
-                .gender(registRequestDto.getRequestDtoList().get(1).getGender())
+                .name(registRequestDto.getParticipants().get(1).getName())
+                .gender(registRequestDto.getParticipants().get(1).getGender())
                 .universityName(user.getUniversityName())
-                .phoneNumber(registRequestDto.getRequestDtoList().get(1).getPhoneNumber())
+                .phoneNumber(registRequestDto.getParticipants().get(1).getPhoneNumber())
                 .build();
 
         Participant savedVolunteer3 = Participant.builder()
                 .participantId(3L)
-                .name(registRequestDto.getRequestDtoList().get(2).getName())
-                .gender(registRequestDto.getRequestDtoList().get(2).getGender())
+                .name(registRequestDto.getParticipants().get(2).getName())
+                .gender(registRequestDto.getParticipants().get(2).getGender())
                 .universityName(user.getUniversityName())
-                .phoneNumber(registRequestDto.getRequestDtoList().get(2).getPhoneNumber())
+                .phoneNumber(registRequestDto.getParticipants().get(2).getPhoneNumber())
                 .build();
 
         ParticipantApplication savedVolunteerApplication1 = ParticipantApplication.builder()
@@ -162,9 +162,9 @@ public class VolunteerParticipantServiceTest {
 
         assertTrue(responseDto.getIsSuccess());
         List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(user.getUserId());
-        assertEquals(findParticipantList.size(), registRequestDto.getRequestDtoList().size());
+        assertEquals(findParticipantList.size(), registRequestDto.getParticipants().size());
         assertTrue(findParticipantList.stream().allMatch(participant -> user.getUniversityName().equals(participant.getUniversityName())));
-        assertEquals(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).get().getEventTeamNumber(), registRequestDto.getRequestDtoList().size());
+        assertEquals(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).get().getEventTeamNumber(), registRequestDto.getParticipants().size());
     }
 
     @Test

@@ -216,7 +216,7 @@ public class ParticipantServiceTest {
 
         RequestDto<IndividualParticipantRequestDto.Regist> registRequestDto = RequestDto.<IndividualParticipantRequestDto.Regist>builder()
                 .userId(user.getUserId())
-                .requestDtoList(Arrays.asList(participant1,participant2, participant3))
+                .participants(Arrays.asList(participant1,participant2, participant3))
                 .build();
 
         Participant savedParticipant1 = Participant.builder()

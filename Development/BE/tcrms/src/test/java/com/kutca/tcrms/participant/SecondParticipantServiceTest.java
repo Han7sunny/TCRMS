@@ -165,7 +165,7 @@ public class SecondParticipantServiceTest {
 
         RequestDto<SecondParticipantRequestDto.Regist> registRequestDto = RequestDto.<SecondParticipantRequestDto.Regist>builder()
                 .userId(user.getUserId())
-                .requestDtoList(Arrays.asList(second1, second2, second3))
+                .participants(Arrays.asList(second1, second2, second3))
                 .build();
 
         Participant findParticipant1 = Participant.builder()
@@ -221,7 +221,7 @@ public class SecondParticipantServiceTest {
         verify(participantRepository, times(2)).findByUser_UserIdAndNameAndIdentityNumber(anyLong(), anyString(), anyString());
         verify(participantRepository, times(1)).findByUser_UserIdAndNameAndPhoneNumber(anyLong(), anyString(), anyString());
         verify(participantRepository, times(1)).save(any(Participant.class));
-        verify(participantApplicationRepository, times(registRequestDto.getRequestDtoList().size())).save(any(ParticipantApplication.class));
+        verify(participantApplicationRepository, times(registRequestDto.getParticipants().size())).save(any(ParticipantApplication.class));
 
     }
 
