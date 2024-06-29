@@ -27,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
-import static java.util.stream.DoubleStream.builder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +37,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class ParticipantServiceTest {
+
     @InjectMocks
     private ParticipantService participantService;
 
@@ -157,9 +157,9 @@ public class ParticipantServiceTest {
         ParticipantResponseDto participantResponseDto = (ParticipantResponseDto)responseDto.getPayload();
 
         assertEquals(participantResponseDto.getIsEditable(), user.getIsEditable());
-        assertNotEquals(participantResponseDto.getIsParticipantExists(), participantResponseDto.getParticipants().getParticipants().isEmpty());
+        assertNotEquals(participantResponseDto.getIsParticipantExists(), participantResponseDto.getParticipants().isEmpty());
 
-        List<IndividualParticipantResponseDto> individualParticipantResponseDto = participantResponseDto.getParticipants().getParticipants();
+        List<IndividualParticipantResponseDto> individualParticipantResponseDto = participantResponseDto.getParticipants();
 
         assertFalse(individualParticipantResponseDto.get(0).getIsForeigner());
 //        assertNull(individualParticipantResponseDto.get(0).getNationality());  //  entity 설정에 default null로 설정해주기?
@@ -216,7 +216,7 @@ public class ParticipantServiceTest {
 
         RequestDto<IndividualParticipantRequestDto.Regist> registRequestDto = RequestDto.<IndividualParticipantRequestDto.Regist>builder()
                 .userId(user.getUserId())
-                .requestDtoList(Arrays.asList(participant1,participant2, participant3))
+                .participants(Arrays.asList(participant1,participant2, participant3))
                 .build();
 
         Participant savedParticipant1 = Participant.builder()

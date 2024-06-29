@@ -68,13 +68,13 @@ public class SecondParticipantService {
                         .isParticipantExists(true)
                         .isEditable(user.getIsEditable())
                         .isDepositConfirmed(user.getIsDepositConfirmed())
-                        .participants(new ParticipantsResponseDto<>(findParticipantList.stream()
+                        .participants(findParticipantList.stream()
                                 .map(participant -> {
                                     Optional<ParticipantApplication> findParticipantApplication = participantApplicationRepository.findByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), SECOND_EVENT_ID);
                                     return findParticipantApplication.map(participantApplication -> SecondParticipantResponseDto.fromEntity(participant, participantApplication.getParticipantApplicationId())).orElse(null);
                                 })
                                 .filter(Objects::nonNull)
-                                .collect(Collectors.toList())))
+                                .collect(Collectors.toList()))
                         .build())
                 .build();
     }
@@ -94,7 +94,7 @@ public class SecondParticipantService {
         Event event = eventRepository.findById(SECOND_EVENT_ID).get();
         AtomicInteger eventTeamNumber = new AtomicInteger(participantApplicationRepository.findTopByEvent_EventId(SECOND_EVENT_ID).map(pa -> pa.getEventTeamNumber() + 1).orElse(1));
 
-        secondParticipantRequestDto.getRequestDtoList().forEach(second -> {
+        secondParticipantRequestDto.getParticipants().forEach(second -> {
 
             Optional<Participant> findParticipant = (second.getIsForeigner() && second.getIdentityNumber() == null)
                     ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), second.getName(), second.getPhoneNumber())
