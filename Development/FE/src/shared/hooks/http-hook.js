@@ -18,7 +18,7 @@ export const useHttpClient = () => {
       errorModalTitle = null
     ) => {
       console.log(body);
-      
+
       setIsLoading(true);
       const httpAbortCtrl = new AbortController();
       activeHttpRequests.current.push(httpAbortCtrl);
@@ -30,6 +30,8 @@ export const useHttpClient = () => {
           headers,
           signal: httpAbortCtrl.signal,
         });
+        console.log(response);
+        // console.log(response.text());
 
         const responseData = await response.json();
 
@@ -51,6 +53,7 @@ export const useHttpClient = () => {
         setIsLoading(false);
         return responseData;
       } catch (err) {
+        console.log(err);
         setError({ title: errorModalTitle, detail: err.message });
         setIsLoading(false);
         throw err;

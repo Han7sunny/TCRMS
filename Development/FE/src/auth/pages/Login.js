@@ -42,28 +42,28 @@ const Login = () => {
 
     if (!auth.isFirstLogin) {
       try {
-        // const responseData = await http.sendRequest(
-        //   `${process.env.REACT_APP_BACKEND_URL}/api/login`,
-        //   "POST",
-        //   JSON.stringify({
-        //     universityName: formState.inputs.uniname.value,
-        //     username: formState.inputs.username.value,
-        //     password: formState.inputs.password.value,
-        //   }),
-        //   {
-        //     "Content-Type": "application/json",
-        //   },
-        //   "로그인 실패"
-        // );
+        const responseData = await http.sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/api/login`,
+          "POST",
+          JSON.stringify({
+            universityName: formState.inputs.uniname.value,
+            username: formState.inputs.username.value,
+            password: formState.inputs.password.value,
+          }),
+          {
+            "Content-Type": "application/json",
+          },
+          "로그인 실패"
+        );
 
-        // TODO : change Dummy DATA
-        const responseData = {
-          payload: {
-          isFirstLogin: false,
-          userId: 1,
-          token: "asdf",
-          isAdmin: false,}
-        };
+        // // TODO : change Dummy DATA
+        // const responseData = {
+        //   payload: {
+        //   isFirstLogin: false,
+        //   userId: 1,
+        //   token: "asdf",
+        //   isAdmin: false,}
+        // };
 
         const responsePayload = responseData.payload;
 

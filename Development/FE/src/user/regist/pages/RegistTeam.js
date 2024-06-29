@@ -31,7 +31,7 @@ const RegistTeam = () => {
   const [teamSelectModalShow, setTeamSelectModalShow] = useState(false);
 
   const [saveTeam, setSaveTeam] = useState([]);
-  const [envPeriod, setEnvPeriod] = useState("none");
+  const [envPeriod, setEnvPeriod] = useState("NONE");
   const [isEditable, setIsEditable] = useState(false);
 
   const errMsgPersonName = "팀";
@@ -710,7 +710,7 @@ const RegistTeam = () => {
     periodGetHandler()
       .then(() => {
         // list get
-        if (["first", "second"].includes(envPeriod)) {
+        if (["FIRST", "SECOND"].includes(envPeriod)) {
           teamListHandler();
         }
       })
@@ -825,10 +825,10 @@ const RegistTeam = () => {
                   modifyColumns={
                     typeof team.event === "string" &&
                     team.event.includes("겨루기")
-                      ? envPeriod === "first"
+                      ? envPeriod === "FIRST"
                         ? TABLE_COLUMNS_REGIST_TEAM_SPARRING
                         : TABLE_COLUMNS_REGIST_PERIOD2_TEAM_SPARRING
-                      : envPeriod === "first"
+                      : envPeriod === "FIRST"
                       ? TABLE_COLUMNS_REGIST_TEAM_FORM
                       : TABLE_COLUMNS_REGIST_PERIOD2_TEAM_FORM
                   }
@@ -840,7 +840,7 @@ const RegistTeam = () => {
               </div>
             );
           })}
-          {envPeriod === "first" && isEditable && (
+          {envPeriod === "FIRST" && isEditable && (
             <div className="check-btn-submit">
               <Button onClick={switchModeHandler} disabled={apiFail}>
                 추가하기

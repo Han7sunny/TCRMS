@@ -185,75 +185,75 @@ const DocuSubmit = () => {
   // API
   const listHandler = useCallback(async () => {
     try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/api/user/file`,
-        "GET",
-        null,
-        {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        `데이터 로드 실패`
-      );
-
-      // // TODO : change Dummy DATA
-      // const responseData = {
-      //   isSuccess: true,
-      //   payload: {
-      //     participants: [
-      //       {
-      //         participantId: 1,
-      //         name: "조서영",
-      //         isForeigner: false,
-      //         identityNumber: "961201-0000000",
-      //         types: ["선수", "세컨"],
-      //         events: ["품새 개인전", "품새 단체전"],
-      //         fileInfos: [
-      //           { fileId: 1, fileName: "증명사진" },
-      //           { fileId: 2, fileName: "학적부" },
-      //         ],
-      //         isAllFileConfirmed: false,
-      //       },
-      //       {
-      //         participantId: 2,
-      //         name: "조땡땡",
-      //         isForeigner: true,
-      //         identityNumber: null,
-      //         types: ["선수"],
-      //         events: ["겨루기 개인전"],
-      //         fileInfos: [],
-      //         isAllFileConfirmed: false,
-      //       },
-      //       {
-      //         participantId: 3,
-      //         name: "조삼삼",
-      //         isForeigner: true,
-      //         identityNumber: "",
-      //         types: ["세컨"],
-      //         events: [],
-      //         fileInfos: [{ fileId: 3, fileName: "증명사진" }],
-      //         isAllFileConfirmed: false,
-      //       },
-      //       {
-      //         participantId: 4,
-      //         name: "조사삼",
-      //         isForeigner: true,
-      //         identityNumber: "",
-      //         types: ["자원봉사자"],
-      //         fileInfos: [{ fileId: 4, fileName: "증명사진" }],
-      //         isAllFileConfirmed: true,
-      //       },
-      //       {
-      //         participantId: 5,
-      //         name: "조오옹",
-      //         isForeigner: true,
-      //         identityNumber: "",
-      //         types: ["자원봉사자"],
-      //         fileInfos: [],
-      //         isAllFileConfirmed: false,
-      //       },
-      //     ],
+      // const responseData = await sendRequest(
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/user/file?userId=${auth.userId}`,
+      //   "GET",
+      //   null,
+      //   {
+      //     Authorization: `Bearer ${auth.token}`,
       //   },
-      // };
+      //   `데이터 로드 실패`
+      // );
+
+      // TODO : change Dummy DATA
+      const responseData = {
+        isSuccess: true,
+        payload: {
+          participants: [
+            {
+              participantId: 1,
+              name: "조서영",
+              isForeigner: false,
+              identityNumber: "961201-0000000",
+              types: ["선수", "세컨"],
+              events: ["품새 개인전", "품새 단체전"],
+              fileInfos: [
+                { fileId: 1, fileName: "증명사진" },
+                { fileId: 2, fileName: "학적부" },
+              ],
+              isAllFileConfirmed: false,
+            },
+            {
+              participantId: 2,
+              name: "조땡땡",
+              isForeigner: true,
+              identityNumber: null,
+              types: ["선수"],
+              events: ["겨루기 개인전"],
+              fileInfos: [],
+              isAllFileConfirmed: false,
+            },
+            {
+              participantId: 3,
+              name: "조삼삼",
+              isForeigner: true,
+              identityNumber: "",
+              types: ["세컨"],
+              events: [],
+              fileInfos: [{ fileId: 3, fileName: "증명사진" }],
+              isAllFileConfirmed: false,
+            },
+            {
+              participantId: 4,
+              name: "조사삼",
+              isForeigner: true,
+              identityNumber: "",
+              types: ["자원봉사자"],
+              fileInfos: [{ fileId: 4, fileName: "증명사진" }],
+              isAllFileConfirmed: true,
+            },
+            {
+              participantId: 5,
+              name: "조오옹",
+              isForeigner: true,
+              identityNumber: "",
+              types: ["자원봉사자"],
+              fileInfos: [],
+              isAllFileConfirmed: false,
+            },
+          ],
+        },
+      };
       // // const responseData = {
       // //   isSuccess: true,
       // //   payload: { isParticipantExists: false },
@@ -305,29 +305,29 @@ const DocuSubmit = () => {
         formData.append("fileInfos", JSON.stringify(fileInfos));
         formData.append("file", file, participant[docuIdx].fileName);
 
-        const responseData = await sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/api/user/file`,
-          "POST",
-          formData,
-          {
-            Authorization: `Bearer ${auth.token}`,
-          },
-          `파일 업로드 실패`
-        );
-
-        // // DUMMY DATA
-        // const responseData = {
-        //   isSuccess: true,
-        //   message: null,
-        //   payload: {
-        //     fileInfos: [
-        //       {
-        //         fileId: 100,
-        //         fileName: "서약서",
-        //       },
-        //     ],
+        // const responseData = await sendRequest(
+        //   `${process.env.REACT_APP_BACKEND_URL}/api/user/file`,
+        //   "POST",
+        //   formData,
+        //   {
+        //     Authorization: `Bearer ${auth.token}`,
         //   },
-        // };
+        //   `파일 업로드 실패`
+        // );
+
+        // DUMMY DATA
+        const responseData = {
+          isSuccess: true,
+          message: null,
+          payload: {
+            fileInfos: [
+              {
+                fileId: 100,
+                fileName: "서약서",
+              },
+            ],
+          },
+        };
 
         if (responseData.isSuccess) {
           let participantsData = participants;
@@ -386,37 +386,37 @@ const DocuSubmit = () => {
           );
         }
 
-        const responseData = await sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/api/user/file`,
-          "POST",
-          formData,
-          {
-            Authorization: `Bearer ${auth.token}`,
-          },
-          `파일 업로드 실패`
-        );
-
-        // // DUMMY DATA
-        // const responseData = {
-        //   isSuccess: true,
-        //   message: null,
-        //   payload: {
-        //     fileInfos: [
-        //       {
-        //         fileId: 100,
-        //         fileName: "서약서",
-        //       },
-        //       {
-        //         fileId: 200,
-        //         fileName: "선수등록이력",
-        //       },
-        //       {
-        //         fileId: 110,
-        //         fileName: "증명사진",
-        //       },
-        //     ],
+        // const responseData = await sendRequest(
+        //   `${process.env.REACT_APP_BACKEND_URL}/api/user/file`,
+        //   "POST",
+        //   formData,
+        //   {
+        //     Authorization: `Bearer ${auth.token}`,
         //   },
-        // };
+        //   `파일 업로드 실패`
+        // );
+
+        // DUMMY DATA
+        const responseData = {
+          isSuccess: true,
+          message: null,
+          payload: {
+            fileInfos: [
+              {
+                fileId: 100,
+                fileName: "서약서",
+              },
+              {
+                fileId: 200,
+                fileName: "선수등록이력",
+              },
+              {
+                fileId: 110,
+                fileName: "증명사진",
+              },
+            ],
+          },
+        };
 
         if (responseData.isSuccess) {
           let participantsData = participants;

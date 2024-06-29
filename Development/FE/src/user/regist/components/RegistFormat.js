@@ -17,7 +17,7 @@ const RegistFormat = (props) => {
   const [apiFail, setApiFail] = useState(false);
 
   const [saveParticipant, setSaveParticipant] = useState([]);
-  const [envPeriod, setEnvPeriod] = useState("none");
+  const [envPeriod, setEnvPeriod] = useState("NONE");
   const [isEditable, setIsEditable] = useState(false);
   const [enableDropdownRow, setEnableDropdownRow] = useState(null);
 
@@ -43,6 +43,8 @@ const RegistFormat = (props) => {
         },
         `기간 호출 실패`
       );
+
+      console.log(responseData);
 
       // // TODO: Remove Dummy data
       // const responseData = {
@@ -191,7 +193,7 @@ const RegistFormat = (props) => {
         "POST",
         JSON.stringify({
           userId: auth.userId,
-          participants: registState.inputs
+          requestDtoList: registState.inputs
             .filter((participant) => participant.isNew)
             .map((participant) => formatParticipant(participant, 2)),
         }),
@@ -323,7 +325,7 @@ const RegistFormat = (props) => {
     //개인전 2차등록일 때 종목 2개이면 종목은 active 처리
     if (
       props.englishTitle === "individual" &&
-      envPeriod === "second" &&
+      envPeriod === "SECOND" &&
       registState.inputs[rowNum].event.length > 1
     ) {
       setEnableDropdownRow(rowNum); // Set the row number to enable the dropdown
@@ -413,7 +415,7 @@ const RegistFormat = (props) => {
     periodGetHandler()
       .then(() => {
         // list get
-        if (["first", "second"].includes(envPeriod)) {
+        if (["FIRST", "SECOND"].includes(envPeriod)) {
           listHandler();
         }
       })
@@ -457,7 +459,7 @@ const RegistFormat = (props) => {
             columns={props.checkTableColumn}
             isEditable={isEditable}
             modifyColumns={
-              envPeriod === "first"
+              envPeriod === "FIRST"
                 ? props.registTableColumn
                 : props.registTableColumnSecondPeriod
             }
@@ -468,7 +470,7 @@ const RegistFormat = (props) => {
             deleteHandler={deleteDataHandler}
             showNumber
           />
-          {envPeriod === "first" && isEditable && (
+          {envPeriod === "FIRST" && isEditable && (
             <div className="check-btn-submit">
               <Button onClick={switchModeHandler} disabled={apiFail}>
                 추가하기
