@@ -67,7 +67,7 @@ public class VolunteerParticipantService {
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
                                 .participants(
-                                        new ParticipantsResponseDto<>(findParticipantList.stream().filter(participant -> participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), VOLUNTEER_EVENT_ID)).collect(Collectors.toList()))
+                                        findParticipantList.stream().filter(participant -> participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), VOLUNTEER_EVENT_ID)).collect(Collectors.toList())
                                 )
                         .build())
                 .build();

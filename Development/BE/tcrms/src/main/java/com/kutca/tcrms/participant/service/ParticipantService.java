@@ -70,9 +70,9 @@ public class ParticipantService {
                                 .isEditable(user.getIsEditable())
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
-                                .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(
+                                .participants(findParticipantList.stream().map(
                                         participant -> IndividualParticipantResponseDto.fromEntity(participant, participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(), 1L, 4L))
-                                ).collect(Collectors.toList())))
+                                ).collect(Collectors.toList()))
                                 .build()
                 )
                 .build();

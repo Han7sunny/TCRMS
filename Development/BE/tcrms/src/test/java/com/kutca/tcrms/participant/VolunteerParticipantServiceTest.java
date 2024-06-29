@@ -6,7 +6,6 @@ import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.VolunteerParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
-import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.VolunteerParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
@@ -23,7 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -271,7 +269,7 @@ public class VolunteerParticipantServiceTest {
 
         //  then
         assertTrue(responseDto.getIsSuccess());
-        List<VolunteerParticipantResponseDto> volunteerResponseDtoList = ((ParticipantResponseDto)responseDto.getPayload()).getParticipants().getParticipants();
+        List<VolunteerParticipantResponseDto> volunteerResponseDtoList = ((ParticipantResponseDto)responseDto.getPayload()).getParticipants();
         assertEquals(volunteerResponseDtoList.size(), 2);
 
         verify(participantApplicationRepository, times(3)).existsByParticipant_ParticipantIdAndEvent_EventId(anyLong(), anyLong());

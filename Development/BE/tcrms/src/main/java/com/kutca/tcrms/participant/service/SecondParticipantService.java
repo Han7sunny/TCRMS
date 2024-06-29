@@ -68,13 +68,13 @@ public class SecondParticipantService {
                         .isParticipantExists(true)
                         .isEditable(user.getIsEditable())
                         .isDepositConfirmed(user.getIsDepositConfirmed())
-                        .participants(new ParticipantsResponseDto<>(findParticipantList.stream()
+                        .participants(findParticipantList.stream()
                                 .map(participant -> {
                                     Optional<ParticipantApplication> findParticipantApplication = participantApplicationRepository.findByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), SECOND_EVENT_ID);
                                     return findParticipantApplication.map(participantApplication -> SecondParticipantResponseDto.fromEntity(participant, participantApplication.getParticipantApplicationId())).orElse(null);
                                 })
                                 .filter(Objects::nonNull)
-                                .collect(Collectors.toList())))
+                                .collect(Collectors.toList()))
                         .build())
                 .build();
     }

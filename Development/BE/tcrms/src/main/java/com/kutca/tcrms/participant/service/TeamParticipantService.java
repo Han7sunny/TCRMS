@@ -102,7 +102,7 @@ public class TeamParticipantService {
                                 .isEditable(user.getIsEditable())
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
-                                .participants(new ParticipantsResponseDto<>(new ArrayList<>(teams)))
+                                .participants(Collections.singletonList(teams))
                                 .build()
                 )
                 .build();
