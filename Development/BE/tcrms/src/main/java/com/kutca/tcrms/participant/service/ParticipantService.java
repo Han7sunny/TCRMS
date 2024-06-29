@@ -70,9 +70,9 @@ public class ParticipantService {
                                 .isEditable(user.getIsEditable())
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
-                                .participants(new ParticipantsResponseDto<>(findParticipantList.stream().map(
+                                .participants(findParticipantList.stream().map(
                                         participant -> IndividualParticipantResponseDto.fromEntity(participant, participantApplicationRepository.findAllByParticipant_ParticipantIdAndEvent_EventIdBetween(participant.getParticipantId(), 1L, 4L))
-                                ).collect(Collectors.toList())))
+                                ).collect(Collectors.toList()))
                                 .build()
                 )
                 .build();
@@ -93,7 +93,7 @@ public class ParticipantService {
 
         List<Event> eventList = eventRepository.findAllByEventIdBetween(1L, 4L);
 
-        individualParticipantRequestDto.getRequestDtoList().forEach(participant -> {
+        individualParticipantRequestDto.getParticipants().forEach(participant -> {
 
             Optional<Participant> findParticipant = (participant.getIsForeigner() && participant.getIdentityNumber() == null)
                     ? participantRepository.findByUser_UserIdAndNameAndPhoneNumber(user.getUserId(), participant.getName(), participant.getPhoneNumber())

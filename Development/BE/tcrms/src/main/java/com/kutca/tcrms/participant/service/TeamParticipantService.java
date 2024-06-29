@@ -102,7 +102,7 @@ public class TeamParticipantService {
                                 .isEditable(user.getIsEditable())
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
-                                .participants(new ParticipantsResponseDto<>(new ArrayList<>(teams)))
+                                .participants(Collections.singletonList(teams))
                                 .build()
                 )
                 .build();
@@ -121,7 +121,7 @@ public class TeamParticipantService {
         }
 
         User user = findUser.get();
-        teamParticipantRequestDto.getRequestDtoList().forEach(team -> {
+        teamParticipantRequestDto.getParticipants().forEach(team -> {
             Event event = eventRepository.findById(team.getEventId()).get();
             int eventTeamNumber = participantApplicationRepository.findTopByEvent_EventId(event.getEventId()).map(pa -> pa.getEventTeamNumber() + 1).orElse(1);
             team.getTeamMembers().forEach(teamMember -> {

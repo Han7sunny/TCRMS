@@ -9,5 +9,5 @@ import java.util.List;
 @Builder
 public class RequestDto<T> {
     private Long userId;
-    private List<T> requestDtoList;
+    private List<T> participants;
 }

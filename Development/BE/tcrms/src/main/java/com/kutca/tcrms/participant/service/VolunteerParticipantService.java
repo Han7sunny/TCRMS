@@ -67,7 +67,7 @@ public class VolunteerParticipantService {
                                 .isDepositConfirmed(user.getIsDepositConfirmed())
                                 .isParticipantExists(true)
                                 .participants(
-                                        new ParticipantsResponseDto<>(findParticipantList.stream().filter(participant -> participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), VOLUNTEER_EVENT_ID)).collect(Collectors.toList()))
+                                        findParticipantList.stream().filter(participant -> participantApplicationRepository.existsByParticipant_ParticipantIdAndEvent_EventId(participant.getParticipantId(), VOLUNTEER_EVENT_ID)).collect(Collectors.toList())
                                 )
                         .build())
                 .build();
@@ -88,7 +88,7 @@ public class VolunteerParticipantService {
         Event event = eventRepository.findById(VOLUNTEER_EVENT_ID).get();
         AtomicInteger eventTeamNumber = new AtomicInteger(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).map(pa -> pa.getEventTeamNumber() + 1).orElse(1));
 
-        volunteerParticipantRequestDto.getRequestDtoList().forEach(volunteer -> {
+        volunteerParticipantRequestDto.getParticipants().forEach(volunteer -> {
 
             Participant participant = participantRepository.save(
                     Participant.builder()

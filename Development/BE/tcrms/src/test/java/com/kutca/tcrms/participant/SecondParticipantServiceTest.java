@@ -6,7 +6,6 @@ import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.SecondParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
-import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.SecondParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
@@ -15,7 +14,6 @@ import com.kutca.tcrms.participantapplication.entity.ParticipantApplication;
 import com.kutca.tcrms.participantapplication.repository.ParticipantApplicationRepository;
 import com.kutca.tcrms.user.entity.User;
 import com.kutca.tcrms.user.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -128,7 +126,7 @@ public class SecondParticipantServiceTest {
         //  then
         assertTrue(responseDto.getIsSuccess());
         assertTrue(((ParticipantResponseDto)responseDto.getPayload()).getIsParticipantExists());
-        List<SecondParticipantResponseDto> secondResponseDtoList = ((ParticipantResponseDto)responseDto.getPayload()).getParticipants().getParticipants();
+        List<SecondParticipantResponseDto> secondResponseDtoList = ((ParticipantResponseDto)responseDto.getPayload()).getParticipants();
         assertEquals(secondResponseDtoList.size(), 2);
 
         verify(participantApplicationRepository, times((3))).findByParticipant_ParticipantIdAndEvent_EventId(anyLong(), anyLong());
@@ -165,7 +163,7 @@ public class SecondParticipantServiceTest {
 
         RequestDto<SecondParticipantRequestDto.Regist> registRequestDto = RequestDto.<SecondParticipantRequestDto.Regist>builder()
                 .userId(user.getUserId())
-                .requestDtoList(Arrays.asList(second1, second2, second3))
+                .participants(Arrays.asList(second1, second2, second3))
                 .build();
 
         Participant findParticipant1 = Participant.builder()
@@ -221,7 +219,7 @@ public class SecondParticipantServiceTest {
         verify(participantRepository, times(2)).findByUser_UserIdAndNameAndIdentityNumber(anyLong(), anyString(), anyString());
         verify(participantRepository, times(1)).findByUser_UserIdAndNameAndPhoneNumber(anyLong(), anyString(), anyString());
         verify(participantRepository, times(1)).save(any(Participant.class));
-        verify(participantApplicationRepository, times(registRequestDto.getRequestDtoList().size())).save(any(ParticipantApplication.class));
+        verify(participantApplicationRepository, times(registRequestDto.getParticipants().size())).save(any(ParticipantApplication.class));
 
     }
 

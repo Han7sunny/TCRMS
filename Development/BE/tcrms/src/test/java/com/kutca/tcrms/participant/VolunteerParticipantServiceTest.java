@@ -6,7 +6,6 @@ import com.kutca.tcrms.event.entity.Event;
 import com.kutca.tcrms.event.repository.EventRepository;
 import com.kutca.tcrms.participant.controller.dto.request.VolunteerParticipantRequestDto;
 import com.kutca.tcrms.participant.controller.dto.response.ParticipantResponseDto;
-import com.kutca.tcrms.participant.controller.dto.response.ParticipantsResponseDto;
 import com.kutca.tcrms.participant.controller.dto.response.VolunteerParticipantResponseDto;
 import com.kutca.tcrms.participant.entity.Participant;
 import com.kutca.tcrms.participant.repository.ParticipantRepository;
@@ -23,7 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -92,7 +90,7 @@ public class VolunteerParticipantServiceTest {
 
         registRequestDto = RequestDto.<VolunteerParticipantRequestDto.Regist>builder()
                 .userId(user.getUserId())
-                .requestDtoList(Arrays.asList(volunteer1, volunteer2, volunteer3))
+                .participants(Arrays.asList(volunteer1, volunteer2, volunteer3))
                 .build();
     }
 
@@ -104,26 +102,26 @@ public class VolunteerParticipantServiceTest {
         //  given
         Participant savedVolunteer1 = Participant.builder()
                 .participantId(1L)
-                .name(registRequestDto.getRequestDtoList().get(0).getName())
-                .gender(registRequestDto.getRequestDtoList().get(0).getGender())
+                .name(registRequestDto.getParticipants().get(0).getName())
+                .gender(registRequestDto.getParticipants().get(0).getGender())
                 .universityName(user.getUniversityName())
-                .phoneNumber(registRequestDto.getRequestDtoList().get(0).getPhoneNumber())
+                .phoneNumber(registRequestDto.getParticipants().get(0).getPhoneNumber())
                 .build();
 
         Participant savedVolunteer2 = Participant.builder()
                 .participantId(2L)
-                .name(registRequestDto.getRequestDtoList().get(1).getName())
-                .gender(registRequestDto.getRequestDtoList().get(1).getGender())
+                .name(registRequestDto.getParticipants().get(1).getName())
+                .gender(registRequestDto.getParticipants().get(1).getGender())
                 .universityName(user.getUniversityName())
-                .phoneNumber(registRequestDto.getRequestDtoList().get(1).getPhoneNumber())
+                .phoneNumber(registRequestDto.getParticipants().get(1).getPhoneNumber())
                 .build();
 
         Participant savedVolunteer3 = Participant.builder()
                 .participantId(3L)
-                .name(registRequestDto.getRequestDtoList().get(2).getName())
-                .gender(registRequestDto.getRequestDtoList().get(2).getGender())
+                .name(registRequestDto.getParticipants().get(2).getName())
+                .gender(registRequestDto.getParticipants().get(2).getGender())
                 .universityName(user.getUniversityName())
-                .phoneNumber(registRequestDto.getRequestDtoList().get(2).getPhoneNumber())
+                .phoneNumber(registRequestDto.getParticipants().get(2).getPhoneNumber())
                 .build();
 
         ParticipantApplication savedVolunteerApplication1 = ParticipantApplication.builder()
@@ -162,9 +160,9 @@ public class VolunteerParticipantServiceTest {
 
         assertTrue(responseDto.getIsSuccess());
         List<Participant> findParticipantList = participantRepository.findAllByUser_UserId(user.getUserId());
-        assertEquals(findParticipantList.size(), registRequestDto.getRequestDtoList().size());
+        assertEquals(findParticipantList.size(), registRequestDto.getParticipants().size());
         assertTrue(findParticipantList.stream().allMatch(participant -> user.getUniversityName().equals(participant.getUniversityName())));
-        assertEquals(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).get().getEventTeamNumber(), registRequestDto.getRequestDtoList().size());
+        assertEquals(participantApplicationRepository.findTopByEvent_EventId(VOLUNTEER_EVENT_ID).get().getEventTeamNumber(), registRequestDto.getParticipants().size());
     }
 
     @Test
@@ -271,7 +269,7 @@ public class VolunteerParticipantServiceTest {
 
         //  then
         assertTrue(responseDto.getIsSuccess());
-        List<VolunteerParticipantResponseDto> volunteerResponseDtoList = ((ParticipantResponseDto)responseDto.getPayload()).getParticipants().getParticipants();
+        List<VolunteerParticipantResponseDto> volunteerResponseDtoList = ((ParticipantResponseDto)responseDto.getPayload()).getParticipants();
         assertEquals(volunteerResponseDtoList.size(), 2);
 
         verify(participantApplicationRepository, times(3)).existsByParticipant_ParticipantIdAndEvent_EventId(anyLong(), anyLong());
